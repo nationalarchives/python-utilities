@@ -56,6 +56,12 @@ class TestGetDateFromString(unittest.TestCase):
             "2006-05-04T01:02:03+01:00",
         )
 
+    def test_happy_iso_8601_zulu(self):
+        self.assertEqual(
+            get_date_from_string("2006-05-04T01:02:03Z").isoformat(timespec="seconds"),
+            "2006-05-04T01:02:03+00:00",
+        )
+
     def test_happy_iso_8601_plain(self):
         self.assertEqual(
             get_date_from_string("1000").isoformat(timespec="seconds"),

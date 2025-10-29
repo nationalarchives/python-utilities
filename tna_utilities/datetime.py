@@ -5,6 +5,7 @@ import math
 def get_date_from_string(s: str) -> datetime:  # noqa: C901
     if not s:
         return None
+    s = s.replace("Z", "+00:00")
     try:
         return datetime.datetime.fromisoformat(s)
     except ValueError:
