@@ -1,0 +1,15 @@
+site_name: TNA Python Utilities Docs
+repo_url: https://github.com/nationalarchives/python-utilities
+theme:
+  name: material
+  favicon: https://raw.githubusercontent.com/nationalarchives/tna-frontend/main/src/nationalarchives/assets/images/favicon.ico
+  features:
+    - navigation.indexes
+plugins:
+  - search
+markdown_extensions:
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
