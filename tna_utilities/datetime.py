@@ -121,14 +121,14 @@ def pretty_date_range(
                 if omit_days:
                     return date_to_string
                 return f"{date_from.strftime('%-d')} to {date_to_string}"
-            return f"{date_from.strftime('%B' if omit_days else "%-d %B")} to {date_to_string}"
-        return f"{date_from.strftime('%B %Y' if omit_days else "%-d %B %Y")} to {date_to_string}"
+            return f"{date_from.strftime('%B' if omit_days else '%-d %B')} to {date_to_string}"
+        return f"{date_from.strftime('%B %Y' if omit_days else '%-d %B %Y')} to {date_to_string}"
     if date_from:
         start = "from" if lowercase_first else "From"
-        return f"{start} {date_from.strftime('%B %Y' if omit_days else "%-d %B %Y")}"
+        return f"{start} {date_from.strftime('%B %Y' if omit_days else '%-d %B %Y')}"
     if date_to:
         start = "now to" if lowercase_first else "Now to"
-        return f"{start} {date_to.strftime('%B %Y' if omit_days else "%-d %B %Y")}"
+        return f"{start} {date_to.strftime('%B %Y' if omit_days else '%-d %B %Y')}"
     return f"{s_from} to {s_to}"
 
 
