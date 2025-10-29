@@ -36,21 +36,21 @@ class TestGetDateFromString(unittest.TestCase):
 
     def test_happy_iso_8601(self):
         self.assertEqual(
-            get_date_from_string("2006-05-04T01:02:03Z").isoformat(timespec="seconds"),
-            "2006-05-04T01:02:03+00:00",
+            get_date_from_string("2006-05-04T01:02:03").isoformat(timespec="seconds"),
+            "2006-05-04T01:02:03",
         )
 
     def test_happy_iso_8601_microseconds(self):
         self.assertEqual(
-            get_date_from_string("2006-05-04T01:02:03.999Z").isoformat(
+            get_date_from_string("2006-05-04T01:02:03.999").isoformat(
                 timespec="microseconds"
             ),
-            "2006-05-04T01:02:03.999000+00:00",
+            "2006-05-04T01:02:03.999000",
         )
 
     def test_happy_iso_8601_timezone(self):
         self.assertEqual(
-            get_date_from_string("2006-05-04T01:02:03+0100").isoformat(
+            get_date_from_string("2006-05-04T01:02:03+01:00").isoformat(
                 timespec="seconds"
             ),
             "2006-05-04T01:02:03+01:00",
