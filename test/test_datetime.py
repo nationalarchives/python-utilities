@@ -69,23 +69,27 @@ class TestGetDateFromString(unittest.TestCase):
         )
 
     def test_unhappy_invalid_day(self):
-        self.assertEqual(get_date_from_string("2006-12-32"), None)
+        with self.assertRaises(ValueError):
+            get_date_from_string("2006-12-32")
 
     def test_unhappy_invalid_month(self):
-        self.assertEqual(get_date_from_string("2006-13"), None)
+        with self.assertRaises(ValueError):
+            get_date_from_string("2006-13")
 
     def test_unhappy_invalid_years(self):
-        self.assertEqual(get_date_from_string("999"), None)
-        self.assertEqual(get_date_from_string("06"), None)
-        self.assertEqual(get_date_from_string("00"), None)
-        self.assertEqual(get_date_from_string("99"), None)
-        self.assertEqual(get_date_from_string("9"), None)
-        self.assertEqual(get_date_from_string("abc"), None)
+        with self.assertRaises(ValueError):
+            get_date_from_string("999")
+            get_date_from_string("06")
+            get_date_from_string("00")
+            get_date_from_string("99")
+            get_date_from_string("9")
+            get_date_from_string("abc")
 
     def test_unhappy_blank_values(self):
-        self.assertEqual(get_date_from_string(""), None)
-        self.assertEqual(get_date_from_string(None), None)
-        self.assertEqual(get_date_from_string(False), None)
+        with self.assertRaises(ValueError):
+            get_date_from_string("")
+            get_date_from_string(None)
+            get_date_from_string(False)
 
 
 class TestPrettyDate(unittest.TestCase):
@@ -270,7 +274,10 @@ class TestIsTodayOrFuture(unittest.TestCase):
         self.assertFalse(
             is_today_or_future(f"{yesterday.year}-{yesterday.month}-{yesterday.day}")
         )
-        self.assertFalse(is_today_or_future(None))
+
+    def test_unhappy(self):
+        with self.assertRaises(ValueError):
+            is_today_or_future(None)
 
 
 class TestIsTodayInDateRange(unittest.TestCase):
@@ -278,9 +285,12 @@ class TestIsTodayInDateRange(unittest.TestCase):
         self.assertTrue(is_today_in_date_range("2000-01-01", "2999-01-01"))
         self.assertFalse(is_today_in_date_range("2000-01-01", "2001-01-01"))
         self.assertFalse(is_today_in_date_range("2998-01-01", "2999-01-01"))
-        self.assertFalse(is_today_in_date_range(None, "2023-10-31"))
-        self.assertFalse(is_today_in_date_range("2023-10-01", None))
-        self.assertFalse(is_today_in_date_range(None, None))
+
+    def test_unhappy(self):
+        with self.assertRaises(ValueError):
+            is_today_in_date_range(None, "2023-10-31")
+            is_today_in_date_range("2023-10-01", None)
+            is_today_in_date_range(None, None)
 
 
 class TestGroupItemsByYearAndMonth(unittest.TestCase):

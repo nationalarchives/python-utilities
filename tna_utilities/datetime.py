@@ -2,10 +2,10 @@ import datetime
 import math
 
 
-def get_date_from_string(s: str) -> datetime:  # noqa: C901
-    if not s:
-        return None
-    s = s.replace("Z", "+00:00")
+def get_date_from_string(date_string: str) -> datetime.datetime:  # noqa: C901
+    if not date_string:
+        raise ValueError("Empty string cannot be parsed as date")
+    s = date_string.replace("Z", "+00:00")
     try:
         return datetime.datetime.fromisoformat(s)
     except ValueError:
@@ -34,7 +34,7 @@ def get_date_from_string(s: str) -> datetime:  # noqa: C901
         return datetime.datetime.strptime(s, "%Y")
     except ValueError:
         pass
-    return None
+    raise ValueError(f"Unable to parse date from string: {date_string}")
 
 
 def pretty_date(s: str, show_day: bool = False, show_time: bool = False) -> str:
@@ -55,7 +55,11 @@ def pretty_date(s: str, show_day: bool = False, show_time: bool = False) -> str:
         return date.strftime("%Y")
     except ValueError:
         pass
-    if date := get_date_from_string(s):
+    try:
+        date = get_date_from_string(s)
+    except ValueError:
+        return s
+    if date:
         if show_time:
             return (
                 date.strftime("%A %-d %B %Y, %H:%M")
@@ -67,13 +71,19 @@ def pretty_date(s: str, show_day: bool = False, show_time: bool = False) -> str:
 
 
 def pretty_datetime_range(
-    s_from: str,
-    s_to: str,
+    s_from: str | None,
+    s_to: str | None,
     lowercase_first: bool = False,
     hide_date_if_single_day: bool = False,
 ) -> str:
-    date_from = get_date_from_string(s_from)
-    date_to = get_date_from_string(s_to)
+    try:
+        date_from = get_date_from_string(s_from)
+    except ValueError:
+        date_from = None
+    try:
+        date_to = get_date_from_string(s_to)
+    except ValueError:
+        date_to = None
     if date_from and date_to:
         if (
             date_from.year == date_to.year
@@ -99,11 +109,20 @@ def pretty_datetime_range(
     return f"{s_from} to {s_to}"
 
 
-def pretty_date_range(
-    s_from: str, s_to: str, omit_days: bool = False, lowercase_first: bool = False
+def pretty_date_range(  # noqa: C901
+    s_from: str | None,
+    s_to: str | None,
+    omit_days: bool = False,
+    lowercase_first: bool = False,
 ) -> str:
-    date_from = get_date_from_string(s_from)
-    date_to = get_date_from_string(s_to)
+    try:
+        date_from = get_date_from_string(s_from)
+    except ValueError:
+        date_from = None
+    try:
+        date_to = get_date_from_string(s_to)
+    except ValueError:
+        date_to = None
     if date_from and date_to:
         date_to_string = date_to.strftime("%B %Y" if omit_days else ("%-d %B %Y"))
         if (
@@ -134,20 +153,14 @@ def pretty_date_range(
 
 
 def is_today_or_future(s: str) -> bool:
-    try:
-        date = get_date_from_string(s).date()
-    except AttributeError:
-        return False
+    date = get_date_from_string(s)
     today = datetime.datetime.now().date()
-    return today <= date
+    return today <= date.date()
 
 
 def is_today_in_date_range(s_from: str, date_to: str) -> bool:
-    try:
-        date_from = get_date_from_string(s_from).date()
-        date_to = get_date_from_string(date_to).date()
-    except AttributeError:
-        return False
+    date_from = get_date_from_string(s_from).date()
+    date_to = get_date_from_string(date_to).date()
     today = datetime.datetime.now().date()
     return date_from <= today <= date_to
 
@@ -160,6 +173,9 @@ def group_items_by_year_and_month(
         if request_date := item.get(date_key):
             try:
                 request_datetime = get_date_from_string(request_date)
+            except ValueError:
+                continue
+            if request_datetime:
                 month = request_datetime.strftime("%B")
                 year = request_datetime.strftime("%Y")
                 year_index = next(
@@ -187,9 +203,6 @@ def group_items_by_year_and_month(
                         )
                     else:
                         grouped[year_index]["items"][month_index]["items"].append(item)
-            except ValueError:
-                request_datetime = None
-                pass
     return grouped
 
 
@@ -219,12 +232,7 @@ def rfc_822_date_format(s):
     if not s:
         return s
     try:
-        date = datetime.datetime.strptime(s, "%Y-%m-%dT%H:%M:%S.%fZ")
-        return date.strftime("%a, %-d %b %Y %H:%M:%S GMT")
-    except ValueError:
-        pass
-    try:
-        date = datetime.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ")
+        date = get_date_from_string(s)
         return date.strftime("%a, %-d %b %Y %H:%M:%S GMT")
     except ValueError:
         pass
