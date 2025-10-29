@@ -18,40 +18,48 @@ from tna_utilities.datetime import (
 class TestGetDateFromString(unittest.TestCase):
     def test_happy_dd_mm_yyyy(self):
         self.assertEqual(
-            get_date_from_string("2006-05-04").isoformat(), "2006-05-04T00:00:00"
+            get_date_from_string("2006-05-04").isoformat(timespec="seconds"),
+            "2006-05-04T00:00:00",
         )
 
     def test_happy_mm_yyyy(self):
         self.assertEqual(
-            get_date_from_string("2006-05").isoformat(), "2006-05-01T00:00:00"
+            get_date_from_string("2006-05").isoformat(timespec="seconds"),
+            "2006-05-01T00:00:00",
         )
 
     def test_happy_yyyy(self):
         self.assertEqual(
-            get_date_from_string("2006").isoformat(), "2006-01-01T00:00:00"
+            get_date_from_string("2006").isoformat(timespec="seconds"),
+            "2006-01-01T00:00:00",
         )
 
     def test_happy_iso_8601(self):
         self.assertEqual(
-            get_date_from_string("2006-05-04T01:02:03Z").isoformat(),
+            get_date_from_string("2006-05-04T01:02:03Z").isoformat(timespec="seconds"),
             "2006-05-04T01:02:03+00:00",
         )
 
     def test_happy_iso_8601_microseconds(self):
         self.assertEqual(
-            get_date_from_string("2006-05-04T01:02:03.999Z").isoformat(),
+            get_date_from_string("2006-05-04T01:02:03.999Z").isoformat(
+                timespec="microseconds"
+            ),
             "2006-05-04T01:02:03.999000+00:00",
         )
 
     def test_happy_iso_8601_timezone(self):
         self.assertEqual(
-            get_date_from_string("2006-05-04T01:02:03+0100").isoformat(),
+            get_date_from_string("2006-05-04T01:02:03+0100").isoformat(
+                timespec="seconds"
+            ),
             "2006-05-04T01:02:03+01:00",
         )
 
     def test_happy_iso_8601_plain(self):
         self.assertEqual(
-            get_date_from_string("1000").isoformat(), "1000-01-01T00:00:00"
+            get_date_from_string("1000").isoformat(timespec="seconds"),
+            "1000-01-01T00:00:00",
         )
 
     def test_unhappy_invalid_day(self):
