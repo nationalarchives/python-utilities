@@ -1,4 +1,7 @@
-def currency(s: float | str | int) -> str:
+from typing import Optional, Union
+
+
+def currency(s: Union[float, str, int]) -> str:
     if not s:
         return "0"
     float_number = float(s)
@@ -8,7 +11,7 @@ def currency(s: float | str | int) -> str:
     return str("{:,.2f}".format(float_number))
 
 
-def pretty_price(s: float | str | int) -> str:
+def pretty_price(s: Union[float, str, int]) -> str:
     price = s if s else 0
     if price == 0 or price == "0":
         return "Free"
@@ -16,10 +19,11 @@ def pretty_price(s: float | str | int) -> str:
 
 
 def pretty_price_range(
-    from_in: float | str | int = 0, to_in: float | str | int = 0
+    from_in: Optional[Union[float, str, int]] = 0,
+    to_in: Optional[Union[float, str, int]] = 0,
 ) -> str:
-    from_float = float(from_in) or 0
-    to_float = float(to_in) or 0
+    from_float = float(from_in) if from_in else 0
+    to_float = float(to_in) if to_in else 0
     if from_float == 0 and to_float == 0:
         return "Free"
     if from_float == to_float:
