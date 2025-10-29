@@ -1,5 +1,6 @@
 import datetime
 import math
+from typing import Optional
 
 
 def get_date_from_string(date_string: str) -> datetime.datetime:  # noqa: C901
@@ -71,8 +72,8 @@ def pretty_date(s: str, show_day: bool = False, show_time: bool = False) -> str:
 
 
 def pretty_datetime_range(
-    s_from: str | None,
-    s_to: str | None,
+    s_from: Optional[str],
+    s_to: Optional[str],
     lowercase_first: bool = False,
     hide_date_if_single_day: bool = False,
 ) -> str:
@@ -110,8 +111,8 @@ def pretty_datetime_range(
 
 
 def pretty_date_range(  # noqa: C901
-    s_from: str | None,
-    s_to: str | None,
+    s_from: Optional[str],
+    s_to: Optional[str],
     omit_days: bool = False,
     lowercase_first: bool = False,
 ) -> str:
@@ -228,7 +229,7 @@ def seconds_to_duration(total_seconds: int) -> str:
     return f"{str(hours).rjust(2, '0')}h {str(minutes).rjust(2, '0')}m {str(seconds).rjust(2, '0')}s"
 
 
-def rfc_822_date_format(s):
+def rfc_822_date_format(s: str) -> str:
     if not s:
         return s
     try:
