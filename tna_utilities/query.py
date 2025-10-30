@@ -1,7 +1,7 @@
 from urllib.parse import urlencode
 
 
-class QueryStringManipulator:
+class QueryStringTransformer:
     """
     A utility class to manipulate query strings from web requests.
 

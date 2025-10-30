@@ -1,6 +1,6 @@
 import unittest
 
-from tna_utilities.query import QueryStringManipulator
+from tna_utilities.query import QueryStringTransformer
 
 
 class TestQueryStringObject:
@@ -16,12 +16,12 @@ class TestQueryStringObject:
 class TestQuery(unittest.TestCase):
     def test_init(self):
         test_query = TestQueryStringObject()
-        manipulator = QueryStringManipulator(test_query)
+        manipulator = QueryStringTransformer(test_query)
         self.assertEqual(manipulator.get_query_string(), "?a=1&b=2&b=3")
 
     def test_filter_values(self):
         test_query = TestQueryStringObject()
-        manipulator = QueryStringManipulator(test_query)
+        manipulator = QueryStringTransformer(test_query)
         self.assertEqual(manipulator.filter_values("a"), ["1"])
         self.assertEqual(manipulator.filter_values("b"), ["2", "3"])
         with self.assertRaises(AttributeError):
@@ -29,7 +29,7 @@ class TestQuery(unittest.TestCase):
 
     def test_add_filter(self):
         test_query = TestQueryStringObject()
-        manipulator = QueryStringManipulator(test_query)
+        manipulator = QueryStringTransformer(test_query)
 
         manipulator.add_filter("c", [])
         self.assertTrue(manipulator.filter_exists("c"))
@@ -61,7 +61,7 @@ class TestQuery(unittest.TestCase):
 
     def test_update_filter(self):
         test_query = TestQueryStringObject()
-        manipulator = QueryStringManipulator(test_query)
+        manipulator = QueryStringTransformer(test_query)
         manipulator.update_filter("a", "10")
         self.assertEqual(manipulator.filter_values("a"), ["10"])
         manipulator.update_filter("b", ["20", "30"])
@@ -72,7 +72,7 @@ class TestQuery(unittest.TestCase):
 
     def test_remove_filter(self):
         test_query = TestQueryStringObject()
-        manipulator = QueryStringManipulator(test_query)
+        manipulator = QueryStringTransformer(test_query)
         manipulator.remove_filter("a")
         self.assertFalse(manipulator.filter_exists("a"))
         manipulator.remove_filter("b")
@@ -83,7 +83,7 @@ class TestQuery(unittest.TestCase):
 
     def test_is_value_in_filter(self):
         test_query = TestQueryStringObject()
-        manipulator = QueryStringManipulator(test_query)
+        manipulator = QueryStringTransformer(test_query)
         self.assertTrue(manipulator.is_value_in_filter("a", "1"))
         self.assertTrue(manipulator.is_value_in_filter("b", "2"))
         self.assertTrue(manipulator.is_value_in_filter("b", "3"))
@@ -93,7 +93,7 @@ class TestQuery(unittest.TestCase):
 
     def test_toggle_filter_value(self):
         test_query = TestQueryStringObject()
-        manipulator = QueryStringManipulator(test_query)
+        manipulator = QueryStringTransformer(test_query)
         manipulator.toggle_filter_value("a", "1")
         self.assertFalse(manipulator.is_value_in_filter("a", "1"))
         manipulator.toggle_filter_value("a", "10")
@@ -107,14 +107,14 @@ class TestQuery(unittest.TestCase):
 
     def test_add_remove_filter_value(self):
         test_query = TestQueryStringObject()
-        manipulator = QueryStringManipulator(test_query)
+        manipulator = QueryStringTransformer(test_query)
         manipulator.add_filter_value("a", "10")
         self.assertTrue(manipulator.is_value_in_filter("a", "10"))
         self.assertEqual(manipulator.filter_values("a"), ["1", "10"])
 
     def test_remove_filter_value(self):
         test_query = TestQueryStringObject()
-        manipulator = QueryStringManipulator(test_query)
+        manipulator = QueryStringTransformer(test_query)
         manipulator.remove_filter_value("b", "2")
         self.assertFalse(manipulator.is_value_in_filter("b", "2"))
         self.assertEqual(manipulator.filter_values("b"), ["3"])
