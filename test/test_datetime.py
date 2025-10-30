@@ -8,6 +8,7 @@ from tna_utilities.datetime import (
     is_today_or_future,
     pretty_date,
     pretty_date_range,
+    pretty_datetime,
     pretty_datetime_range,
     rfc_822_date_format,
     seconds_to_duration,
@@ -93,12 +94,14 @@ class TestGetDateFromString(unittest.TestCase):
 
 
 class TestPrettyDate(unittest.TestCase):
-    def test_happy(self):
+    def test_happy_string(self):
         self.assertEqual(pretty_date("2000-01-01T12:00:00Z"), "1 January 2000")
         self.assertEqual(pretty_date("2000-01-01"), "1 January 2000")
         self.assertEqual(pretty_date("2000-12-31"), "31 December 2000")
         self.assertEqual(pretty_date("2000-01"), "January 2000")
         self.assertEqual(pretty_date("2000"), "2000")
+
+    def test_happy_string_show_day(self):
         self.assertEqual(
             pretty_date("2000-01-01T12:00:00Z", show_day=True),
             "Saturday 1 January 2000",
@@ -112,13 +115,239 @@ class TestPrettyDate(unittest.TestCase):
         self.assertEqual(pretty_date("2000-01", show_day=True), "January 2000")
         self.assertEqual(pretty_date("2000", show_day=True), "2000")
         self.assertEqual(
-            pretty_date("2000-01-01T12:30:00Z", show_day=True, show_time=True),
-            "Saturday 1 January 2000, 12:30",
+            pretty_date("2000-01-01T12:30:00Z", show_day=True),
+            "Saturday 1 January 2000",
         )
+
+    def test_happy_date(self):
+        date = datetime.date(2000, 1, 1)
+        self.assertEqual(pretty_date(date), "1 January 2000")
+        self.assertEqual(pretty_date(date, show_day=True), "Saturday 1 January 2000")
+
+    def test_happy_datetime(self):
+        date = datetime.datetime(2000, 1, 1, 12, 30, 0)
+        self.assertEqual(pretty_date(date), "1 January 2000")
+        self.assertEqual(pretty_date(date, show_day=True), "Saturday 1 January 2000")
+
+    def test_unhappy_none(self):
+        with self.assertRaises(ValueError):
+            pretty_date(None)
+
+
+class TestPrettyDatetime(unittest.TestCase):
+    def test_happy_string(self):
+        self.assertEqual(
+            pretty_datetime("2000-01-01T12:00:00Z"), "1 January 2000, 12:00"
+        )
+        self.assertEqual(pretty_datetime("2000-01-01"), "1 January 2000, 00:00")
+        self.assertEqual(pretty_datetime("2000-01"), "1 January 2000, 00:00")
+        self.assertEqual(pretty_datetime("2000"), "1 January 2000, 00:00")
+
+    def test_happy_string_show_day(self):
+        self.assertEqual(
+            pretty_datetime("2000-01-01T12:00:00Z", show_day=True),
+            "Saturday 1 January 2000, 12:00",
+        )
+        self.assertEqual(
+            pretty_datetime("2000-01-01", show_day=True),
+            "Saturday 1 January 2000, 00:00",
+        )
+        self.assertEqual(
+            pretty_datetime("2000-01", show_day=True), "Saturday 1 January 2000, 00:00"
+        )
+        self.assertEqual(
+            pretty_datetime("2000", show_day=True), "Saturday 1 January 2000, 00:00"
+        )
+
+    def test_happy_datetime(self):
+        date = datetime.datetime(2000, 1, 1, 12, 30, 0)
+        self.assertEqual(pretty_datetime(date), "1 January 2000, 12:30")
+        self.assertEqual(
+            pretty_datetime(date, show_day=True), "Saturday 1 January 2000, 12:30"
+        )
+
+    def test_unhappy_date(self):
+        date = datetime.date(2000, 1, 1)
+        with self.assertRaises(ValueError):
+            pretty_datetime(date)
+
+    def test_unhappy_none(self):
+        with self.assertRaises(ValueError):
+            pretty_datetime(None)
+
+
+class TestPrettyDateRange(unittest.TestCase):
+    def test_happy_string(self):
+        start_date = "2000-01-01"
+        self.assertEqual(pretty_date_range(start_date, "2000-01-01"), "1 January 2000")
+        self.assertEqual(
+            pretty_date_range(start_date, "2000-01-02"), "1 to 2 January 2000"
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, "2000-01-31"), "1 to 31 January 2000"
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, "2000-02-01"),
+            "1 January to 1 February 2000",
+        )
+        self.assertEqual(pretty_date_range(start_date, "2000-12-31"), "2000")
+        self.assertEqual(
+            pretty_date_range(start_date, "2001-01-01"),
+            "1 January 2000 to 1 January 2001",
+        )
+        self.assertEqual(pretty_date_range(start_date, "2001-12-31"), "2000 to 2001")
+        self.assertEqual(
+            pretty_date_range(None, "2001-12-31"), "Now to 31 December 2001"
+        )
+        self.assertEqual(pretty_date_range(start_date, None), "From 1 January 2000")
+
+    def test_happy_date(self):
+        start_date = datetime.date(2000, 1, 1)
+        self.assertEqual(
+            pretty_date_range(start_date, datetime.date(2000, 1, 1)),
+            "1 January 2000",
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, datetime.date(2000, 1, 2)),
+            "1 to 2 January 2000",
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, datetime.date(2000, 1, 31)),
+            "1 to 31 January 2000",
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, datetime.date(2000, 2, 1)),
+            "1 January to 1 February 2000",
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, datetime.date(2000, 12, 31)), "2000"
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, datetime.date(2001, 1, 1)),
+            "1 January 2000 to 1 January 2001",
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, datetime.date(2001, 12, 31)), "2000 to 2001"
+        )
+        self.assertEqual(
+            pretty_date_range(None, datetime.date(2001, 12, 31)),
+            "Now to 31 December 2001",
+        )
+        self.assertEqual(pretty_date_range(start_date, None), "From 1 January 2000")
+        self.assertEqual(
+            pretty_date_range(None, datetime.date(2001, 12, 31), lowercase_first=True),
+            "now to 31 December 2001",
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, None, lowercase_first=True),
+            "from 1 January 2000",
+        )
+
+    def test_happy_datetime(self):
+        start_date = datetime.datetime(2000, 1, 1)
+        self.assertEqual(
+            pretty_date_range(start_date, datetime.datetime(2000, 1, 1, 14, 45, 0)),
+            "1 January 2000",
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, datetime.datetime(2000, 1, 2, 14, 45, 0)),
+            "1 to 2 January 2000",
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, datetime.datetime(2000, 1, 31, 14, 45, 0)),
+            "1 to 31 January 2000",
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, datetime.datetime(2000, 2, 1, 14, 45, 0)),
+            "1 January to 1 February 2000",
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, datetime.datetime(2000, 12, 31, 14, 45, 0)),
+            "2000",
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, datetime.datetime(2001, 1, 1, 14, 45, 0)),
+            "1 January 2000 to 1 January 2001",
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, datetime.datetime(2001, 12, 31, 14, 45, 0)),
+            "2000 to 2001",
+        )
+        self.assertEqual(
+            pretty_date_range(None, datetime.datetime(2001, 12, 31, 14, 45, 0)),
+            "Now to 31 December 2001",
+        )
+        self.assertEqual(pretty_date_range(start_date, None), "From 1 January 2000")
+        self.assertEqual(
+            pretty_date_range(
+                None, datetime.datetime(2001, 12, 31, 14, 45, 0), lowercase_first=True
+            ),
+            "now to 31 December 2001",
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, None, lowercase_first=True),
+            "from 1 January 2000",
+        )
+
+    def test_pretty_date_range_no_days(self):
+        start_date = "2000-01-01"
+        self.assertEqual(
+            pretty_date_range(start_date, "2000-01-01", omit_days=True),
+            "January 2000",
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, "2000-01-02", omit_days=True),
+            "January 2000",
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, "2000-01-31", omit_days=True),
+            "January 2000",
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, "2000-02-01", omit_days=True),
+            "January to February 2000",
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, "2000-12-31", omit_days=True), "2000"
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, "2001-01-01", omit_days=True),
+            "January 2000 to January 2001",
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, "2001-12-31", omit_days=True),
+            "2000 to 2001",
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, None, omit_days=True),
+            "From January 2000",
+        )
+        self.assertEqual(
+            pretty_date_range(None, "2001-12-31", omit_days=True),
+            "Now to December 2001",
+        )
+        self.assertEqual(
+            pretty_date_range(start_date, None, omit_days=True, lowercase_first=True),
+            "from January 2000",
+        )
+        self.assertEqual(
+            pretty_date_range(None, "2001-12-31", omit_days=True, lowercase_first=True),
+            "now to December 2001",
+        )
+
+    def test_unhappy_order(self):
+        with self.assertRaises(ValueError):
+            pretty_date_range(
+                datetime.datetime(2001, 1, 1), datetime.datetime(2000, 1, 1)
+            )
+
+    def test_unhappy_none(self):
+        with self.assertRaises(ValueError):
+            pretty_date_range(None, None)
 
 
 class TestPrettyDatetimeRange(unittest.TestCase):
-    def test_happy(self):
+    def test_happy_string(self):
         start_date = "2000-01-01T12:30:00Z"
         self.assertEqual(
             pretty_datetime_range(start_date, "2000-01-01T12:30:00Z"),
@@ -133,7 +362,7 @@ class TestPrettyDatetimeRange(unittest.TestCase):
             "1 January 2000, 12:30 to 23:59",
         )
         self.assertEqual(
-            pretty_datetime_range(start_date, "2000-01-02T00:00:0Z"),
+            pretty_datetime_range(start_date, "2000-01-02T00:00:00Z"),
             "1 January 2000, 12:30 to 2 January 2000, 00:00",
         )
         self.assertEqual(
@@ -190,74 +419,119 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         )
         self.assertEqual(
             pretty_datetime_range(
-                start_date, "2000-01-02T00:00:0Z", hide_date_if_single_day=True
+                start_date, "2000-01-02T00:00:00Z", hide_date_if_single_day=True
             ),
             "1 January 2000, 12:30 to 2 January 2000, 00:00",
         )
 
+    def test_happy_datetime(self):
+        start_date = datetime.datetime(2000, 1, 1, 12, 30, 0)
+        self.assertEqual(
+            pretty_datetime_range(start_date, datetime.datetime(2000, 1, 1, 12, 30, 0)),
+            "1 January 2000, 12:30",
+        )
+        self.assertEqual(
+            pretty_datetime_range(start_date, datetime.datetime(2000, 1, 1, 12, 31, 0)),
+            "1 January 2000, 12:30 to 12:31",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, datetime.datetime(2000, 1, 1, 23, 59, 59)
+            ),
+            "1 January 2000, 12:30 to 23:59",
+        )
+        self.assertEqual(
+            pretty_datetime_range(start_date, datetime.datetime(2000, 1, 2, 0, 0, 0)),
+            "1 January 2000, 12:30 to 2 January 2000, 00:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(start_date, datetime.datetime(2000, 1, 2, 14, 45, 0)),
+            "1 January 2000, 12:30 to 2 January 2000, 14:45",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, datetime.datetime(2000, 1, 31, 14, 45, 0)
+            ),
+            "1 January 2000, 12:30 to 31 January 2000, 14:45",
+        )
+        self.assertEqual(
+            pretty_datetime_range(start_date, datetime.datetime(2000, 2, 1, 14, 45, 0)),
+            "1 January 2000, 12:30 to 1 February 2000, 14:45",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, datetime.datetime(2000, 12, 31, 14, 45, 0)
+            ),
+            "1 January 2000, 12:30 to 31 December 2000, 14:45",
+        )
+        self.assertEqual(
+            pretty_datetime_range(start_date, datetime.datetime(2001, 1, 1, 14, 45, 0)),
+            "1 January 2000, 12:30 to 1 January 2001, 14:45",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, datetime.datetime(2001, 12, 31, 14, 45, 0)
+            ),
+            "1 January 2000, 12:30 to 31 December 2001, 14:45",
+        )
+        self.assertEqual(
+            pretty_datetime_range(start_date, None),
+            "From 1 January 2000, 12:30",
+        )
+        self.assertEqual(
+            pretty_datetime_range(None, datetime.datetime(2001, 12, 31, 14, 45, 0)),
+            "Now to 31 December 2001, 14:45",
+        )
+        self.assertEqual(
+            pretty_datetime_range(start_date, None, lowercase_first=True),
+            "from 1 January 2000, 12:30",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                None, datetime.datetime(2001, 12, 31, 14, 45, 0), lowercase_first=True
+            ),
+            "now to 31 December 2001, 14:45",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date,
+                datetime.datetime(2000, 1, 1, 12, 30, 0),
+                hide_date_if_single_day=True,
+            ),
+            "12:30",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date,
+                datetime.datetime(2000, 1, 1, 12, 45, 0),
+                hide_date_if_single_day=True,
+            ),
+            "12:30 to 12:45",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date,
+                datetime.datetime(2000, 1, 2, 0, 0, 0),
+                hide_date_if_single_day=True,
+            ),
+            "1 January 2000, 12:30 to 2 January 2000, 00:00",
+        )
 
-class TestPrettyDateRange(unittest.TestCase):
-    def test_happy(self):
-        start_date = "2000-01-01"
-        self.assertEqual(pretty_date_range(start_date, "2000-01-01"), "1 January 2000")
-        self.assertEqual(
-            pretty_date_range(start_date, "2000-01-02"), "1 to 2 January 2000"
-        )
-        self.assertEqual(
-            pretty_date_range(start_date, "2000-01-31"), "1 to 31 January 2000"
-        )
-        self.assertEqual(
-            pretty_date_range(start_date, "2000-02-01"),
-            "1 January to 1 February 2000",
-        )
-        self.assertEqual(pretty_date_range(start_date, "2000-12-31"), "2000")
-        self.assertEqual(
-            pretty_date_range(start_date, "2001-01-01"),
-            "1 January 2000 to 1 January 2001",
-        )
-        self.assertEqual(pretty_date_range(start_date, "2001-12-31"), "2000 to 2001")
-        self.assertEqual(
-            pretty_date_range(None, "2001-12-31"), "Now to 31 December 2001"
-        )
-        self.assertEqual(pretty_date_range(start_date, None), "From 1 January 2000")
+    def test_unhappy_date(self):
+        with self.assertRaises(ValueError):
+            pretty_datetime_range(datetime.date(2000, 1, 1), None)
+        with self.assertRaises(ValueError):
+            pretty_datetime_range(None, datetime.date(2000, 1, 1))
 
-    def test_pretty_date_range_no_days(self):
-        start_date = "2000-01-01"
-        self.assertEqual(
-            pretty_date_range(start_date, "2000-01-01", omit_days=True),
-            "January 2000",
-        )
-        self.assertEqual(
-            pretty_date_range(start_date, "2000-01-02", omit_days=True),
-            "January 2000",
-        )
-        self.assertEqual(
-            pretty_date_range(start_date, "2000-01-31", omit_days=True),
-            "January 2000",
-        )
-        self.assertEqual(
-            pretty_date_range(start_date, "2000-02-01", omit_days=True),
-            "January to February 2000",
-        )
-        self.assertEqual(
-            pretty_date_range(start_date, "2000-12-31", omit_days=True), "2000"
-        )
-        self.assertEqual(
-            pretty_date_range(start_date, "2001-01-01", omit_days=True),
-            "January 2000 to January 2001",
-        )
-        self.assertEqual(
-            pretty_date_range(start_date, "2001-12-31", omit_days=True),
-            "2000 to 2001",
-        )
-        self.assertEqual(
-            pretty_date_range(start_date, None, omit_days=True),
-            "From January 2000",
-        )
-        self.assertEqual(
-            pretty_date_range(None, "2001-12-31", omit_days=True),
-            "Now to December 2001",
-        )
+    def test_unhappy_order(self):
+        with self.assertRaises(ValueError):
+            pretty_datetime_range(
+                datetime.datetime(2001, 1, 1), datetime.datetime(2000, 1, 1)
+            )
+
+    def test_unhappy_none(self):
+        with self.assertRaises(ValueError):
+            pretty_datetime_range(None, None)
 
 
 class TestIsTodayOrFuture(unittest.TestCase):
@@ -281,20 +555,42 @@ class TestIsTodayOrFuture(unittest.TestCase):
 
 
 class TestIsTodayInDateRange(unittest.TestCase):
-    def test_happy(self):
+    def test_happy_string(self):
         self.assertTrue(is_today_in_date_range("2000-01-01", "2999-01-01"))
         self.assertFalse(is_today_in_date_range("2000-01-01", "2001-01-01"))
         self.assertFalse(is_today_in_date_range("2998-01-01", "2999-01-01"))
 
-    def test_unhappy(self):
+    def test_happy_date(self):
+        self.assertTrue(
+            is_today_in_date_range(datetime.date(2000, 1, 1), datetime.date(2999, 1, 1))
+        )
+        self.assertFalse(
+            is_today_in_date_range(datetime.date(2000, 1, 1), datetime.date(2001, 1, 1))
+        )
+        self.assertFalse(
+            is_today_in_date_range(datetime.date(2998, 1, 1), datetime.date(2999, 1, 1))
+        )
+
+    def test_unhappy_string(self):
         with self.assertRaises(ValueError):
             is_today_in_date_range(None, "2023-10-31")
             is_today_in_date_range("2023-10-01", None)
             is_today_in_date_range(None, None)
 
+    def test_unhappy_invalid(self):
+        with self.assertRaises(ValueError):
+            is_today_in_date_range(None, "foo")
+            is_today_in_date_range("bar", None)
+
+    def test_unhappy_date(self):
+        with self.assertRaises(ValueError):
+            is_today_in_date_range(None, datetime.date(2023, 10, 31))
+            is_today_in_date_range(datetime.date(2023, 10, 31), None)
+            is_today_in_date_range(None, None)
+
 
 class TestGroupItemsByYearAndMonth(unittest.TestCase):
-    def test_happy(self):
+    def test_happy_strings(self):
         input_data = [
             {"id": 1, "date": "2022-05-15"},
             {"id": 2, "date": "2022-05-20"},
@@ -302,6 +598,7 @@ class TestGroupItemsByYearAndMonth(unittest.TestCase):
             {"id": 4, "date": "2021-12-25"},
             {"id": 5, "date": "2021-11-11"},
             {"id": 6, "date": "2022-06-15"},
+            {"id": 7, "date": "foobar"},
         ]
         result = group_items_by_year_and_month({"items": input_data}, "date")
         expected = [
@@ -340,6 +637,53 @@ class TestGroupItemsByYearAndMonth(unittest.TestCase):
         ]
         self.assertEqual(result, expected)
 
+    def test_happy_datetime(self):
+        input_data = [
+            {"id": 1, "date": datetime.date(2022, 5, 15)},
+            {"id": 2, "date": datetime.date(2022, 5, 20)},
+            {"id": 3, "date": datetime.date(2022, 6, 10)},
+            {"id": 4, "date": datetime.date(2021, 12, 25)},
+            {"id": 5, "date": datetime.date(2021, 11, 11)},
+            {"id": 6, "date": datetime.date(2022, 6, 15)},
+            {"id": 7, "date": None},
+        ]
+        result = group_items_by_year_and_month({"items": input_data}, "date")
+        expected = [
+            {
+                "heading": "2022",
+                "items": [
+                    {
+                        "heading": "May",
+                        "items": [
+                            {"id": 1, "date": datetime.date(2022, 5, 15)},
+                            {"id": 2, "date": datetime.date(2022, 5, 20)},
+                        ],
+                    },
+                    {
+                        "heading": "June",
+                        "items": [
+                            {"id": 3, "date": datetime.date(2022, 6, 10)},
+                            {"id": 6, "date": datetime.date(2022, 6, 15)},
+                        ],
+                    },
+                ],
+            },
+            {
+                "heading": "2021",
+                "items": [
+                    {
+                        "heading": "December",
+                        "items": [{"id": 4, "date": datetime.date(2021, 12, 25)}],
+                    },
+                    {
+                        "heading": "November",
+                        "items": [{"id": 5, "date": datetime.date(2021, 11, 11)}],
+                    },
+                ],
+            },
+        ]
+        self.assertEqual(result, expected)
+
 
 class TestSecondsToIso8601Duration(unittest.TestCase):
     def test_happy(self):
@@ -352,6 +696,10 @@ class TestSecondsToIso8601Duration(unittest.TestCase):
         self.assertEqual(seconds_to_iso_8601_duration(3600), "PT1H0M0S")
         self.assertEqual(seconds_to_iso_8601_duration(3601), "PT1H0M1S")
 
+    def test_unhappy_negative(self):
+        with self.assertRaises(ValueError):
+            seconds_to_iso_8601_duration(-1)
+
 
 class TestSecondsToTime(unittest.TestCase):
     def test_happy(self):
@@ -363,6 +711,10 @@ class TestSecondsToTime(unittest.TestCase):
         self.assertEqual(seconds_to_duration(3599), "00h 59m 59s")
         self.assertEqual(seconds_to_duration(3600), "01h 00m 00s")
         self.assertEqual(seconds_to_duration(3601), "01h 00m 01s")
+
+    def test_unhappy_negative(self):
+        with self.assertRaises(ValueError):
+            seconds_to_duration(-1)
 
 
 class TestRfc822DateFormat(unittest.TestCase):
