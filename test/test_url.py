@@ -1,6 +1,6 @@
 import unittest
 
-from tna_utilities.query import QueryStringTransformer
+from tna_utilities.url import QueryStringTransformer
 
 
 class TestQueryStringObject:

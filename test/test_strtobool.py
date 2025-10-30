@@ -23,18 +23,18 @@ class TestStrToBool(unittest.TestCase):
 
     def test_unhappy_invalid(self):
         with self.assertRaises(ValueError):
-            strtobool(True)
-        with self.assertRaises(ValueError):
-            strtobool(False)
-        with self.assertRaises(ValueError):
             strtobool("")
         with self.assertRaises(ValueError):
             strtobool("maybe")
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
+            strtobool(True)
+        with self.assertRaises(TypeError):
+            strtobool(False)
+        with self.assertRaises(TypeError):
             strtobool(42)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             strtobool(None)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             strtobool({})
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             strtobool(())

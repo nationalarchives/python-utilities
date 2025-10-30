@@ -168,7 +168,7 @@ class TestPrettyDatetime(unittest.TestCase):
 
     def test_unhappy_date(self):
         date = datetime.date(2000, 1, 1)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             pretty_datetime(date)
 
     def test_unhappy_none(self):
@@ -518,9 +518,9 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         )
 
     def test_unhappy_date(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             pretty_datetime_range(datetime.date(2000, 1, 1), None)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             pretty_datetime_range(None, datetime.date(2000, 1, 1))
 
     def test_unhappy_order(self):

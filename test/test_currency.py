@@ -89,6 +89,8 @@ class TestPrettyPriceRange(unittest.TestCase):
         self.assertEqual(pretty_price_range(5, 10), "£5 to £10")
         self.assertEqual(pretty_price_range(10, 5), "£5 to £10")
         with self.assertRaises(ValueError):
-            pretty_price_range("5", "a")
-            pretty_price_range("5", [])
-            pretty_price_range("5", True)
+            pretty_price_range(5, "a")
+        with self.assertRaises(TypeError):
+            pretty_price_range(5, [])
+        with self.assertRaises(TypeError):
+            pretty_price_range(5, True)

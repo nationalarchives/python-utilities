@@ -120,7 +120,7 @@ def pretty_datetime(
         return date.strftime("%-d %B %Y, %H:%M")
 
     if isinstance(date, datetime.date):
-        raise ValueError("Date object provided, datetime object expected")
+        raise TypeError("Date object provided, datetime object expected")
 
     date = get_date_from_string(date)
     if show_day:
@@ -208,7 +208,7 @@ def pretty_datetime_range(  # noqa: C901
     if date_from and isinstance(date_from, datetime.datetime):
         date_from = date_from
     elif date_from and isinstance(date_from, datetime.date):
-        raise ValueError("From date object provided, datetime object expected")
+        raise TypeError("From date object provided, datetime object expected")
     else:
         try:
             date_from = get_date_from_string(date_from)
@@ -218,7 +218,7 @@ def pretty_datetime_range(  # noqa: C901
     if date_to and isinstance(date_to, datetime.datetime):
         date_to = date_to
     elif date_to and isinstance(date_to, datetime.date):
-        raise ValueError("To date object provided, datetime object expected")
+        raise TypeError("To date object provided, datetime object expected")
     else:
         try:
             date_to = get_date_from_string(date_to)

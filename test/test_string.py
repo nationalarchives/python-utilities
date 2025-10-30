@@ -18,6 +18,6 @@ class TestSlugify(unittest.TestCase):
 class TestUnslugify(unittest.TestCase):
     def test_happy(self):
         self.assertEqual(unslugify("test-test"), "Test test")
-        self.assertEqual(unslugify("test-test", False), "test test")
+        self.assertEqual(unslugify("test-test", capitalize_first=False), "test test")
         self.assertEqual(unslugify("test-123"), "Test 123")
         self.assertEqual(unslugify("test-1-2-3"), "Test 1 2 3")

@@ -7,7 +7,7 @@ def strtobool(value: str) -> bool:
     try:
         value = value.lower()
     except AttributeError:
-        raise ValueError("invalid truth value %r" % (value,))
+        raise TypeError("invalid truth value %r" % (value,))
 
     if value in ("y", "yes", "t", "true", "on", "1"):
         return True
