@@ -12,6 +12,18 @@ A library of common National Archives Python functions.
 
 See the [documentation](https://nationalarchives.github.io/python-utilities/).
 
+## Install
+
+```sh
+# Install with Poetry
+poetry add tna-utilities
+
+# Install with pip
+pip install tna-utilities
+```
+
+## Developing
+
 ```sh
 # Run the tests
 python -m unittest discover test
