@@ -3,9 +3,6 @@ name: CI
 on:
   workflow_dispatch:
   push:
-    # branches:
-    #   - main
-    #   - feature/*
 
 jobs:
   test:
@@ -20,4 +17,4 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Run tests
-        run: python -m unittest discover test
+        run: python -m unittest discover tests

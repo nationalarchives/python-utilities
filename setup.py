@@ -1,9 +1,9 @@
-import setuptools
+from setuptools import find_packages, setup
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-setuptools.setup(
+setup(
     name="tna-utilities",
     version="0.0.1",
     author="Andrew Hosgood",
@@ -22,9 +22,8 @@ setuptools.setup(
         "Environment :: Web Environment",
         "Intended Audience :: Developers",
     ],
-    packages=["tna_utilities"],
-    # package_data={
-    #     "": ["**/*.py", "**/*.html"],
-    # },
+    packages=find_packages(
+        include=["tna_utilities", "tna_utilities.*"], exclude=["tests", "tests.*"]
+    ),
     python_requires=">=3.9",
 )
