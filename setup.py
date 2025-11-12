@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="tna-utilities",
-    version="0.0.1-rc1",
+    version="0.0.1-rc2",
     author="Andrew Hosgood",
     author_email="andrew.hosgood@nationalarchives.gov.uk",
     description="A library of common National Archives Python functions",
