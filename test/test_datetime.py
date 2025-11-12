@@ -3,7 +3,7 @@ import unittest
 
 from tna_utilities.datetime import (
     get_date_from_string,
-    group_items_by_year_and_month,
+    group_by_year_and_month,
     is_today_in_date_range,
     is_today_or_future,
     pretty_date,
@@ -19,54 +19,55 @@ from tna_utilities.datetime import (
 class TestGetDateFromString(unittest.TestCase):
     def test_happy_dd_mm_yyyy(self):
         self.assertEqual(
-            get_date_from_string("2006-05-04").isoformat(timespec="seconds"),
-            "2006-05-04T00:00:00",
+            get_date_from_string("2006-05-04"),
+            datetime.datetime(2006, 5, 4, 0, 0, 0),
         )
 
     def test_happy_mm_yyyy(self):
         self.assertEqual(
-            get_date_from_string("2006-05").isoformat(timespec="seconds"),
-            "2006-05-01T00:00:00",
+            get_date_from_string("2006-05"), datetime.datetime(2006, 5, 1, 0, 0, 0)
         )
 
     def test_happy_yyyy(self):
         self.assertEqual(
-            get_date_from_string("2006").isoformat(timespec="seconds"),
-            "2006-01-01T00:00:00",
+            get_date_from_string("2006"), datetime.datetime(2006, 1, 1, 0, 0, 0)
         )
 
     def test_happy_iso_8601(self):
         self.assertEqual(
-            get_date_from_string("2006-05-04T01:02:03").isoformat(timespec="seconds"),
-            "2006-05-04T01:02:03",
+            get_date_from_string("2006-05-04T01:02:03"),
+            datetime.datetime(2006, 5, 4, 1, 2, 3),
         )
 
     def test_happy_iso_8601_microseconds(self):
         self.assertEqual(
-            get_date_from_string("2006-05-04T01:02:03.999").isoformat(
-                timespec="microseconds"
-            ),
-            "2006-05-04T01:02:03.999000",
+            get_date_from_string("2006-05-04T01:02:03.999"),
+            datetime.datetime(2006, 5, 4, 1, 2, 3, 999000),
         )
 
     def test_happy_iso_8601_timezone(self):
         self.assertEqual(
-            get_date_from_string("2006-05-04T01:02:03+01:00").isoformat(
-                timespec="seconds"
+            get_date_from_string("2006-05-04T01:02:03+01:00"),
+            datetime.datetime(
+                2006,
+                5,
+                4,
+                1,
+                2,
+                3,
+                tzinfo=datetime.timezone(datetime.timedelta(hours=1)),
             ),
-            "2006-05-04T01:02:03+01:00",
         )
 
     def test_happy_iso_8601_zulu(self):
         self.assertEqual(
-            get_date_from_string("2006-05-04T01:02:03Z").isoformat(timespec="seconds"),
-            "2006-05-04T01:02:03+00:00",
+            get_date_from_string("2006-05-04T01:02:03Z"),
+            datetime.datetime(2006, 5, 4, 1, 2, 3, tzinfo=datetime.timezone.utc),
         )
 
     def test_happy_iso_8601_plain(self):
         self.assertEqual(
-            get_date_from_string("1000").isoformat(timespec="seconds"),
-            "1000-01-01T00:00:00",
+            get_date_from_string("1000"), datetime.datetime(1000, 1, 1, 0, 0, 0)
         )
 
     def test_unhappy_invalid_day(self):
@@ -289,33 +290,34 @@ class TestPrettyDateRange(unittest.TestCase):
             "from 1 January 2000",
         )
 
-    def test_pretty_date_range_no_days(self):
-        start_date = "2000-01-01"
+    def test_happy_pretty_date_range_no_days(self):
+        start_date = datetime.date(2000, 1, 1)
         self.assertEqual(
-            pretty_date_range(start_date, "2000-01-01", omit_days=True),
+            pretty_date_range(start_date, datetime.date(2000, 1, 1), omit_days=True),
             "January 2000",
         )
         self.assertEqual(
-            pretty_date_range(start_date, "2000-01-02", omit_days=True),
+            pretty_date_range(start_date, datetime.date(2000, 1, 2), omit_days=True),
             "January 2000",
         )
         self.assertEqual(
-            pretty_date_range(start_date, "2000-01-31", omit_days=True),
+            pretty_date_range(start_date, datetime.date(2000, 1, 31), omit_days=True),
             "January 2000",
         )
         self.assertEqual(
-            pretty_date_range(start_date, "2000-02-01", omit_days=True),
+            pretty_date_range(start_date, datetime.date(2000, 2, 1), omit_days=True),
             "January to February 2000",
         )
         self.assertEqual(
-            pretty_date_range(start_date, "2000-12-31", omit_days=True), "2000"
+            pretty_date_range(start_date, datetime.date(2000, 12, 31), omit_days=True),
+            "2000",
         )
         self.assertEqual(
-            pretty_date_range(start_date, "2001-01-01", omit_days=True),
+            pretty_date_range(start_date, datetime.date(2001, 1, 1), omit_days=True),
             "January 2000 to January 2001",
         )
         self.assertEqual(
-            pretty_date_range(start_date, "2001-12-31", omit_days=True),
+            pretty_date_range(start_date, datetime.date(2001, 12, 31), omit_days=True),
             "2000 to 2001",
         )
         self.assertEqual(
@@ -323,7 +325,7 @@ class TestPrettyDateRange(unittest.TestCase):
             "From January 2000",
         )
         self.assertEqual(
-            pretty_date_range(None, "2001-12-31", omit_days=True),
+            pretty_date_range(None, datetime.date(2001, 12, 31), omit_days=True),
             "Now to December 2001",
         )
         self.assertEqual(
@@ -331,7 +333,9 @@ class TestPrettyDateRange(unittest.TestCase):
             "from January 2000",
         )
         self.assertEqual(
-            pretty_date_range(None, "2001-12-31", omit_days=True, lowercase_first=True),
+            pretty_date_range(
+                None, datetime.date(2001, 12, 31), omit_days=True, lowercase_first=True
+            ),
             "now to December 2001",
         )
 
@@ -536,18 +540,14 @@ class TestPrettyDatetimeRange(unittest.TestCase):
 
 class TestIsTodayOrFuture(unittest.TestCase):
     def test_happy(self):
-        self.assertTrue(is_today_or_future("2999-01-01"))
-        self.assertFalse(is_today_or_future("2000-01-01"))
-        today = datetime.datetime.now().date()
-        self.assertTrue(is_today_or_future(today.isoformat()))
+        self.assertTrue(is_today_or_future(datetime.date(2999, 1, 1)))
+        self.assertFalse(is_today_or_future(datetime.date(2000, 1, 1)))
+        today = datetime.datetime.now()
+        self.assertTrue(is_today_or_future(today))
         tomorrow = today + datetime.timedelta(days=1)
-        self.assertTrue(
-            is_today_or_future(f"{tomorrow.year}-{tomorrow.month}-{tomorrow.day}")
-        )
+        self.assertTrue(is_today_or_future(tomorrow))
         yesterday = today + datetime.timedelta(days=-1)
-        self.assertFalse(
-            is_today_or_future(f"{yesterday.year}-{yesterday.month}-{yesterday.day}")
-        )
+        self.assertFalse(is_today_or_future(yesterday))
 
     def test_unhappy(self):
         with self.assertRaises(ValueError):
@@ -555,17 +555,12 @@ class TestIsTodayOrFuture(unittest.TestCase):
 
 
 class TestIsTodayInDateRange(unittest.TestCase):
-    def test_happy_string(self):
-        self.assertTrue(is_today_in_date_range("2000-01-01", "2999-01-01"))
-        self.assertFalse(is_today_in_date_range("2000-01-01", "2001-01-01"))
-        self.assertFalse(is_today_in_date_range("2998-01-01", "2999-01-01"))
-
     def test_happy_date(self):
-        self.assertTrue(
-            is_today_in_date_range(datetime.date(2000, 1, 1), datetime.date(2999, 1, 1))
-        )
         self.assertFalse(
             is_today_in_date_range(datetime.date(2000, 1, 1), datetime.date(2001, 1, 1))
+        )
+        self.assertTrue(
+            is_today_in_date_range(datetime.date(2000, 1, 1), datetime.date(2999, 1, 1))
         )
         self.assertFalse(
             is_today_in_date_range(datetime.date(2998, 1, 1), datetime.date(2999, 1, 1))
@@ -589,8 +584,9 @@ class TestIsTodayInDateRange(unittest.TestCase):
             is_today_in_date_range(None, None)
 
 
-class TestGroupItemsByYearAndMonth(unittest.TestCase):
+class TestGroupByYearAndMonth(unittest.TestCase):
     def test_happy_strings(self):
+        self.maxDiff = None
         input_data = [
             {"id": 1, "date": "2022-05-15"},
             {"id": 2, "date": "2022-05-20"},
@@ -600,13 +596,31 @@ class TestGroupItemsByYearAndMonth(unittest.TestCase):
             {"id": 6, "date": "2022-06-15"},
             {"id": 7, "date": "foobar"},
         ]
-        result = group_items_by_year_and_month({"items": input_data}, "date")
+        result = group_by_year_and_month({"items": input_data}, "date")
         expected = [
             {
+                "heading": "2021",
+                "index": 2021,
+                "items": [
+                    {
+                        "heading": "November",
+                        "index": 11,
+                        "items": [{"id": 5, "date": "2021-11-11"}],
+                    },
+                    {
+                        "heading": "December",
+                        "index": 12,
+                        "items": [{"id": 4, "date": "2021-12-25"}],
+                    },
+                ],
+            },
+            {
                 "heading": "2022",
+                "index": 2022,
                 "items": [
                     {
                         "heading": "May",
+                        "index": 5,
                         "items": [
                             {"id": 1, "date": "2022-05-15"},
                             {"id": 2, "date": "2022-05-20"},
@@ -614,23 +628,11 @@ class TestGroupItemsByYearAndMonth(unittest.TestCase):
                     },
                     {
                         "heading": "June",
+                        "index": 6,
                         "items": [
                             {"id": 3, "date": "2022-06-10"},
                             {"id": 6, "date": "2022-06-15"},
                         ],
-                    },
-                ],
-            },
-            {
-                "heading": "2021",
-                "items": [
-                    {
-                        "heading": "December",
-                        "items": [{"id": 4, "date": "2021-12-25"}],
-                    },
-                    {
-                        "heading": "November",
-                        "items": [{"id": 5, "date": "2021-11-11"}],
                     },
                 ],
             },
@@ -647,13 +649,31 @@ class TestGroupItemsByYearAndMonth(unittest.TestCase):
             {"id": 6, "date": datetime.date(2022, 6, 15)},
             {"id": 7, "date": None},
         ]
-        result = group_items_by_year_and_month({"items": input_data}, "date")
+        result = group_by_year_and_month({"items": input_data}, "date")
         expected = [
             {
+                "heading": "2021",
+                "index": 2021,
+                "items": [
+                    {
+                        "heading": "November",
+                        "index": 11,
+                        "items": [{"id": 5, "date": datetime.date(2021, 11, 11)}],
+                    },
+                    {
+                        "heading": "December",
+                        "index": 12,
+                        "items": [{"id": 4, "date": datetime.date(2021, 12, 25)}],
+                    },
+                ],
+            },
+            {
                 "heading": "2022",
+                "index": 2022,
                 "items": [
                     {
                         "heading": "May",
+                        "index": 5,
                         "items": [
                             {"id": 1, "date": datetime.date(2022, 5, 15)},
                             {"id": 2, "date": datetime.date(2022, 5, 20)},
@@ -661,6 +681,7 @@ class TestGroupItemsByYearAndMonth(unittest.TestCase):
                     },
                     {
                         "heading": "June",
+                        "index": 6,
                         "items": [
                             {"id": 3, "date": datetime.date(2022, 6, 10)},
                             {"id": 6, "date": datetime.date(2022, 6, 15)},
@@ -668,15 +689,109 @@ class TestGroupItemsByYearAndMonth(unittest.TestCase):
                     },
                 ],
             },
+        ]
+        self.assertEqual(result, expected)
+
+    def test_happy_strings_reverse(self):
+        self.maxDiff = None
+        input_data = [
+            {"id": 1, "date": "2022-05-15"},
+            {"id": 2, "date": "2022-05-20"},
+            {"id": 3, "date": "2022-06-10"},
+            {"id": 4, "date": "2021-12-25"},
+            {"id": 5, "date": "2021-11-11"},
+            {"id": 6, "date": "2022-06-15"},
+            {"id": 7, "date": "foobar"},
+        ]
+        result = group_by_year_and_month({"items": input_data}, "date", reverse=True)
+        expected = [
+            {
+                "heading": "2022",
+                "index": 2022,
+                "items": [
+                    {
+                        "heading": "June",
+                        "index": 6,
+                        "items": [
+                            {"id": 6, "date": "2022-06-15"},
+                            {"id": 3, "date": "2022-06-10"},
+                        ],
+                    },
+                    {
+                        "heading": "May",
+                        "index": 5,
+                        "items": [
+                            {"id": 2, "date": "2022-05-20"},
+                            {"id": 1, "date": "2022-05-15"},
+                        ],
+                    },
+                ],
+            },
             {
                 "heading": "2021",
+                "index": 2021,
                 "items": [
                     {
                         "heading": "December",
+                        "index": 12,
+                        "items": [{"id": 4, "date": "2021-12-25"}],
+                    },
+                    {
+                        "heading": "November",
+                        "index": 11,
+                        "items": [{"id": 5, "date": "2021-11-11"}],
+                    },
+                ],
+            },
+        ]
+        self.assertEqual(result, expected)
+
+    def test_happy_datetime_reverse(self):
+        input_data = [
+            {"id": 1, "date": datetime.date(2022, 5, 15)},
+            {"id": 2, "date": datetime.date(2022, 5, 20)},
+            {"id": 3, "date": datetime.date(2022, 6, 10)},
+            {"id": 4, "date": datetime.date(2021, 12, 25)},
+            {"id": 5, "date": datetime.date(2021, 11, 11)},
+            {"id": 6, "date": datetime.date(2022, 6, 15)},
+            {"id": 7, "date": None},
+        ]
+        result = group_by_year_and_month({"items": input_data}, "date", reverse=True)
+        expected = [
+            {
+                "heading": "2022",
+                "index": 2022,
+                "items": [
+                    {
+                        "heading": "June",
+                        "index": 6,
+                        "items": [
+                            {"id": 6, "date": datetime.date(2022, 6, 15)},
+                            {"id": 3, "date": datetime.date(2022, 6, 10)},
+                        ],
+                    },
+                    {
+                        "heading": "May",
+                        "index": 5,
+                        "items": [
+                            {"id": 2, "date": datetime.date(2022, 5, 20)},
+                            {"id": 1, "date": datetime.date(2022, 5, 15)},
+                        ],
+                    },
+                ],
+            },
+            {
+                "heading": "2021",
+                "index": 2021,
+                "items": [
+                    {
+                        "heading": "December",
+                        "index": 12,
                         "items": [{"id": 4, "date": datetime.date(2021, 12, 25)}],
                     },
                     {
                         "heading": "November",
+                        "index": 11,
                         "items": [{"id": 5, "date": datetime.date(2021, 11, 11)}],
                     },
                 ],
@@ -692,6 +807,7 @@ class TestSecondsToIso8601Duration(unittest.TestCase):
         self.assertEqual(seconds_to_iso_8601_duration(59), "PT59S")
         self.assertEqual(seconds_to_iso_8601_duration(60), "PT1M0S")
         self.assertEqual(seconds_to_iso_8601_duration(61), "PT1M1S")
+        self.assertEqual(seconds_to_iso_8601_duration(1337), "PT22M17S")
         self.assertEqual(seconds_to_iso_8601_duration(3599), "PT59M59S")
         self.assertEqual(seconds_to_iso_8601_duration(3600), "PT1H0M0S")
         self.assertEqual(seconds_to_iso_8601_duration(3601), "PT1H0M1S")
@@ -708,9 +824,21 @@ class TestSecondsToTime(unittest.TestCase):
         self.assertEqual(seconds_to_duration(59), "00h 00m 59s")
         self.assertEqual(seconds_to_duration(60), "00h 01m 00s")
         self.assertEqual(seconds_to_duration(61), "00h 01m 01s")
+        self.assertEqual(seconds_to_duration(1337), "00h 22m 17s")
         self.assertEqual(seconds_to_duration(3599), "00h 59m 59s")
         self.assertEqual(seconds_to_duration(3600), "01h 00m 00s")
         self.assertEqual(seconds_to_duration(3601), "01h 00m 01s")
+
+    def test_happy_simplified(self):
+        self.assertEqual(seconds_to_duration(0, simplify=True), "00s")
+        self.assertEqual(seconds_to_duration(1, simplify=True), "01s")
+        self.assertEqual(seconds_to_duration(59, simplify=True), "59s")
+        self.assertEqual(seconds_to_duration(60, simplify=True), "01m 00s")
+        self.assertEqual(seconds_to_duration(61, simplify=True), "01m 01s")
+        self.assertEqual(seconds_to_duration(1337, simplify=True), "22m 17s")
+        self.assertEqual(seconds_to_duration(3599, simplify=True), "59m 59s")
+        self.assertEqual(seconds_to_duration(3600, simplify=True), "01h 00m 00s")
+        self.assertEqual(seconds_to_duration(3601, simplify=True), "01h 00m 01s")
 
     def test_unhappy_negative(self):
         with self.assertRaises(ValueError):
@@ -720,6 +848,6 @@ class TestSecondsToTime(unittest.TestCase):
 class TestRfc822DateFormat(unittest.TestCase):
     def test_happy(self):
         self.assertEqual(
-            rfc_822_date_format("2000-01-01T12:30:00Z"),
-            "Sat, 1 Jan 2000 12:30:00 GMT",
+            rfc_822_date_format(datetime.datetime(2000, 1, 1, 12, 30, 45)),
+            "Sat, 1 Jan 2000 12:30:45 GMT",
         )

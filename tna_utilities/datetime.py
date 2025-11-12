@@ -261,7 +261,7 @@ def pretty_datetime_range(  # noqa: C901
         return f"{start} {date_to.strftime('%-d %B %Y, %H:%M')}"
 
 
-def is_today_or_future(date: Union[str, datetime.date, datetime.datetime]) -> bool:
+def is_today_or_future(date: Union[datetime.date, datetime.datetime]) -> bool:
     """
     Determines if the given date string represents today or a future date.
     """
@@ -269,38 +269,36 @@ def is_today_or_future(date: Union[str, datetime.date, datetime.datetime]) -> bo
     if not date:
         raise ValueError("No date provided")
 
-    if not isinstance(date, (datetime.datetime, datetime.date)):
-        date = get_date_from_string(date)
+    if isinstance(date, datetime.datetime):
+        date = date.date()
 
     today = datetime.datetime.now().date()
-    return today <= date.date()
+    return today <= date
 
 
 def is_today_in_date_range(
-    date_from: Union[str, datetime.date, datetime.datetime],
-    date_to: Union[str, datetime.date, datetime.datetime],
+    date_from: Union[datetime.date, datetime.datetime],
+    date_to: Union[datetime.date, datetime.datetime],
 ) -> bool:
     """
     Determines if today's date falls within the given date range.
     """
 
-    if not isinstance(date_from, (datetime.date, datetime.datetime)):
-        date_from = get_date_from_string(date_from)
-        date_from = date_from.date()
-
-    if not isinstance(date_to, (datetime.date, datetime.datetime)):
-        date_to = get_date_from_string(date_to)
-        date_to = date_to.date()
-
     if not date_from or not date_to:
         raise ValueError("Both from and to dates must be provided")
+
+    if isinstance(date_from, datetime.datetime):
+        date_from = date_from.date()
+
+    if isinstance(date_to, datetime.datetime):
+        date_to = date_to.date()
 
     today = datetime.datetime.now().date()
     return date_from <= today <= date_to
 
 
-def group_items_by_year_and_month(
-    items: list[dict], date_key: str
+def group_by_year_and_month(
+    items: list[dict], date_key: str, reverse: bool = False
 ) -> dict:  # noqa: C901
     """
     Groups a list of items by year and month based on a date key in each item.
@@ -320,32 +318,60 @@ def group_items_by_year_and_month(
 
             if request_datetime:
                 month = request_datetime.strftime("%B")
+                month_index = int(request_datetime.strftime("%-m"))
                 year = request_datetime.strftime("%Y")
-                year_index = next(
-                    (i for i, d in enumerate(grouped) if d["heading"] == year), None
+                year_index = int(year)
+                existing_year_index = next(
+                    (i for i, d in enumerate(grouped) if d["index"] == year_index), None
                 )
-                if year_index is None:
+                if existing_year_index is None:
                     grouped.append(
                         {
                             "heading": year,
-                            "items": [{"heading": month, "items": [item]}],
+                            "index": year_index,
+                            "items": [
+                                {
+                                    "heading": month,
+                                    "index": month_index,
+                                    "items": [item],
+                                }
+                            ],
                         }
                     )
                 else:
-                    month_index = next(
+                    existing_month_index = next(
                         (
                             i
-                            for i, m in enumerate(grouped[year_index]["items"])
-                            if m["heading"] == month
+                            for i, m in enumerate(grouped[existing_year_index]["items"])
+                            if m["index"] == month_index
                         ),
                         None,
                     )
-                    if month_index is None:
-                        grouped[year_index]["items"].append(
-                            {"heading": month, "items": [item]}
+                    if existing_month_index is None:
+                        grouped[existing_year_index]["items"].append(
+                            {
+                                "heading": month,
+                                "index": month_index,
+                                "items": [item],
+                            }
                         )
                     else:
-                        grouped[year_index]["items"][month_index]["items"].append(item)
+                        grouped[existing_year_index]["items"][existing_month_index][
+                            "items"
+                        ].append(item)
+
+    for year_group in grouped:
+        year_group["items"].sort(key=lambda x: x["index"], reverse=reverse)
+        for month_group in year_group["items"]:
+            month_group["items"].sort(
+                key=lambda x: (
+                    x.get(date_key)
+                    if isinstance(x.get(date_key), (datetime.date, datetime.datetime))
+                    else get_date_from_string(x.get(date_key))
+                ),
+                reverse=reverse,
+            )
+    grouped.sort(key=lambda x: x["index"], reverse=reverse)
 
     return grouped
 
@@ -373,13 +399,13 @@ def seconds_to_iso_8601_duration(total_seconds: int) -> str:
     return f"PT{seconds}S"
 
 
-def seconds_to_duration(total_seconds: int) -> str:
+def seconds_to_duration(total_seconds: int, simplify: bool = False) -> str:
     """
     Converts a total number of seconds into a human-readable duration string.
     """
 
     if not total_seconds:
-        return "00h 00m 00s"
+        return "00s" if simplify else "00h 00m 00s"
 
     if total_seconds < 0:
         raise ValueError("Total seconds cannot be negative")
@@ -387,18 +413,32 @@ def seconds_to_duration(total_seconds: int) -> str:
     hours = math.floor(total_seconds / 3600)
     minutes = math.floor((total_seconds - (hours * 3600)) / 60)
     seconds = total_seconds - (hours * 3600) - (minutes * 60)
-    return f"{str(hours).rjust(2, '0')}h {str(minutes).rjust(2, '0')}m {str(seconds).rjust(2, '0')}s"
+
+    hours_string = f"{str(hours).rjust(2, '0')}h"
+    minutes_string = f"{str(minutes).rjust(2, '0')}m"
+    seconds_string = f"{str(seconds).rjust(2, '0')}s"
+
+    return_values = []
+    if simplify:
+        if hours:
+            return_values.append(hours_string)
+            return_values.append(minutes_string)
+        elif minutes:
+            return_values.append(minutes_string)
+    else:
+        return_values.append(hours_string)
+        return_values.append(minutes_string)
+    return_values.append(seconds_string)
+
+    return " ".join(return_values)
 
 
-def rfc_822_date_format(date: Union[str, datetime.date, datetime.datetime]) -> str:
+def rfc_822_date_format(date: Union[datetime.date, datetime.datetime]) -> str:
     """
     Formats a date into RFC 822 format.
     """
 
     if not date:
         raise ValueError("No date provided")
-
-    if not isinstance(date, (datetime.datetime, datetime.date)):
-        date = get_date_from_string(date)
 
     return date.strftime("%a, %-d %b %Y %H:%M:%S GMT")

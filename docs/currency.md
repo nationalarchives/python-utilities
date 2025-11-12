@@ -2,7 +2,7 @@
 
 ## `currency()`
 
-Takes a string, float or integer and coerses it to two decimal points.
+Formats a number as a currency without the currency symbol.
 
 ### Arguments
 
@@ -28,7 +28,7 @@ print(currency(5.2))
 
 ## `pretty_price()`
 
-Takes a string, float or integer and formats it into a currency string.
+Formats a number as a price.
 
 ### Arguments
 
@@ -55,7 +55,7 @@ print(pretty_price(5, currency_symbol="€"))
 
 ## `pretty_price_range()`
 
-Takes two values and formats a price range.
+Formats a price range.
 
 ### Arguments
 
