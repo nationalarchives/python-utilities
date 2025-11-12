@@ -81,16 +81,23 @@ class TestGetDateFromString(unittest.TestCase):
     def test_unhappy_invalid_years(self):
         with self.assertRaises(ValueError):
             get_date_from_string("999")
+        with self.assertRaises(ValueError):
             get_date_from_string("06")
+        with self.assertRaises(ValueError):
             get_date_from_string("00")
+        with self.assertRaises(ValueError):
             get_date_from_string("99")
+        with self.assertRaises(ValueError):
             get_date_from_string("9")
+        with self.assertRaises(ValueError):
             get_date_from_string("abc")
 
     def test_unhappy_blank_values(self):
         with self.assertRaises(ValueError):
             get_date_from_string("")
+        with self.assertRaises(ValueError):
             get_date_from_string(None)
+        with self.assertRaises(ValueError):
             get_date_from_string(False)
 
 
@@ -569,18 +576,23 @@ class TestIsTodayInDateRange(unittest.TestCase):
     def test_unhappy_string(self):
         with self.assertRaises(ValueError):
             is_today_in_date_range(None, "2023-10-31")
+        with self.assertRaises(ValueError):
             is_today_in_date_range("2023-10-01", None)
+        with self.assertRaises(ValueError):
             is_today_in_date_range(None, None)
 
     def test_unhappy_invalid(self):
         with self.assertRaises(ValueError):
             is_today_in_date_range(None, "foo")
+        with self.assertRaises(ValueError):
             is_today_in_date_range("bar", None)
 
     def test_unhappy_date(self):
         with self.assertRaises(ValueError):
             is_today_in_date_range(None, datetime.date(2023, 10, 31))
+        with self.assertRaises(ValueError):
             is_today_in_date_range(datetime.date(2023, 10, 31), None)
+        with self.assertRaises(ValueError):
             is_today_in_date_range(None, None)
 
 

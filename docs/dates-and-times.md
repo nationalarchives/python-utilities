@@ -61,9 +61,6 @@ Formats a date and time into the format used by The National Archives.
 ```py
 from tna_utils.datetime import pretty_datetime
 
-print(pretty_datetime(foo))
-# bar
-
 print(pretty_datetime("2000-01-01T12:00:00Z"))
 # 1 January 2000, 12:00
 
