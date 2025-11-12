@@ -86,7 +86,7 @@ from tna_utils.urls import QueryStringTransformer
 # ?a=1&b=2&b=3
 qs = QueryStringTransformer(iter([("a", ["1"]), ("b", ["2", "3"])]))
 
-qs.add_parameter("c", ["4"])
+qs.add_parameter("c", "4")
 qs.update_parameter("b", ["5", "6"])
 qs.remove_parameter("a")
 
