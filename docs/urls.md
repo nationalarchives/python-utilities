@@ -63,7 +63,7 @@ qs = QueryStringTransformer(iter([("a", ["1"]), ("b", ["2", "3"])]))
 qs.parameter_exists("a")
 # True
 qs.parameter_exists("c")
-# True
+# False
 
 qs.parameter_values("a")
 # ["1"]
