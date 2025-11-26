@@ -25,10 +25,7 @@ class QueryStringTransformer:
         Check if a parameter exists in the query parameters.
         """
 
-        for key, _ in self.args:
-            if key == parameter:
-                return True
-        return False
+        return parameter in dict(self.args)
 
     def parameter_values(self, parameter):
         """
