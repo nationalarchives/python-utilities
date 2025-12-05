@@ -23,5 +23,5 @@ setup(
         "Intended Audience :: Developers",
     ],
     packages=find_packages(include=["tna_utilities"], exclude=["test"]),
-    python_requires=">=3.9",
+    python_requires=">=3.10",
 )
