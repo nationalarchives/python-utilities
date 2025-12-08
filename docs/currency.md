@@ -14,7 +14,7 @@ Formats a number as a currency without the currency symbol.
 ### Example
 
 ```py
-from tna_utils.currency import currency
+from tna_utilities.currency import currency
 
 print(currency(5))
 # 5.00
@@ -41,7 +41,7 @@ Formats a number as a price.
 ### Example
 
 ```py
-from tna_utils.currency import pretty_price
+from tna_utilities.currency import pretty_price
 
 print(pretty_price(5))
 # £5.00
@@ -69,7 +69,7 @@ Formats a price range.
 ### Example
 
 ```py
-from tna_utils.currency import pretty_price_range
+from tna_utilities.currency import pretty_price_range
 
 print(pretty_price_range(5, 10))
 # £5.00 to £10
