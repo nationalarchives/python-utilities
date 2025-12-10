@@ -92,6 +92,15 @@ qs.remove_parameter("a")
 
 print(qs.get_query_string())
 # ?b=5&b=6&c=4
+
+# Chainable
+qs.add_parameter(
+    "c", "4"
+).update_parameter(
+    "b", ["5", "6"]
+).remove_parameter(
+    "a"
+).get_query_string()
 ```
 
 ### Update parameter values
@@ -108,4 +117,13 @@ qs.remove_parameter_value("a", "1")
 
 print(qs.get_query_string())
 # ?a=4&b=2
+
+# Chainable
+qs.add_parameter_value(
+    "a", "4"
+).toggle_parameter_value(
+    "b", "3"
+).remove_parameter_value(
+    "a", "1"
+).get_query_string()
 ```
