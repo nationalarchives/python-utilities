@@ -8,13 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased](https://github.com/nationalarchives/python-utilities/compare/v0.0.1...HEAD)
 
 ### Added
+
 ### Changed
 
 - Allow functions in `QueryStringTransformer` to be chained
 
 ### Deprecated
+
 ### Removed
+
 ### Fixed
+
 ### Security
 
 ## [1.0.0](https://github.com/nationalarchives/python-utilities/releases/tag/v1.0.0) - 2025-12-05
