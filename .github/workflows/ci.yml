@@ -20,7 +20,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Check formatting
-        # TODO: Change from preview to latest image when available
-        run: docker run --rm -v "$(pwd)":/app/ ghcr.io/nationalarchives/tna-python-dev:preview checkformat
+        run: docker run --rm -v "$(pwd)":/app/ ghcr.io/nationalarchives/tna-python-dev:latest checkformat
       - name: Run tests
         run: python -m unittest discover test
