@@ -26,7 +26,7 @@ pip install tna-utilities
 
 ```sh
 # Run the tests
-python -m unittest discover test
+python -m unittest discover tests
 
 # Format the code
 ./tasks/format.sh

@@ -22,6 +22,6 @@ setup(
         "Environment :: Web Environment",
         "Intended Audience :: Developers",
     ],
-    packages=find_packages(include=["tna_utilities"], exclude=["test"]),
+    packages=find_packages(include=["tna_utilities"], exclude=["tests"]),
     python_requires=">=3.10",
 )

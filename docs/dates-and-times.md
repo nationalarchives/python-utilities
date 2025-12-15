@@ -121,7 +121,7 @@ print(pretty_datetime_range(datetime.datetime(2000, 1, 1, 12, 30, 0), "2000-01-0
 # 1 January 2000, 12:30 to 12:45
 
 print(pretty_datetime_range(datetime.datetime(2000, 1, 1, 12, 30, 0), datetime.datetime(2000, 1, 2, 14, 45, 0)))
-# 1 January 2000, 12:30 to 1 February 2000, 14:45
+# 1 January 2000, 12:30 to 2 February 2000, 14:45
 
 print(pretty_datetime_range(datetime.datetime(2000, 1, 1, 12, 30, 0), datetime.datetime(2000, 1, 2, 12, 45, 0), hide_date_if_single_day=True))
 # 12:30 to 12:45
@@ -185,7 +185,7 @@ Groups a list of items by year and month based on a date key in each item.
 | ---------- | ------------------------------------------------------------ | ------- |
 | `items`    | A list of items to group                                     | [none]  |
 | `date_key` | The key of the date to sort by                               | [none]  |
-| `reverse`  | If `True`, show the mast recent items at the top of the list | `False` |
+| `reverse`  | If `True`, show the most recent items at the top of the list | `False` |
 
 ### Example
 
