@@ -32,7 +32,9 @@ def get_date_from_string(date_string: str) -> datetime.datetime:  # noqa: C901
         pass
 
     try:
-        return datetime.datetime.strptime(normalised_date_string, "%Y-%m-%dT%H:%M:%S+00:00")
+        return datetime.datetime.strptime(
+            normalised_date_string, "%Y-%m-%dT%H:%M:%S+00:00"
+        )
     except ValueError:
         pass
 
@@ -145,14 +147,12 @@ def pretty_date_range(  # noqa: C901
             date_from = get_date_from_string(date_from)
         except ValueError:
             date_from = None
-            pass
 
     if not date_to or not isinstance(date_to, (datetime.date, datetime.datetime)):
         try:
             date_to = get_date_from_string(date_to)
         except ValueError:
             date_to = None
-            pass
 
     if not date_from and not date_to:
         raise ValueError("No dates provided")
@@ -215,7 +215,6 @@ def pretty_datetime_range(  # noqa: C901
                 date_from = get_date_from_string(date_from)
             except ValueError:
                 date_from = None
-                pass
 
     if not date_to or not isinstance(date_to, datetime.datetime):
         if date_to and isinstance(date_to, datetime.date):
@@ -225,7 +224,6 @@ def pretty_datetime_range(  # noqa: C901
                 date_to = get_date_from_string(date_to)
             except ValueError:
                 date_to = None
-                pass
 
     if not date_from and not date_to:
         raise ValueError("No dates provided")
