@@ -142,12 +142,14 @@ def pretty_date_range(  # noqa: C901
         try:
             date_from = get_date_from_string(date_from)
         except ValueError:
+            date_from = None
             pass
 
     if not date_to or not isinstance(date_to, (datetime.date, datetime.datetime)):
         try:
             date_to = get_date_from_string(date_to)
         except ValueError:
+            date_to = None
             pass
 
     if not date_from and not date_to:
@@ -210,6 +212,7 @@ def pretty_datetime_range(  # noqa: C901
             try:
                 date_from = get_date_from_string(date_from)
             except ValueError:
+                date_from = None
                 pass
 
     if not date_to or not isinstance(date_to, datetime.datetime):
@@ -219,6 +222,7 @@ def pretty_datetime_range(  # noqa: C901
             try:
                 date_to = get_date_from_string(date_to)
             except ValueError:
+                date_to = None
                 pass
 
     if not date_from and not date_to:
