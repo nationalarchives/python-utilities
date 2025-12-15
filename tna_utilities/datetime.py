@@ -17,40 +17,42 @@ def get_date_from_string(date_string: str) -> datetime.datetime:  # noqa: C901
     if not date_string:
         raise ValueError("Empty string cannot be parsed as date")
 
-    s = date_string.replace("Z", "+00:00")
+    normalised_date_string = date_string.replace("Z", "+00:00")
 
     try:
-        return datetime.datetime.fromisoformat(s)
+        return datetime.datetime.fromisoformat(normalised_date_string)
     except ValueError:
         pass
 
     try:
-        return datetime.datetime.strptime(s, "%Y-%m-%dT%H:%M:%S.%fZ")
+        return datetime.datetime.strptime(
+            normalised_date_string, "%Y-%m-%dT%H:%M:%S.%f+00:00"
+        )
     except ValueError:
         pass
 
     try:
-        return datetime.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ")
+        return datetime.datetime.strptime(normalised_date_string, "%Y-%m-%dT%H:%M:%S+00:00")
     except ValueError:
         pass
 
     try:
-        return datetime.datetime.strptime(s, "%Y-%m-%dT%H:%M:%S%z")
+        return datetime.datetime.strptime(normalised_date_string, "%Y-%m-%dT%H:%M:%S%z")
     except ValueError:
         pass
 
     try:
-        return datetime.datetime.strptime(s, "%Y-%m-%d")
+        return datetime.datetime.strptime(normalised_date_string, "%Y-%m-%d")
     except ValueError:
         pass
 
     try:
-        return datetime.datetime.strptime(s, "%Y-%m")
+        return datetime.datetime.strptime(normalised_date_string, "%Y-%m")
     except ValueError:
         pass
 
     try:
-        return datetime.datetime.strptime(s, "%Y")
+        return datetime.datetime.strptime(normalised_date_string, "%Y")
     except ValueError:
         pass
 
