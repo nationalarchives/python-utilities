@@ -43,13 +43,7 @@ qs = QueryStringTransformer(normalised_args)
 ```python
 from tna_utilities.urls import QueryStringTransformer
 
-# Create an iterable list that will allow
-# us to use the lists() method to get the
-# values and replicate the structure that
-# Flask and Django provide
-args = iter([("a", ["1"]), ("b", ["2", "3"])])
-
-qs = QueryStringTransformer(args)
+qs = QueryStringTransformer([("a", ["1"]), ("b", ["2", "3"])])
 ```
 
 ### Check and get values
@@ -58,7 +52,7 @@ qs = QueryStringTransformer(args)
 from tna_utilities.urls import QueryStringTransformer
 
 # ?a=1&b=2&b=3
-qs = QueryStringTransformer(iter([("a", ["1"]), ("b", ["2", "3"])]))
+qs = QueryStringTransformer([("a", ["1"]), ("b", ["2", "3"])])
 
 qs.parameter_exists("a")
 # True
@@ -84,7 +78,7 @@ qs.is_value_in_parameter("b", "4")
 from tna_utilities.urls import QueryStringTransformer
 
 # ?a=1&b=2&b=3
-qs = QueryStringTransformer(iter([("a", ["1"]), ("b", ["2", "3"])]))
+qs = QueryStringTransformer([("a", ["1"]), ("b", ["2", "3"])])
 
 qs.add_parameter("c", "4")
 qs.update_parameter("b", ["5", "6"])
@@ -109,7 +103,7 @@ qs.add_parameter(
 from tna_utilities.urls import QueryStringTransformer
 
 # ?a=1&b=2&b=3
-qs = QueryStringTransformer(iter([("a", ["1"]), ("b", ["2", "3"])]))
+qs = QueryStringTransformer([("a", ["1"]), ("b", ["2", "3"])])
 
 qs.add_parameter_value("a", "4")
 qs.toggle_parameter_value("b", "3")

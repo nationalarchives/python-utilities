@@ -11,14 +11,19 @@ class QueryStringTransformer:
               accessed with request.GET (Django) or request.args (Flask).
     """
 
-    def __init__(self, args):
-        try:
-            args_lists = args.lists()
-        except AttributeError:
-            raise TypeError(
-                "args must be a ImmutableMultiDict (Django) or QueryDict (Flask) object"
-            )
-        self.args = list(args_lists)
+    def __init__(self, args=None) -> None:
+        if type(args) is list:
+            self.args = args
+        elif args is not None:
+            try:
+                args_lists = args.lists()
+            except AttributeError:
+                raise TypeError(
+                    "args must be an ImmutableMultiDict (Django), a QueryDict (Flask) object or an iterable of (key, [values]) tuples"
+                )
+            self.args = list(args_lists)
+        else:
+            self.args = []
 
     def parameter_exists(self, parameter) -> bool:
         """
@@ -27,7 +32,7 @@ class QueryStringTransformer:
 
         return parameter in dict(self.args)
 
-    def parameter_values(self, parameter) -> list:
+    def parameter_values(self, parameter: str) -> list:
         """
         Get the values associated with a parameter in the query parameters.
         Raises an AttributeError if the parameter does not exist.
@@ -38,7 +43,9 @@ class QueryStringTransformer:
                 return values
         raise AttributeError(f"Parameter '{parameter}' does not exist")
 
-    def add_parameter(self, parameter, values=None) -> "QueryStringTransformer":
+    def add_parameter(
+        self, parameter: str, values: str | int | list | None = None
+    ) -> "QueryStringTransformer":
         """
         Add a new parameter to the query parameters.
         Raises a ValueError if the parameter already exists.
@@ -54,7 +61,9 @@ class QueryStringTransformer:
         self.args.append((parameter, values))
         return self
 
-    def update_parameter(self, parameter, values=None) -> "QueryStringTransformer":
+    def update_parameter(
+        self, parameter: str, values: str | int | list | None = None
+    ) -> "QueryStringTransformer":
         """
         Update an existing parameter in the query parameters.
         If the parameter does not exist, it will be added.
@@ -67,7 +76,7 @@ class QueryStringTransformer:
         self.add_parameter(parameter, values)
         return self
 
-    def remove_parameter(self, parameter) -> "QueryStringTransformer":
+    def remove_parameter(self, parameter: str) -> "QueryStringTransformer":
         """
         Remove a parameter from the query parameters.
         Raises an AttributeError if the parameter does not exist.
@@ -79,7 +88,7 @@ class QueryStringTransformer:
                 return self
         raise AttributeError(f"Parameter '{parameter}' does not exist")
 
-    def is_value_in_parameter(self, parameter, value) -> bool:
+    def is_value_in_parameter(self, parameter: str, value: str | int) -> bool:
         """
         Check if a specific value exists within a parameter's values.
         Raises an AttributeError if the parameter does not exist.
@@ -90,7 +99,9 @@ class QueryStringTransformer:
                 return value in values
         raise AttributeError(f"Parameter '{parameter}' does not exist")
 
-    def add_parameter_value(self, parameter, value) -> "QueryStringTransformer":
+    def add_parameter_value(
+        self, parameter: str, value: str | int
+    ) -> "QueryStringTransformer":
         """
         Add a specific value to a parameter's values.
         Raises an AttributeError if the parameter does not exist.
@@ -103,7 +114,9 @@ class QueryStringTransformer:
                 return self
         raise AttributeError(f"Parameter '{parameter}' does not exist")
 
-    def toggle_parameter_value(self, parameter, value) -> "QueryStringTransformer":
+    def toggle_parameter_value(
+        self, parameter: str, value: str | int
+    ) -> "QueryStringTransformer":
         """
         Toggle a value within a parameter's values.
         If the value exists, it will be removed; if it does not exist, it will be added.
@@ -119,7 +132,9 @@ class QueryStringTransformer:
                 return self
         raise AttributeError(f"Parameter '{parameter}' does not exist")
 
-    def remove_parameter_value(self, parameter, value) -> "QueryStringTransformer":
+    def remove_parameter_value(
+        self, parameter: str, value: str | int
+    ) -> "QueryStringTransformer":
         """
         Remove a specific value from a parameter's values.
         Raises an AttributeError if the parameter does not exist.
