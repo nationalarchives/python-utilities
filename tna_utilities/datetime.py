@@ -138,17 +138,13 @@ def pretty_date_range(  # noqa: C901
     Formats a date range into the format used by The National Archives.
     """
 
-    if date_from and isinstance(date_from, (datetime.date, datetime.datetime)):
-        date_from = date_from
-    else:
+    if not date_from or not isinstance(date_from, (datetime.date, datetime.datetime)):
         try:
             date_from = get_date_from_string(date_from)
         except ValueError:
             pass
 
-    if date_to and isinstance(date_to, (datetime.date, datetime.datetime)):
-        date_to = date_to
-    else:
+    if not date_to or not isinstance(date_to, (datetime.date, datetime.datetime)):
         try:
             date_to = get_date_from_string(date_to)
         except ValueError:
@@ -194,6 +190,8 @@ def pretty_date_range(  # noqa: C901
         start = "now to" if lowercase_first else "Now to"
         return f"{start} {date_to.strftime('%B %Y' if omit_days else '%-d %B %Y')}"
 
+    return ""
+
 
 def pretty_datetime_range(  # noqa: C901
     date_from: Optional[Union[str, datetime.date, datetime.datetime]],
@@ -205,25 +203,23 @@ def pretty_datetime_range(  # noqa: C901
     Formats a date/time range into the format used by The National Archives.
     """
 
-    if date_from and isinstance(date_from, datetime.datetime):
-        date_from = date_from
-    elif date_from and isinstance(date_from, datetime.date):
-        raise TypeError("From date object provided, datetime object expected")
-    else:
-        try:
-            date_from = get_date_from_string(date_from)
-        except ValueError:
-            pass
+    if not date_from or not isinstance(date_from, datetime.datetime):
+        if date_from and isinstance(date_from, datetime.date):
+            raise TypeError("From date object provided, datetime object expected")
+        else:
+            try:
+                date_from = get_date_from_string(date_from)
+            except ValueError:
+                pass
 
-    if date_to and isinstance(date_to, datetime.datetime):
-        date_to = date_to
-    elif date_to and isinstance(date_to, datetime.date):
-        raise TypeError("To date object provided, datetime object expected")
-    else:
-        try:
-            date_to = get_date_from_string(date_to)
-        except ValueError:
-            pass
+    if not date_to or not isinstance(date_to, datetime.datetime):
+        if date_to and isinstance(date_to, datetime.date):
+            raise TypeError("To date object provided, datetime object expected")
+        else:
+            try:
+                date_to = get_date_from_string(date_to)
+            except ValueError:
+                pass
 
     if not date_from and not date_to:
         raise ValueError("No dates provided")
@@ -259,6 +255,8 @@ def pretty_datetime_range(  # noqa: C901
     if date_to:
         start = "now to" if lowercase_first else "Now to"
         return f"{start} {date_to.strftime('%-d %B %Y, %H:%M')}"
+
+    return ""
 
 
 def is_today_or_future(date: Union[datetime.date, datetime.datetime]) -> bool:
