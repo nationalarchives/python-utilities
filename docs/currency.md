@@ -17,10 +17,10 @@ Formats a number as a currency without the currency symbol.
 from tna_utilities.currency import currency
 
 print(currency(5))
-# 5.00
-
-print(currency(5, simplify=True))
 # 5
+
+print(currency(5, simplify=False))
+# 5.00
 
 print(currency(5.2))
 # 5.20
@@ -36,7 +36,7 @@ Formats a number as a price.
 | ----------------- | --------------------------------------------------------------- | ------- |
 | `value`           | The value to format                                             | [none]  |
 | `simplify`        | If `True`, remove the decimal values for whole number of pounds | `True`  |
-| `currency_symbol` | The currency sybmol to use                                      | `£`     |
+| `currency_symbol` | The currency symbol to use                                      | `£`     |
 
 ### Example
 
@@ -44,10 +44,10 @@ Formats a number as a price.
 from tna_utilities.currency import pretty_price
 
 print(pretty_price(5))
-# £5.00
-
-print(pretty_price(5, simplify=True))
 # £5
+
+print(pretty_price(5, simplify=False))
+# £5.00
 
 print(pretty_price(5, currency_symbol="€"))
 # €5.00
@@ -64,7 +64,7 @@ Formats a price range.
 | `value_from`      | The lower value                                                 | `None`  |
 | `value_to`        | The higher value                                                | `None`  |
 | `simplify`        | If `True`, remove the decimal values for whole number of pounds | `True`  |
-| `currency_symbol` | The currency sybmol to use                                      | `£`     |
+| `currency_symbol` | The currency symbol to use                                      | `£`     |
 
 ### Example
 
