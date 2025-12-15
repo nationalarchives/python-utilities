@@ -8,6 +8,13 @@ permissions:
   contents: read
 
 jobs:
+  check_format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check formatting
+        run: docker run --rm -v "$(pwd)":/app/ ghcr.io/nationalarchives/tna-python-dev:latest checkformat
+
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -19,7 +26,5 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Check formatting
-        run: docker run --rm -v "$(pwd)":/app/ ghcr.io/nationalarchives/tna-python-dev:latest checkformat
       - name: Run tests
         run: python -m unittest discover test
