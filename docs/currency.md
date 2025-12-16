@@ -72,11 +72,11 @@ Formats a price range.
 from tna_utilities.currency import pretty_price_range
 
 print(pretty_price_range(5, 10))
-# £5.00 to £10
+# £5 to £10
 
 print(pretty_price_range(0, 15))
-# Free to £15.00
+# Free to £15
 
 print(pretty_price_range(10, 0))
-# From £10.00
+# From £10
 ```
