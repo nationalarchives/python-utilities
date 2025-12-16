@@ -12,7 +12,7 @@ class QueryStringTransformer:
     """
 
     def __init__(self, args=None) -> None:
-        if type(args) is list:
+        if isinstance(args, list):
             self.args = args
         elif args is not None:
             try:
@@ -54,7 +54,7 @@ class QueryStringTransformer:
         for key, vals in self.args:
             if key == parameter:
                 raise ValueError(f"Parameter '{parameter}' already exists")
-        if type(values) is not list:
+        if not isinstance(values, list):
             values = [str(values)] if values is not None else []
         else:
             values = [str(v) for v in values]
@@ -96,7 +96,7 @@ class QueryStringTransformer:
 
         for key, values in self.args:
             if key == parameter:
-                return value in values
+                return str(value) in values
         raise AttributeError(f"Parameter '{parameter}' does not exist")
 
     def add_parameter_value(
@@ -109,8 +109,8 @@ class QueryStringTransformer:
 
         for key, values in self.args:
             if key == parameter:
-                if value not in values:
-                    values.append(value)
+                if str(value) not in values:
+                    values.append(str(value))
                 return self
         raise AttributeError(f"Parameter '{parameter}' does not exist")
 
