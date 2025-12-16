@@ -69,10 +69,8 @@ class QueryStringTransformer:
         If the parameter does not exist, it will be added.
         """
 
-        try:
+        if self.parameter_exists(parameter):
             self.remove_parameter(parameter)
-        except AttributeError:
-            pass
         self.add_parameter(parameter, values)
         return self
 
