@@ -130,6 +130,33 @@ print(pretty_datetime_range(datetime.datetime(2000, 1, 1, 12, 30, 0), None))
 # From 1 January 2000, 12:30
 ```
 
+## pretty_age()
+
+Formats a datetime into a human-readable delta.
+
+### Arguments
+
+| Argument           | Description                                                                                  | Default |
+| ------------------ | -------------------------------------------------------------------------------------------- | ------- |
+| `date`             | The datetime to show the delta from                                                          | [none]  |
+| `just_now_seconds` | The maximum number of seconds in the past to use `Just now` instead of `x seconds ago`       | `5`     |
+| `lowercase_first`  | If `True`, use `just now` and `in...` for outputs that normally start `Just now` and `In...` | `False` |
+
+### Example
+
+```py
+from tna_utilities.datetime import pretty_age
+
+print(pretty_age(datetime.datetime.now() - datetime.timedelta(seconds=1337)))
+# 22 minutes ago
+
+print(pretty_age(datetime.datetime.now() + datetime.timedelta(days=1)))
+# In 1 day
+
+print(pretty_age(datetime.datetime.now() - datetime.timedelta(seconds=29), just_now_seconds=60))
+# Just now
+```
+
 ## is_today_or_future()
 
 Determines if the given date string represents today or a future date.

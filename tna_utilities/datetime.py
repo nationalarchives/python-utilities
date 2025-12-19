@@ -263,6 +263,45 @@ def pretty_datetime_range(  # noqa: C901
     return ""
 
 
+def pretty_age(date, just_now_seconds: int = 5, lowercase_first: bool = False) -> str:
+    if not date:
+        raise ValueError("Date must be provided")
+
+    date = date.replace(microsecond=0)
+    now = datetime.datetime.now().replace(microsecond=0)
+
+    future = now < date
+    delta = date - now if future else now - date
+    days = delta.days
+    seconds = delta.seconds
+
+    if future:
+        prefix = "in " if lowercase_first else "In "
+        suffix = ""
+    else:
+        prefix = ""
+        suffix = " ago"
+
+    if days > 365:
+        years = days // 365
+        return f"{prefix}{years} year{'s' if years != 1 else ''}{suffix}"
+    elif days > 30:
+        months = days // 30
+        return f"{prefix}{months} month{'s' if months != 1 else ''}{suffix}"
+    elif days > 0:
+        return f"{prefix}{days} day{'s' if days != 1 else ''}{suffix}"
+    elif seconds >= 3600:
+        hours = seconds // 3600
+        return f"{prefix}{hours} hour{'s' if hours != 1 else ''}{suffix}"
+    elif seconds >= 60:
+        minutes = seconds // 60
+        return f"{prefix}{minutes} minute{'s' if minutes != 1 else ''}{suffix}"
+    elif seconds > just_now_seconds or future:
+        return f"{prefix}{seconds} second{'s' if seconds != 1 else ''}{suffix}"
+    else:
+        return "just now" if lowercase_first else "Just now"
+
+
 def is_today_or_future(date: Union[datetime.date, datetime.datetime]) -> bool:
     """
     Determines if the given date string represents today or a future date.

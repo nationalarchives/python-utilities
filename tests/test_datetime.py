@@ -6,6 +6,7 @@ from tna_utilities.datetime import (
     group_by_year_and_month,
     is_today_in_date_range,
     is_today_or_future,
+    pretty_age,
     pretty_date,
     pretty_date_range,
     pretty_datetime,
@@ -543,6 +544,172 @@ class TestPrettyDatetimeRange(unittest.TestCase):
     def test_unhappy_none(self):
         with self.assertRaises(ValueError):
             pretty_datetime_range(None, None)
+
+
+class TestPrettyAge(unittest.TestCase):
+    def test_happy_past(self):
+        self.assertEqual(
+            pretty_age(datetime.datetime.now()),
+            "Just now",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() - datetime.timedelta(seconds=1)),
+            "Just now",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() - datetime.timedelta(seconds=5)),
+            "Just now",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() - datetime.timedelta(seconds=6)),
+            "6 seconds ago",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() - datetime.timedelta(seconds=60)),
+            "1 minute ago",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() - datetime.timedelta(seconds=1337)),
+            "22 minutes ago",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() - datetime.timedelta(minutes=1)),
+            "1 minute ago",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() - datetime.timedelta(minutes=60)),
+            "1 hour ago",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() - datetime.timedelta(hours=1)),
+            "1 hour ago",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() - datetime.timedelta(hours=24)),
+            "1 day ago",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() - datetime.timedelta(days=1)),
+            "1 day ago",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() - datetime.timedelta(days=30)),
+            "30 days ago",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() - datetime.timedelta(days=31)),
+            "1 month ago",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() - datetime.timedelta(days=365)),
+            "12 months ago",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() - datetime.timedelta(days=366)),
+            "1 year ago",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() - datetime.timedelta(days=3651)),
+            "10 years ago",
+        )
+
+    def test_happy_future(self):
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() + datetime.timedelta(seconds=1)),
+            "In 1 second",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() + datetime.timedelta(seconds=5)),
+            "In 5 seconds",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() + datetime.timedelta(seconds=6)),
+            "In 6 seconds",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() + datetime.timedelta(seconds=60)),
+            "In 1 minute",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() + datetime.timedelta(seconds=1337)),
+            "In 22 minutes",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() + datetime.timedelta(minutes=1)),
+            "In 1 minute",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() + datetime.timedelta(minutes=60)),
+            "In 1 hour",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() + datetime.timedelta(hours=1)),
+            "In 1 hour",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() + datetime.timedelta(hours=24)),
+            "In 1 day",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() + datetime.timedelta(days=1)),
+            "In 1 day",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() + datetime.timedelta(days=30)),
+            "In 30 days",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() + datetime.timedelta(days=31)),
+            "In 1 month",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() + datetime.timedelta(days=365)),
+            "In 12 months",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() + datetime.timedelta(days=366)),
+            "In 1 year",
+        )
+        self.assertEqual(
+            pretty_age(datetime.datetime.now() + datetime.timedelta(days=3651)),
+            "In 10 years",
+        )
+
+    def test_happy_just_now(self):
+        self.assertEqual(
+            pretty_age(
+                datetime.datetime.now() - datetime.timedelta(seconds=1),
+                just_now_seconds=1,
+            ),
+            "Just now",
+        )
+        self.assertEqual(
+            pretty_age(
+                datetime.datetime.now() - datetime.timedelta(seconds=2),
+                just_now_seconds=1,
+            ),
+            "2 seconds ago",
+        )
+
+    def test_happy_lowercase(self):
+        self.assertEqual(
+            pretty_age(
+                datetime.datetime.now() - datetime.timedelta(seconds=1),
+                lowercase_first=True,
+            ),
+            "just now",
+        )
+        self.assertEqual(
+            pretty_age(
+                datetime.datetime.now() + datetime.timedelta(seconds=1),
+                lowercase_first=True,
+            ),
+            "in 1 second",
+        )
+
+    def test_unhappy_none(self):
+        with self.assertRaises(ValueError):
+            pretty_age(None)
 
 
 class TestIsTodayOrFuture(unittest.TestCase):
