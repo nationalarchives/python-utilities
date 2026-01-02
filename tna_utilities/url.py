@@ -83,9 +83,9 @@ class QueryStringTransformer:
         Raises a KeyError if the parameter does not exist.
         """
 
-        for key, vals in self.args:
+        for index, (key, vals) in enumerate(self.args):
             if key == parameter:
-                self.args.remove((key, vals))
+                del self.args[index]
                 return self
         raise KeyError(f"Parameter '{parameter}' does not exist")
 
