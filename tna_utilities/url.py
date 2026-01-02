@@ -126,10 +126,12 @@ class QueryStringTransformer:
 
         for key, values in self.args:
             if key == parameter:
-                if str(value) in values:
-                    self.remove_parameter_value(parameter, value)
+                str_value = str(value)
+                if str_value in values:
+                    values.remove(str_value)
                 else:
-                    self.add_parameter_value(parameter, value)
+                    if str_value not in values:
+                        values.append(str_value)
                 return self
         raise KeyError(f"Parameter '{parameter}' does not exist")
 
