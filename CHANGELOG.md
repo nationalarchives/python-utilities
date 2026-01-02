@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Allow `QueryStringTransformer` to be instantiated with a list of tuples or an empty query object
 - Add `pretty_age` to show human-readable deltas (e.g. `3 days ago`)
+- Add `numbers` module with `numberish` function to provide human-readable approximate numbers (e.g. `About 120 million`)
 
 ### Changed
 
