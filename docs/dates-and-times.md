@@ -120,10 +120,10 @@ from tna_utilities.datetime import pretty_datetime_range
 print(pretty_datetime_range(datetime.datetime(2000, 1, 1, 12, 30, 0), "2000-01-01T12:45:00Z"))
 # 1 January 2000, 12:30 to 12:45
 
-print(pretty_datetime_range(datetime.datetime(2000, 1, 1, 12, 30, 0), datetime.datetime(2000, 1, 2, 14, 45, 0)))
-# 1 January 2000, 12:30 to 2 February 2000, 14:45
+print(pretty_datetime_range(datetime.datetime(2000, 1, 1, 12, 30, 0), datetime.datetime(2001, 2, 2, 14, 45, 0)))
+# 1 January 2000, 12:30 to 2 February 2001, 14:45
 
-print(pretty_datetime_range(datetime.datetime(2000, 1, 1, 12, 30, 0), datetime.datetime(2000, 1, 2, 12, 45, 0), hide_date_if_single_day=True))
+print(pretty_datetime_range(datetime.datetime(2000, 1, 1, 12, 30, 0), datetime.datetime(2000, 1, 1, 12, 45, 0), hide_date_if_single_day=True))
 # 12:30 to 12:45
 
 print(pretty_datetime_range(datetime.datetime(2000, 1, 1, 12, 30, 0), None))
@@ -227,7 +227,7 @@ items = [
     {"id": 3, "date": datetime.date(2022, 6, 10)},
     {"id": 4, "date": datetime.date(2021, 12, 25)},
 ]
-print(group_by_year_and_month(items))
+print(group_by_year_and_month(items, date_key="date"))
 # [
 #     {
 #         "heading": "2021",
@@ -291,9 +291,10 @@ Converts a total number of seconds into a human-readable duration string.
 
 ### Arguments
 
-| Argument        | Description                     | Default |
-| --------------- | ------------------------------- | ------- |
-| `total_seconds` | The number of seconds to format | [none]  |
+| Argument        | Description                                         | Default |
+| --------------- | --------------------------------------------------- | ------- |
+| `total_seconds` | The number of seconds to format                     | [none]  |
+| `simplify`      | If `True`, omit leading zero-valued time components | [none]  |
 
 ### Example
 
