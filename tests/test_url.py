@@ -35,11 +35,15 @@ class TestQuery(unittest.TestCase):
         self.assertEqual(manipulator.add_parameter("foo", "bar"), manipulator)
         self.assertEqual(manipulator.get_query_string(), "?a=1&b=2&b=3&foo=bar")
 
+    def test_unhappy_init(self):
+        with self.assertRaises(AttributeError):
+            QueryStringTransformer(0)
+
     def test_parameter_values(self):
         manipulator = QueryStringTransformer(self.test_query)
         self.assertEqual(manipulator.parameter_values("a"), ["1"])
         self.assertEqual(manipulator.parameter_values("b"), ["2", "3"])
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(KeyError):
             manipulator.parameter_values("c")
 
     def test_add_parameter(self):
@@ -89,7 +93,7 @@ class TestQuery(unittest.TestCase):
         self.assertFalse(manipulator.parameter_exists("a"))
         self.assertEqual(manipulator.remove_parameter("b"), manipulator)
         self.assertFalse(manipulator.parameter_exists("b"))
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(KeyError):
             self.assertEqual(manipulator.remove_parameter("c"), manipulator)
         self.assertEqual(manipulator.get_query_string(), "?")
 
@@ -99,7 +103,7 @@ class TestQuery(unittest.TestCase):
         self.assertTrue(manipulator.is_value_in_parameter("b", "2"))
         self.assertTrue(manipulator.is_value_in_parameter("b", "3"))
         self.assertFalse(manipulator.is_value_in_parameter("b", "4"))
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(KeyError):
             self.assertFalse(manipulator.is_value_in_parameter("c", "5"))
 
     def test_toggle_parameter_value(self):

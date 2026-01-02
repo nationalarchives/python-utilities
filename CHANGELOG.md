@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Transformations to non-existent keys in `QueryStringTransformer` now throw `KeyError` rather than `AttributeError`
+
 ### Deprecated
 
 ### Removed
