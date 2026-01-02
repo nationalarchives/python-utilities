@@ -87,7 +87,7 @@ class QueryStringTransformer:
             if key == parameter:
                 self.args.remove((key, vals))
                 return self
-        raise AttributeError(f"Parameter '{parameter}' does not exist")
+        raise KeyError(f"Parameter '{parameter}' does not exist")
 
     def is_value_in_parameter(self, parameter: str, value: str | int) -> bool:
         """
@@ -98,7 +98,7 @@ class QueryStringTransformer:
         for key, values in self.args:
             if key == parameter:
                 return str(value) in values
-        raise AttributeError(f"Parameter '{parameter}' does not exist")
+        raise KeyError(f"Parameter '{parameter}' does not exist")
 
     def add_parameter_value(
         self, parameter: str, value: str | int
@@ -113,7 +113,7 @@ class QueryStringTransformer:
                 if str(value) not in values:
                     values.append(str(value))
                 return self
-        raise AttributeError(f"Parameter '{parameter}' does not exist")
+        raise KeyError(f"Parameter '{parameter}' does not exist")
 
     def toggle_parameter_value(
         self, parameter: str, value: str | int
@@ -131,7 +131,7 @@ class QueryStringTransformer:
                 else:
                     self.add_parameter_value(parameter, value)
                 return self
-        raise AttributeError(f"Parameter '{parameter}' does not exist")
+        raise KeyError(f"Parameter '{parameter}' does not exist")
 
     def remove_parameter_value(
         self, parameter: str, value: str | int
@@ -146,7 +146,7 @@ class QueryStringTransformer:
                 if str(value) in values:
                     values.remove(str(value))
                 return self
-        raise AttributeError(f"Parameter '{parameter}' does not exist")
+        raise KeyError(f"Parameter '{parameter}' does not exist")
 
     def get_query_string(self) -> str:
         """
