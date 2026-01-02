@@ -138,14 +138,17 @@ class QueryStringTransformer:
     ) -> "QueryStringTransformer":
         """
         Remove a specific value from a parameter's values.
-        Raises a KeyError if the parameter does not exist.
+        Raises a KeyError if the parameter does not exist or if the value is not present.
         """
 
         for key, values in self.args:
             if key == parameter:
                 if str(value) in values:
                     values.remove(str(value))
-                return self
+                    return self
+                raise KeyError(
+                    f"Value '{value}' does not exist for parameter '{parameter}'"
+                )
         raise KeyError(f"Parameter '{parameter}' does not exist")
 
     def get_query_string(self) -> str:
