@@ -151,6 +151,10 @@ class QueryStringTransformer:
     def get_query_string(self) -> str:
         """
         Get the full query string.
+        Returns an empty string if there are no query parameters.
         """
 
-        return f"?{urlencode(self.args, doseq=True)}"
+        query = urlencode(self.args, doseq=True)
+        if not query:
+            return ""
+        return f"?{query}"

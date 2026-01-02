@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Transformations to non-existent keys in `QueryStringTransformer` now throw `KeyError` rather than `AttributeError`
+- If there is an empty query string, `QueryStringTransformer` returns a blank string rather than an empty `?`
 
 ### Deprecated
 

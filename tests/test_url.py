@@ -11,7 +11,7 @@ class TestQuery(unittest.TestCase):
 
     def test_init(self):
         manipulator = QueryStringTransformer()
-        self.assertEqual(manipulator.get_query_string(), "?")
+        self.assertEqual(manipulator.get_query_string(), "")
         self.assertEqual(manipulator.add_parameter("foo", "bar"), manipulator)
         self.assertEqual(manipulator.get_query_string(), "?foo=bar")
 
@@ -95,7 +95,7 @@ class TestQuery(unittest.TestCase):
         self.assertFalse(manipulator.parameter_exists("b"))
         with self.assertRaises(KeyError):
             self.assertEqual(manipulator.remove_parameter("c"), manipulator)
-        self.assertEqual(manipulator.get_query_string(), "?")
+        self.assertEqual(manipulator.get_query_string(), "")
 
     def test_is_value_in_parameter(self):
         manipulator = QueryStringTransformer(self.test_query)
