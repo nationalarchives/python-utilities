@@ -38,7 +38,7 @@ class QueryStringTransformer:
     def parameter_values(self, parameter: str) -> list:
         """
         Get the values associated with a parameter in the query parameters.
-        Raises an KeyError if the parameter does not exist.
+        Raises a KeyError if the parameter does not exist.
         """
 
         for key, values in self.args:
@@ -80,7 +80,7 @@ class QueryStringTransformer:
     def remove_parameter(self, parameter: str) -> "QueryStringTransformer":
         """
         Remove a parameter from the query parameters.
-        Raises an KeyError if the parameter does not exist.
+        Raises a KeyError if the parameter does not exist.
         """
 
         for key, vals in self.args:
@@ -92,7 +92,7 @@ class QueryStringTransformer:
     def is_value_in_parameter(self, parameter: str, value: str | int) -> bool:
         """
         Check if a specific value exists within a parameter's values.
-        Raises an KeyError if the parameter does not exist.
+        Raises a KeyError if the parameter does not exist.
         """
 
         for key, values in self.args:
@@ -105,7 +105,7 @@ class QueryStringTransformer:
     ) -> "QueryStringTransformer":
         """
         Add a specific value to a parameter's values.
-        Raises an KeyError if the parameter does not exist.
+        Raises a KeyError if the parameter does not exist.
         """
 
         for key, values in self.args:
@@ -121,7 +121,7 @@ class QueryStringTransformer:
         """
         Toggle a value within a parameter's values.
         If the value exists, it will be removed; if it does not exist, it will be added.
-        Raises an KeyError if the parameter does not exist.
+        Raises a KeyError if the parameter does not exist.
         """
 
         for key, values in self.args:
@@ -138,7 +138,7 @@ class QueryStringTransformer:
     ) -> "QueryStringTransformer":
         """
         Remove a specific value from a parameter's values.
-        Raises an KeyError if the parameter does not exist.
+        Raises a KeyError if the parameter does not exist.
         """
 
         for key, values in self.args:
