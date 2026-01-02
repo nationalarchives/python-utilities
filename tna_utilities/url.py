@@ -30,7 +30,10 @@ class QueryStringTransformer:
         Check if a parameter exists in the query parameters.
         """
 
-        return parameter in dict(self.args)
+        for key, _ in self.args:
+            if key == parameter:
+                return True
+        return False
 
     def parameter_values(self, parameter: str) -> list:
         """
@@ -123,7 +126,7 @@ class QueryStringTransformer:
 
         for key, values in self.args:
             if key == parameter:
-                if value in values:
+                if str(value) in values:
                     self.remove_parameter_value(parameter, value)
                 else:
                     self.add_parameter_value(parameter, value)
@@ -140,8 +143,8 @@ class QueryStringTransformer:
 
         for key, values in self.args:
             if key == parameter:
-                if value in values:
-                    values.remove(value)
+                if str(value) in values:
+                    values.remove(str(value))
                 return self
         raise AttributeError(f"Parameter '{parameter}' does not exist")
 
