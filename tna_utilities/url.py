@@ -38,13 +38,13 @@ class QueryStringTransformer:
     def parameter_values(self, parameter: str) -> list:
         """
         Get the values associated with a parameter in the query parameters.
-        Raises an AttributeError if the parameter does not exist.
+        Raises a KeyError if the parameter does not exist.
         """
 
         for key, values in self.args:
             if key == parameter:
                 return values
-        raise AttributeError(f"Parameter '{parameter}' does not exist")
+        raise KeyError(f"Parameter '{parameter}' does not exist")
 
     def add_parameter(
         self, parameter: str, values: str | int | list | None = None
