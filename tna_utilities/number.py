@@ -1,3 +1,4 @@
+import math
 from typing import Union
 
 
@@ -25,7 +26,10 @@ def numberish(
             base_value = value / threshold
             if base_value.is_integer():
                 return f"{int(base_value)}{unit}"
-            base_value_rounded = float(f"{base_value:.2g}")
+            base_value_rounded = round(
+                base_value,
+                -int(math.floor(math.log10(abs(base_value)))) + 1,
+            )
             if base_value_rounded == base_value:
                 prefix_text = ""
             elif isinstance(prefix_text, tuple):
@@ -35,9 +39,9 @@ def numberish(
                     raise ValueError(
                         "Both elements of the prefix_text tuple must be strings"
                     )
-                is_approximation_high = base_value_rounded * threshold - value >= 0
+                approximation_is_over = base_value_rounded * threshold - value >= 0
                 prefix_text = (
-                    prefix_text[0] if is_approximation_high else prefix_text[1]
+                    prefix_text[0] if approximation_is_over else prefix_text[1]
                 )
             return f"{prefix_text}{base_value_rounded:g}{unit}"
     return str(int(value))
