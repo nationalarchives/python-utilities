@@ -5,7 +5,7 @@ def numberish(
     value: Union[float, int],
     simple_units: bool = False,
     prefix_text: Union[str, tuple[str]] = "About ",
-):
+) -> str:
     if not isinstance(value, (int, float)):
         raise ValueError("Value must be an integer or float")
     if value == 0:
