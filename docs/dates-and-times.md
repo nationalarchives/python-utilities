@@ -294,7 +294,7 @@ Converts a total number of seconds into a human-readable duration string.
 | Argument        | Description                                         | Default |
 | --------------- | --------------------------------------------------- | ------- |
 | `total_seconds` | The number of seconds to format                     | [none]  |
-| `simplify`      | If `True`, omit leading zero-valued time components | [none]  |
+| `simplify`      | If `True`, omit leading zero-valued time components | `False` |
 
 ### Example
 
