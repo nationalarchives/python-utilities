@@ -14,8 +14,6 @@ def numberish(
         raise ValueError("Value must be an integer or float")
     if value == 0:
         return "None"
-    if value < 1000:
-        return str(int(value))
     units = [
         ("billion", "b", 1_000_000_000),
         ("million", "m", 1_000_000),
@@ -42,3 +40,4 @@ def numberish(
                     prefix_text[0] if is_approximation_high else prefix_text[1]
                 )
             return f"{prefix_text}{base_value_rounded:g}{unit}"
+    return str(int(value))
