@@ -9,7 +9,7 @@ A utility class to manipulate query strings.
 #### Flask
 
 ```python
-from tna_utilities.urls import QueryStringTransformer
+from tna_utilities.url import QueryStringTransformer
 
 # ?a=1&b=2&b=3
 print(request.args)
@@ -25,7 +25,7 @@ qs = QueryStringTransformer(normalised_args)
 #### Django
 
 ```python
-from tna_utilities.urls import QueryStringTransformer
+from tna_utilities.url import QueryStringTransformer
 
 # ?a=1&b=2&b=3
 print(request.GET)
@@ -41,7 +41,7 @@ qs = QueryStringTransformer(normalised_args)
 #### Bespoke
 
 ```python
-from tna_utilities.urls import QueryStringTransformer
+from tna_utilities.url import QueryStringTransformer
 
 qs = QueryStringTransformer([("a", ["1"]), ("b", ["2", "3"])])
 ```
@@ -49,7 +49,7 @@ qs = QueryStringTransformer([("a", ["1"]), ("b", ["2", "3"])])
 ### Check and get values
 
 ```python
-from tna_utilities.urls import QueryStringTransformer
+from tna_utilities.url import QueryStringTransformer
 
 # ?a=1&b=2&b=3
 qs = QueryStringTransformer([("a", ["1"]), ("b", ["2", "3"])])
@@ -75,7 +75,7 @@ qs.is_value_in_parameter("b", "4")
 ### Add and remove parameters
 
 ```python
-from tna_utilities.urls import QueryStringTransformer
+from tna_utilities.url import QueryStringTransformer
 
 # ?a=1&b=2&b=3
 qs = QueryStringTransformer([("a", ["1"]), ("b", ["2", "3"])])
@@ -100,7 +100,7 @@ qs.add_parameter(
 ### Update parameter values
 
 ```python
-from tna_utilities.urls import QueryStringTransformer
+from tna_utilities.url import QueryStringTransformer
 
 # ?a=1&b=2&b=3
 qs = QueryStringTransformer([("a", ["1"]), ("b", ["2", "3"])])

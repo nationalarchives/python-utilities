@@ -14,7 +14,7 @@ Convert a string to a URL-friendly slug.
 ### Example
 
 ```py
-from tna_utilities.strings import slugify
+from tna_utilities.string import slugify
 
 print(slugify("TNA Python Utilities Docs"))
 # tna-python-utilities-docs
@@ -34,7 +34,7 @@ Convert a slug back to a human-readable string.
 ### Example
 
 ```py
-from tna_utilities.strings import unslugify
+from tna_utilities.string import unslugify
 
 print(unslugify("tna-python-utilities-docs"))
 # Tna python utilities docs
