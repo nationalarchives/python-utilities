@@ -209,14 +209,33 @@ class CspGenerator:
         self.directives["require-trusted-types-for"] = ["'script'"]
         return self
 
-    def sandbox(
-        self, sources: str | list[str] | None = None, omit_self=False
-    ) -> "CspGenerator":
+    def sandbox(self, value: str | None = None) -> "CspGenerator":
         """
         Add a sandbox directive.
         """
 
-        return self.add_directive("sandbox", sources, omit_self)
+        values = [
+            "allow-downloads",
+            "allow-forms",
+            "allow-modals",
+            "allow-orientation-lock",
+            "allow-pointer-lock",
+            "allow-popups",
+            "allow-popups-to-escape-sandbox",
+            "allow-presentation",
+            "allow-same-origin",
+            "allow-scripts",
+            "allow-top-navigation",
+            "allow-top-navigation-by-user-activation",
+            "allow-top-navigation-to-custom-protocols",
+        ]
+        if value and value in values:
+            sources = [value]
+        else:
+            sources = []
+
+        self.directives["sandbox"] = sources
+        return self
 
     def script_src(
         self, sources: str | list[str] | None = None, omit_self=False
