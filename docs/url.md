@@ -88,13 +88,13 @@ print(qs.get_query_string())
 # ?b=5&b=6&c=4
 
 # Chainable (as of v1.1.0)
-qs.add_parameter(
+print(qs.add_parameter(
     "c", "4"
 ).update_parameter(
     "b", ["5", "6"]
 ).remove_parameter(
     "a"
-).get_query_string()
+).get_query_string())
 ```
 
 ### Update parameter values
