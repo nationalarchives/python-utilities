@@ -1,5 +1,7 @@
 # Security
 
+Added in `v1.3.0`.
+
 ## `CspGenerator`
 
 A utility class to generate a CSP.
