@@ -363,8 +363,7 @@ def security_headers(
     return {
         header["header"]: (
             header["value"]
-            if "value" in header
-            and header["value"] is not None
+            if header["value"] is not None
             and header["value"] in header["values"]
             else header["default"]
         )
