@@ -3,10 +3,10 @@ import unittest
 from tna_utilities.url import QueryStringTransformer
 
 
-class TestQuery(unittest.TestCase):
+class TestQueryStringTransformer(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
-        super(TestQuery, self).__init__(*args, **kwargs)
+        super(TestQueryStringTransformer, self).__init__(*args, **kwargs)
         self.test_query = [("a", ["1"]), ("b", ["2", "3"])]
 
     def test_init(self):
