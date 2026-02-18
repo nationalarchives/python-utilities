@@ -42,7 +42,7 @@ class CspGenerator:
         if sources == self.default_src:
             return self
 
-        # If the option is not passed to omit self and self or none is not already in the sources, we add self to the beginning of the sources
+        # Unless omit_self is True, add 'self' when either it or 'none' is not specified in the sources
         if (
             not omit_self
             and self.CSP_SELF not in sources
@@ -90,15 +90,6 @@ class CspGenerator:
         """
 
         return self.add_directive("connect-src", sources, omit_self)
-
-    # def fenced_frame_src(
-    #     self, sources: str | list[str] | None = None, omit_self=False
-    # ) -> "CspGenerator":
-    #     """
-    #     Add a fenced-frame-src directive.
-    #     """
-
-    #     return self.add_directive("fenced-frame-src", sources, omit_self)
 
     def font_src(
         self, sources: str | list[str] | None = None, omit_self=False
