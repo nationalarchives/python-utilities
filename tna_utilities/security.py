@@ -42,7 +42,7 @@ class CspGenerator:
         if sources == self.default_src:
             return self
 
-        # If the option is not passed to omit self and self or none is not already in the sources, we add self to the beginning of the sources
+        # Unless omit_self is True, add 'self' when either it or 'none' is not specified in the sources
         if (
             not omit_self
             and self.CSP_SELF not in sources
@@ -90,15 +90,6 @@ class CspGenerator:
         """
 
         return self.add_directive("connect-src", sources, omit_self)
-
-    # def fenced_frame_src(
-    #     self, sources: str | list[str] | None = None, omit_self=False
-    # ) -> "CspGenerator":
-    #     """
-    #     Add a fenced-frame-src directive.
-    #     """
-
-    #     return self.add_directive("fenced-frame-src", sources, omit_self)
 
     def font_src(
         self, sources: str | list[str] | None = None, omit_self=False
@@ -218,14 +209,33 @@ class CspGenerator:
         self.directives["require-trusted-types-for"] = ["'script'"]
         return self
 
-    def sandbox(
-        self, sources: str | list[str] | None = None, omit_self=False
-    ) -> "CspGenerator":
+    def sandbox(self, value: str | None = None) -> "CspGenerator":
         """
         Add a sandbox directive.
         """
 
-        return self.add_directive("sandbox", sources, omit_self)
+        values = [
+            "allow-downloads",
+            "allow-forms",
+            "allow-modals",
+            "allow-orientation-lock",
+            "allow-pointer-lock",
+            "allow-popups",
+            "allow-popups-to-escape-sandbox",
+            "allow-presentation",
+            "allow-same-origin",
+            "allow-scripts",
+            "allow-top-navigation",
+            "allow-top-navigation-by-user-activation",
+            "allow-top-navigation-to-custom-protocols",
+        ]
+        if value and value in values:
+            sources = [value]
+        else:
+            sources = []
+
+        self.directives["sandbox"] = sources
+        return self
 
     def script_src(
         self, sources: str | list[str] | None = None, omit_self=False

@@ -131,7 +131,6 @@ class TestSecurityCSP(unittest.TestCase):
             ("media-src", "media_src"),
             ("object-src", "object_src"),
             ("prefetch-src", "prefetch_src"),
-            ("sandbox", "sandbox"),
             ("script-src", "script_src"),
             ("script-src-attr", "script_src_attr"),
             ("script-src-elem", "script_src_elem"),
@@ -168,6 +167,24 @@ class TestSecurityCSP(unittest.TestCase):
         generator.require_trusted_types_for()
         self.assertIn("default-src 'self';", generator.get_csp())
         self.assertIn("require-trusted-types-for 'script';", generator.get_csp())
+
+    def test_add_sandbox(self):
+        generator = CspGenerator()
+        generator.sandbox()
+        self.assertIn("default-src 'self';", generator.get_csp())
+        self.assertIn("sandbox;", generator.get_csp())
+
+    def test_add_sandbox_value(self):
+        generator = CspGenerator()
+        generator.sandbox("allow-scripts")
+        self.assertIn("default-src 'self';", generator.get_csp())
+        self.assertIn("sandbox allow-scripts;", generator.get_csp())
+
+    def test_add_sandbox_invalid_value(self):
+        generator = CspGenerator()
+        generator.sandbox("pizza")
+        self.assertIn("default-src 'self';", generator.get_csp())
+        self.assertIn("sandbox;", generator.get_csp())
 
 
 class TestSecurityHeaders(unittest.TestCase):

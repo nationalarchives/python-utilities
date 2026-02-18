@@ -77,5 +77,5 @@ def pretty_price_range(
     if value_to == 0:
         return f"From {pretty_price(value_from, simplify, currency_symbol)}"
 
-    min_price, max_price = sorted([float(value_from), float(value_to)])
+    min_price, max_price = sorted([value_from, value_to])
     return f"{pretty_price(min_price, simplify, currency_symbol)} to {pretty_price(max_price, simplify, currency_symbol)}"
