@@ -149,13 +149,19 @@ class TestSecurityCSP(unittest.TestCase):
                 f"{directive} 'self' {self.test_domain};", generator.get_csp()
             )
 
-    def test_add_report_to(self):
+    def test_add_report_uri(self):
         generator = CspGenerator()
         report_uri = "https://report.example.com"
-        generator.report_to(report_uri)
+        generator.report_uri(report_uri)
         self.assertIn("default-src 'self';", generator.get_csp())
         self.assertIn(f"report-uri {report_uri};", generator.get_csp())
-        self.assertIn(f"report-to {report_uri};", generator.get_csp())
+
+    def test_add_report_to(self):
+        generator = CspGenerator()
+        report_endpoint_name = "csp_report_endpoint"
+        generator.report_to(report_endpoint_name)
+        self.assertIn("default-src 'self';", generator.get_csp())
+        self.assertIn(f"report-to {report_endpoint_name};", generator.get_csp())
 
     def test_add_require_trusted_types_for(self):
         generator = CspGenerator()
