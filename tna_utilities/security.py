@@ -181,14 +181,23 @@ class CspGenerator:
 
         return self.add_directive("prefetch-src", sources, omit_self)
 
-    def report_to(self, uri: str) -> "CspGenerator":
+    def report_to(self, endpoint: str) -> "CspGenerator":
         """
-        Add a report-to directive.
+        Add report-uri and report-to directives.
+
+        The ``report-uri`` directive accepts a URI and has been deprecated in favor of
+        ``report-to``. The ``report-to`` directive, however, expects the *name* of a
+        Reporting API endpoint configured via the corresponding header, not a raw URI.
+
+        This method uses the given ``endpoint`` value for both directives. Callers
+        SHOULD pass a valid Reporting API endpoint name; if a URI is passed instead,
+        it will be syntactically correct for ``report-uri`` but may not work as
+        expected for ``report-to`` in all user agents.
         """
 
-        # The report-uri directive has been deprecated in favor of report-to, but we will add both for backwards compatibility
-        self.directives["report-uri"] = [uri]
-        self.directives["report-to"] = [uri]
+        # The report-uri directive has been deprecated in favor of report-to, but we will add both for backwards compatibility.
+        self.directives["report-uri"] = [endpoint]
+        self.directives["report-to"] = [endpoint]
         return self
 
     def require_trusted_types_for(self) -> "CspGenerator":
