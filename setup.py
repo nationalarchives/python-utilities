@@ -22,10 +22,8 @@ setup(
         "Environment :: Web Environment",
         "Intended Audience :: Developers",
     ],
-    packages=find_packages(include=["tna_utilities"]),
+    packages=find_packages(),
     python_requires=">=3.10",
-    install_requires=[],
-    extras_require={},
     keywords=[
         "utilities",
         "library",
