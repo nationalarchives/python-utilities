@@ -5,3 +5,5 @@
 - [Security](./security.md)
 - [Strings](./strings.md)
 - [URLs](./urls.md)
+
+[Read the changelog](https://github.com/nationalarchives/python-utilities/blob/main/CHANGELOG.md).
