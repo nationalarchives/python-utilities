@@ -113,11 +113,11 @@ print(qs.get_query_string())
 # ?a=4&b=2
 
 # Chainable (as of v1.1.0)
-qs.add_parameter_value(
+print(qs.add_parameter_value(
     "a", "4"
 ).toggle_parameter_value(
     "b", "3"
 ).remove_parameter_value(
     "a", "1"
-).get_query_string()
+).get_query_string())
 ```
