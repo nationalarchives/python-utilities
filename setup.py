@@ -24,4 +24,13 @@ setup(
     ],
     packages=find_packages(include=["tna_utilities"], exclude=["tests"]),
     python_requires=">=3.10",
+    install_requires=[],
+    extras_require={},
+    keywords=[
+        "utilities",
+        "library",
+        "python",
+        "the national archives",
+        "tna",
+    ],
 )
