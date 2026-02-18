@@ -22,7 +22,9 @@ setup(
         "Environment :: Web Environment",
         "Intended Audience :: Developers",
     ],
+    license="MIT",
     packages=find_packages(),
+    install_requires=[],
     python_requires=">=3.10",
     keywords=[
         "utilities",
