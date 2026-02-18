@@ -117,7 +117,6 @@ class TestSecurityCSP(unittest.TestCase):
         self.assertIn(f"style-src 'self' {self.test_domain_2};", generator.get_csp())
 
     def test_add_directive_sources(self):
-        generator = CspGenerator()
         directives = [
             ("base-uri", "base_uri"),
             ("child-src", "child_src"),
