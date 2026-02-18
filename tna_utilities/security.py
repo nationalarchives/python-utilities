@@ -15,7 +15,7 @@ class CspGenerator:
                 self.default_src.append(default_src)
         else:
             self.default_src.append(self.CSP_SELF)
-        self.directives: dict = {
+        self.directives: dict[str, list[str]] = {
             "default-src": self.default_src,
         }
 
