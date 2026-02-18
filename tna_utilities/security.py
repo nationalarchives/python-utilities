@@ -295,13 +295,13 @@ class CspGenerator:
         Get the complete CSP as a string.
         """
 
-        return (
-            "; ".join(
-                f"{directive}{' ' + ' '.join(sources) if sources else ''}"
-                for directive, sources in self.directives.items()
-            )
-            + ";"
-        )
+        parts: list[str] = []
+        for directive, sources in self.directives.items():
+            directive_str = directive
+            if sources:
+                directive_str += " " + " ".join(sources)
+            parts.append(directive_str)
+        return "; ".join(parts) + ";"
 
 
 def security_headers(
