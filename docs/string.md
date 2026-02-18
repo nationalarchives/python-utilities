@@ -26,10 +26,10 @@ Convert a slug back to a human-readable string.
 
 ### Arguments
 
-| Argument           | Description                                | Default |
-| ------------------ | ------------------------------------------ | ------- |
-| `slug`             | The slug to unslugify                      | [none]  |
-| `capitalize_first` | If `True`, capitalise the first characters | `True`  |
+| Argument           | Description                               | Default |
+| ------------------ | ----------------------------------------- | ------- |
+| `slug`             | The slug to unslugify                     | [none]  |
+| `capitalize_first` | If `True`, capitalise the first character | `True`  |
 
 ### Example
 
