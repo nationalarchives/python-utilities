@@ -64,7 +64,7 @@ qs.parameter_values("a")
 qs.parameter_values("b")
 # ["2", "3"]
 qs.parameter_values("c")
-# AttributeError
+# Raises AttributeError
 
 qs.is_value_in_parameter("b", "2")
 # True
