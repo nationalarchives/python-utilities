@@ -12,7 +12,7 @@ Parses a date string into a datetime object.
 
 ### Example
 
-```py
+```python
 from tna_utilities.datetime import get_date_from_string
 
 print(get_date_from_string("2006-05-04T01:02:03"))
@@ -35,7 +35,7 @@ Formats a date into the format used by The National Archives.
 
 ### Example
 
-```py
+```python
 from tna_utilities.datetime import pretty_date
 
 print(pretty_date("2000-01-01T12:00:00Z"))
@@ -58,7 +58,7 @@ Formats a date and time into the format used by The National Archives.
 
 ### Example
 
-```py
+```python
 from tna_utilities.datetime import pretty_datetime
 
 print(pretty_datetime("2000-01-01T12:00:00Z"))
@@ -83,7 +83,7 @@ Formats a date range into the format used by The National Archives.
 
 ### Example
 
-```py
+```python
 from tna_utilities.datetime import pretty_date_range
 
 print(pretty_date_range(datetime.date(2000, 1, 1), "2000-01-02"))
@@ -114,7 +114,7 @@ Formats a date/time range into the format used by The National Archives.
 
 ### Example
 
-```py
+```python
 from tna_utilities.datetime import pretty_datetime_range
 
 print(pretty_datetime_range(datetime.datetime(2000, 1, 1, 12, 30, 0), "2000-01-01T12:45:00Z"))
@@ -146,7 +146,7 @@ Added in `v1.2.0`.
 
 ### Example
 
-```py
+```python
 from tna_utilities.datetime import pretty_age
 
 print(pretty_age(datetime.datetime.now() - datetime.timedelta(seconds=1337)))
@@ -171,7 +171,7 @@ Determines if the given date string represents today or a future date.
 
 ### Example
 
-```py
+```python
 from tna_utilities.datetime import is_today_or_future
 
 print(is_today_or_future(datetime.date(2999, 1, 1)))
@@ -194,7 +194,7 @@ Determines if today's date falls within the given date range.
 
 ### Example
 
-```py
+```python
 from tna_utilities.datetime import is_today_in_date_range
 
 print(is_today_in_date_range(datetime.date(2000, 1, 1), datetime.date(2001, 1, 1)))
@@ -218,7 +218,7 @@ Groups a list of items by year and month based on a date key in each item.
 
 ### Example
 
-```py
+```python
 from tna_utilities.datetime import group_by_year_and_month
 
 items = [
@@ -278,7 +278,7 @@ Converts a total number of seconds into an ISO 8601 duration string.
 
 ### Example
 
-```py
+```python
 from tna_utilities.datetime import seconds_to_iso_8601_duration
 
 print(seconds_to_iso_8601_duration(1337))
@@ -298,7 +298,7 @@ Converts a total number of seconds into a human-readable duration string.
 
 ### Example
 
-```py
+```python
 from tna_utilities.datetime import seconds_to_duration
 
 print(seconds_to_duration(1337))
@@ -320,7 +320,7 @@ Formats a date into RFC 822 format.
 
 ### Example
 
-```py
+```python
 from tna_utilities.datetime import rfc_822_date_format
 
 print(rfc_822_date_format(datetime.datetime(2000, 1, 1, 12, 30, 45)))

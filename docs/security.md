@@ -45,7 +45,7 @@ Get a dictionary of common security headers.
 
 ### Example
 
-```py
+```python
 from tna_utilities.security import security_headers
 
 print(security_headers())

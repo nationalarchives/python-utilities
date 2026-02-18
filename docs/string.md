@@ -13,7 +13,7 @@ Convert a string to a URL-friendly slug.
 
 ### Example
 
-```py
+```python
 from tna_utilities.string import slugify
 
 print(slugify("TNA Python Utilities Docs"))
@@ -33,7 +33,7 @@ Convert a slug back to a human-readable string.
 
 ### Example
 
-```py
+```python
 from tna_utilities.string import unslugify
 
 print(unslugify("tna-python-utilities-docs"))

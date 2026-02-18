@@ -13,7 +13,7 @@ Formats a number as a currency without the currency symbol.
 
 ### Example
 
-```py
+```python
 from tna_utilities.currency import currency
 
 print(currency(5))
@@ -40,7 +40,7 @@ Formats a number as a price.
 
 ### Example
 
-```py
+```python
 from tna_utilities.currency import pretty_price
 
 print(pretty_price(5))
@@ -68,7 +68,7 @@ Formats a price range.
 
 ### Example
 
-```py
+```python
 from tna_utilities.currency import pretty_price_range
 
 print(pretty_price_range(5, 10))

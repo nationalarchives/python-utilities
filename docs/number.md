@@ -18,7 +18,7 @@ Formats a number as an approximate, human-readable value.
 
 ### Example
 
-```py
+```python
 from tna_utilities.number import numberish
 
 print(numberish(67))
