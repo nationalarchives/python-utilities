@@ -15,11 +15,11 @@ class TestSecurityCSP(unittest.TestCase):
         self.assertEqual(generator.get_csp(), "default-src 'self';")
 
     def test_init_none(self):
-        generator = CspGenerator(CspGenerator.CSP_NONE)
+        generator = CspGenerator(CspGenerator.NONE)
         self.assertEqual(generator.get_csp(), "default-src 'none';")
 
     def test_init_list(self):
-        generator = CspGenerator([CspGenerator.CSP_NONE, self.test_domain])
+        generator = CspGenerator([CspGenerator.NONE, self.test_domain])
         self.assertEqual(generator.get_csp(), f"default-src 'none' {self.test_domain};")
 
     def test_add_directive(self):
@@ -30,7 +30,7 @@ class TestSecurityCSP(unittest.TestCase):
 
     def test_add_directive_none(self):
         generator = CspGenerator()
-        generator.script_src(CspGenerator.CSP_NONE)
+        generator.script_src(CspGenerator.NONE)
         self.assertIn("default-src 'self';", generator.get_csp())
         self.assertIn("script-src 'none';", generator.get_csp())
 
@@ -63,19 +63,19 @@ class TestSecurityCSP(unittest.TestCase):
 
     def test_add_directive_duplicated_self(self):
         generator = CspGenerator()
-        generator.script_src(CspGenerator.CSP_SELF)
+        generator.script_src(CspGenerator.SELF)
         self.assertIn("default-src 'self';", generator.get_csp())
         self.assertNotIn("script-src 'self';", generator.get_csp())
 
     def test_add_directive_existing_self(self):
         generator = CspGenerator()
-        generator.script_src([CspGenerator.CSP_SELF, self.test_domain])
+        generator.script_src([CspGenerator.SELF, self.test_domain])
         self.assertIn("default-src 'self';", generator.get_csp())
         self.assertIn(f"script-src 'self' {self.test_domain};", generator.get_csp())
 
     def test_add_directive_existing_none(self):
         generator = CspGenerator()
-        generator.script_src([CspGenerator.CSP_NONE, self.test_domain])
+        generator.script_src([CspGenerator.NONE, self.test_domain])
         self.assertIn("default-src 'self';", generator.get_csp())
         self.assertIn(f"script-src 'none' {self.test_domain};", generator.get_csp())
 
@@ -95,7 +95,7 @@ class TestSecurityCSP(unittest.TestCase):
 
     def test_add_directive_omit_self_existing_none(self):
         generator = CspGenerator()
-        generator.script_src([CspGenerator.CSP_NONE, self.test_domain], omit_self=True)
+        generator.script_src([CspGenerator.NONE, self.test_domain], omit_self=True)
         self.assertIn("default-src 'self';", generator.get_csp())
         self.assertIn(f"script-src 'none' {self.test_domain};", generator.get_csp())
 

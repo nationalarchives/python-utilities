@@ -1,10 +1,26 @@
 class CspGenerator:
     """
-    A utility class to generate a CSP.
+    A utility class for generating a Content Security Policy (CSP) header value.
+
+    Lets you incrementally add or disallow directive sources (for example for `script-src` or `style-src`) and then produces a correctly formatted CSP string that can be returned from your application or attached to HTTP responses.
+
+    Typical usage:
+        # Create a generator with a default-src of 'self'
+        csp = CspGenerator()
+        # Add additional directives (methods return self for chaining)
+        csp.base_uri("'self'") \
+           .connect_src(["'self'", "https://api.example.com"]) \
+           .font_src("'self'")
+
+    The ``default_src`` argument to ``__init__`` controls the initial
+    ``default-src`` directive. If it is omitted, a default of ``'self'`` is
+    used. Helper methods such as ``base_uri``, ``child_src``, ``connect_src``,
+    and ``font_src`` delegate to :meth:`add_directive` to add or override
+    specific CSP directives.
     """
 
-    CSP_NONE: str = "'none'"
-    CSP_SELF: str = "'self'"
+    NONE: str = "'none'"
+    SELF: str = "'self'"
 
     def __init__(self, default_src: str | list[str] | None = None) -> None:
         self.default_src: list[str] = []
@@ -14,7 +30,7 @@ class CspGenerator:
             else:
                 self.default_src.append(default_src)
         else:
-            self.default_src.append(self.CSP_SELF)
+            self.default_src.append(self.SELF)
         self.directives: dict[str, list[str]] = {
             "default-src": self.default_src,
         }
@@ -30,25 +46,17 @@ class CspGenerator:
         if sources is None:
             return self
 
-        # If sources is not a list, we convert it to a list
+        # If sources is not a list, we convert it to a list which can be a string split by spaces
         if not isinstance(sources, list):
-            # If there are spaces in the sources, we split it into a list, otherwise we create a list with the single source
-            if " " in sources:
-                sources = sources.split(" ")
-            else:
-                sources = [sources]
+            sources = sources.split(" ")
 
         # If the sources are the same as the default-src, we don't add the directive
         if sources == self.default_src:
             return self
 
         # Unless omit_self is True, add 'self' when either it or 'none' is not specified in the sources
-        if (
-            not omit_self
-            and self.CSP_SELF not in sources
-            and self.CSP_NONE not in sources
-        ):
-            sources.insert(0, self.CSP_SELF)
+        if not omit_self and self.SELF not in sources and self.NONE not in sources:
+            sources.insert(0, self.SELF)
 
         # Add the directive to the directives dictionary
         self.directives[directive] = sources
@@ -61,7 +69,7 @@ class CspGenerator:
         Disallow a directive by setting it to 'none'.
         """
 
-        self.directives[directive] = [self.CSP_NONE]
+        self.directives[directive] = [self.NONE]
         return self
 
     def base_uri(
@@ -229,7 +237,7 @@ class CspGenerator:
             "allow-top-navigation-by-user-activation",
             "allow-top-navigation-to-custom-protocols",
         ]
-        if value and value in values:
+        if value is not None and value in values:
             sources = [value]
         else:
             sources = []
@@ -290,25 +298,6 @@ class CspGenerator:
         """
 
         return self.add_directive("style-src-elem", sources, omit_self)
-
-    # def trusted_types(
-    #     self, sources: str | list[str] | None = None, omit_self=False
-    # ) -> "CspGenerator":
-    #     """
-    #     Add a trusted-types directive.
-    #     """
-
-    #     return self.add_directive("trusted-types", sources, omit_self)
-
-    # def upgrade_insecure_requests(
-    #     self, sources: str | list[str] | None = None, omit_self=False
-    # ) -> "CspGenerator":
-    #     """
-    #     Add a upgrade-insecure-requests directive.
-    #     """
-
-    #     self.directives["upgrade-insecure-requests"] = []
-    #     return self
 
     def worker_src(
         self, sources: str | list[str] | None = None, omit_self=False
