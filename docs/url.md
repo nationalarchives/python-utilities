@@ -64,7 +64,7 @@ qs.parameter_values("a")
 qs.parameter_values("b")
 # ["2", "3"]
 qs.parameter_values("c")
-# AttributeError
+# Raises AttributeError
 
 qs.is_value_in_parameter("b", "2")
 # True
@@ -88,13 +88,13 @@ print(qs.get_query_string())
 # ?b=5&b=6&c=4
 
 # Chainable (as of v1.1.0)
-qs.add_parameter(
+print(qs.add_parameter(
     "c", "4"
 ).update_parameter(
     "b", ["5", "6"]
 ).remove_parameter(
     "a"
-).get_query_string()
+).get_query_string())
 ```
 
 ### Update parameter values
@@ -113,11 +113,11 @@ print(qs.get_query_string())
 # ?a=4&b=2
 
 # Chainable (as of v1.1.0)
-qs.add_parameter_value(
+print(qs.add_parameter_value(
     "a", "4"
 ).toggle_parameter_value(
     "b", "3"
 ).remove_parameter_value(
     "a", "1"
-).get_query_string()
+).get_query_string())
 ```
