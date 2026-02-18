@@ -163,13 +163,6 @@ class TestSecurityCSP(unittest.TestCase):
         self.assertIn("default-src 'self';", generator.get_csp())
         self.assertIn("require-trusted-types-for 'script';", generator.get_csp())
 
-    # Not technically part of the CSP spec
-    # def test_add_upgrade_insecure_requests(self):
-    #     generator = CspGenerator()
-    #     generator.upgrade_insecure_requests()
-    #     self.assertIn("default-src 'self';", generator.get_csp())
-    #     self.assertIn("upgrade-insecure-requests;", generator.get_csp())
-
 
 class TestSecurityHeaders(unittest.TestCase):
     def test_security_headers_default(self):
