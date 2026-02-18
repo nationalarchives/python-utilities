@@ -15,7 +15,7 @@ class CspGenerator:
                 self.default_src.append(default_src)
         else:
             self.default_src.append(self.CSP_SELF)
-        self.directives: dict = {
+        self.directives: dict[str, list[str]] = {
             "default-src": self.default_src,
         }
 
@@ -181,14 +181,33 @@ class CspGenerator:
 
         return self.add_directive("prefetch-src", sources, omit_self)
 
-    def report_to(self, uri: str) -> "CspGenerator":
+    def report_uri(self, uri: str) -> "CspGenerator":
         """
-        Add a report-to directive.
+        Add a report-uri directive.
+
+        The report-uri directive is deprecated in favor of report-to however, it is still supported by a few browsers.
+
+        For new implementations, it is recommended to use report-to instead of report-uri.
         """
 
-        # The report-uri directive has been deprecated in favor of report-to, but we will add both for backwards compatibility
         self.directives["report-uri"] = [uri]
-        self.directives["report-to"] = [uri]
+        return self
+
+    def report_to(self, endpoint_name: str) -> "CspGenerator":
+        """
+        Add a report-to directive.
+
+        When using report-to, you need to set a Reporting-Endpoints header with the same endpoint name and the URL to send reports to.
+
+        For example:
+            # Add the report-to directive to the CSP
+            CspGenerator.report_to("csp-endpoint")
+
+            # Set the header for the Reporting-Endpoints
+            Reporting-Endpoints: csp-endpoint="https://example.com/csp-reports"
+        """
+
+        self.directives["report-to"] = [endpoint_name]
         return self
 
     def require_trusted_types_for(self) -> "CspGenerator":
@@ -295,13 +314,13 @@ class CspGenerator:
         Get the complete CSP as a string.
         """
 
-        return (
-            "; ".join(
-                f"{directive}{' ' + ' '.join(sources) if sources else ''}"
-                for directive, sources in self.directives.items()
-            )
-            + ";"
-        )
+        parts: list[str] = []
+        for directive, sources in self.directives.items():
+            directive_str = directive
+            if sources:
+                directive_str += " " + " ".join(sources)
+            parts.append(directive_str)
+        return "; ".join(parts) + ";"
 
 
 def security_headers(
@@ -363,9 +382,7 @@ def security_headers(
     return {
         header["header"]: (
             header["value"]
-            if "value" in header
-            and header["value"] is not None
-            and header["value"] in header["values"]
+            if header["value"] is not None and header["value"] in header["values"]
             else header["default"]
         )
         for header in headers
