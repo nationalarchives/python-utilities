@@ -16,8 +16,8 @@ generator = CspGenerator()
 # Add a single directive source (plus 'self')
 generator.script_src("example.com")
 
-# Add a list of sources for a directive (plus 'self')
-generator.style_src(["example.com", "another.net"])
+# Add multiple sources for a directive (plus 'self')
+generator.style_src("example.com", "another.net")
 
 # Add a directive source without allowing 'self'
 generator.object_src("example.com", omit_self=True)

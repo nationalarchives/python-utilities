@@ -34,6 +34,26 @@ class TestSecurityCSP(unittest.TestCase):
         self.assertIn("default-src 'self';", generator.get_csp())
         self.assertIn("script-src 'none';", generator.get_csp())
 
+    def test_add_directive_multiple(self):
+        generator = CspGenerator()
+        generator.script_src(self.test_domain, self.test_domain_2)
+        self.assertIn("default-src 'self';", generator.get_csp())
+        self.assertIn(
+            f"script-src 'self' {self.test_domain} {self.test_domain_2};",
+            generator.get_csp(),
+        )
+
+    def test_add_directive_duplicates(self):
+        generator = CspGenerator()
+        generator.script_src(
+            self.test_domain, self.test_domain_2, self.test_domain, self.test_domain
+        )
+        self.assertIn("default-src 'self';", generator.get_csp())
+        self.assertIn(
+            f"script-src 'self' {self.test_domain} {self.test_domain_2};",
+            generator.get_csp(),
+        )
+
     def test_add_directive_list(self):
         generator = CspGenerator()
         generator.script_src([self.test_domain, self.test_domain_2])
@@ -43,15 +63,20 @@ class TestSecurityCSP(unittest.TestCase):
             generator.get_csp(),
         )
 
-    def test_add_directive_list_mixed_types(self):
+    def test_add_directive_mixed_types(self):
         generator = CspGenerator()
         test_domain_3 = "https://third.org"
+        test_domain_4 = "https://fourth.io"
+        test_domain_5 = "https://fifth.co"
+        test_domain_6 = "https://sixth.edu"
         generator.script_src(
-            [self.test_domain, f"{self.test_domain_2} {test_domain_3}"]
+            self.test_domain,
+            f"{self.test_domain_2} {test_domain_3}",
+            [test_domain_4, f"{test_domain_5} {test_domain_6}"],
         )
         self.assertIn("default-src 'self';", generator.get_csp())
         self.assertIn(
-            f"script-src 'self' {self.test_domain} {self.test_domain_2} {test_domain_3};",
+            f"script-src 'self' {self.test_domain} {self.test_domain_2} {test_domain_3} {test_domain_4} {test_domain_5} {test_domain_6};",
             generator.get_csp(),
         )
 
