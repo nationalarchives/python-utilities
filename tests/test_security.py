@@ -43,6 +43,18 @@ class TestSecurityCSP(unittest.TestCase):
             generator.get_csp(),
         )
 
+    def test_add_directive_list_mixed_types(self):
+        generator = CspGenerator()
+        test_domain_3 = "https://third.org"
+        generator.script_src(
+            [self.test_domain, f"{self.test_domain_2} {test_domain_3}"]
+        )
+        self.assertIn("default-src 'self';", generator.get_csp())
+        self.assertIn(
+            f"script-src 'self' {self.test_domain} {self.test_domain_2} {test_domain_3};",
+            generator.get_csp(),
+        )
+
     def test_add_directive_space_separated_list(self):
         generator = CspGenerator()
         generator.script_src(f"{self.test_domain} {self.test_domain_2}")

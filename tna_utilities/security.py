@@ -319,7 +319,7 @@ class CspGenerator:
         """
         Get the complete CSP as a string.
         """
-        
+
         parts: list[str] = []
         for directive, sources in self.directives.items():
             directive_str = directive
