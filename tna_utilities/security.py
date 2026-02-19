@@ -36,30 +36,37 @@ class CspGenerator:
         }
 
     def add_directive(
-        self, directive: str, sources: str | list[str] | None = None, omit_self=False
+        self, directive: str, values: str | list[str] | None = None, omit_self=False
     ) -> "CspGenerator":
         """
         Add a directive.
         """
 
         # If there are no sources, we don't add the directive
-        if sources is None:
+        if values is None:
             return self
 
-        # If sources is not a list, we convert it to a list which can be a string split by spaces
-        if not isinstance(sources, list):
-            sources = sources.split(" ")
+        # If sources is not a list, normalise string input into a list by splitting on whitespace
+        if isinstance(values, str):
+            values = values.split(" ")
 
-        # If the sources are the same as the default-src, we don't add the directive
-        if sources == self.default_src:
+        # Split every item in the list of values on whitespace and flatten the resulting lists into a single list of sources
+        values = [source for value in values for source in value.split(" ") if source]
+
+        # If nothing valid was parsed, do not add the directive
+        if not values:
+            return self
+
+        # If the values are the same as the default-src, we don't add the directive for simplicity and to avoid redundancy
+        if values == self.default_src:
             return self
 
         # Unless omit_self is True, add 'self' when either it or 'none' is not specified in the sources
-        if not omit_self and self.SELF not in sources and self.NONE not in sources:
-            sources.insert(0, self.SELF)
+        if not omit_self and self.SELF not in values and self.NONE not in values:
+            values.insert(0, self.SELF)
 
         # Add the directive to the directives dictionary
-        self.directives[directive] = sources
+        self.directives[directive] = values
 
         # Return self to allow for method chaining
         return self
@@ -312,7 +319,7 @@ class CspGenerator:
         """
         Get the complete CSP as a string.
         """
-
+        
         parts: list[str] = []
         for directive, sources in self.directives.items():
             directive_str = directive
