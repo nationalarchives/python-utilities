@@ -61,6 +61,14 @@ def get_date_from_string(date_string: str) -> datetime.datetime:  # noqa: C901
     raise ValueError(f"Unable to parse date from string: {date_string}")
 
 
+def _format_day(date: datetime.date) -> str:
+    return str(date.day)
+
+
+def _format_month_index(date: datetime.date) -> int:
+    return date.month
+
+
 def pretty_date(
     date: Union[str, datetime.date, datetime.datetime],
     show_day: bool = False,
@@ -78,14 +86,14 @@ def pretty_date(
 
     if isinstance(date, datetime.date):
         if show_day:
-            return date.strftime("%A %-d %B %Y")
-        return date.strftime("%-d %B %Y")
+            return f"{date.strftime('%A')} {_format_day(date)} {date.strftime('%B %Y')}"
+        return f"{_format_day(date)} {date.strftime('%B %Y')}"
 
     try:
         date = datetime.datetime.strptime(date, "%Y-%m-%d")
         if show_day:
-            return date.strftime("%A %-d %B %Y")
-        return date.strftime("%-d %B %Y")
+            return f"{date.strftime('%A')} {_format_day(date)} {date.strftime('%B %Y')}"
+        return f"{_format_day(date)} {date.strftime('%B %Y')}"
     except ValueError:
         pass
 
@@ -103,8 +111,8 @@ def pretty_date(
 
     date = get_date_from_string(date)
     if show_day:
-        return date.strftime("%A %-d %B %Y")
-    return date.strftime("%-d %B %Y")
+        return f"{date.strftime('%A')} {_format_day(date)} {date.strftime('%B %Y')}"
+    return f"{_format_day(date)} {date.strftime('%B %Y')}"
 
 
 def pretty_datetime(
@@ -120,16 +128,18 @@ def pretty_datetime(
 
     if isinstance(date, datetime.datetime):
         if show_day:
-            return date.strftime("%A %-d %B %Y, %H:%M")
-        return date.strftime("%-d %B %Y, %H:%M")
+            return f"{date.strftime('%A')} {_format_day(date)} {date.strftime('%B %Y, %H:%M')}"
+        return f"{_format_day(date)} {date.strftime('%B %Y, %H:%M')}"
 
     if isinstance(date, datetime.date):
         raise TypeError("Date object provided, datetime object expected")
 
     date = get_date_from_string(date)
     if show_day:
-        return date.strftime("%A %-d %B %Y, %H:%M")
-    return date.strftime("%-d %B %Y, %H:%M")
+        return (
+            f"{date.strftime('%A')} {_format_day(date)} {date.strftime('%B %Y, %H:%M')}"
+        )
+    return f"{_format_day(date)} {date.strftime('%B %Y, %H:%M')}"
 
 
 def pretty_date_range(  # noqa: C901
@@ -161,7 +171,11 @@ def pretty_date_range(  # noqa: C901
         if date_from > date_to:
             raise ValueError("From date is after to date")
 
-        date_to_string = date_to.strftime("%B %Y" if omit_days else ("%-d %B %Y"))
+        date_to_string = (
+            date_to.strftime("%B %Y")
+            if omit_days
+            else f"{_format_day(date_to)} {date_to.strftime('%B %Y')}"
+        )
         if (
             date_from.day == 1
             and date_from.month == 1
@@ -176,23 +190,35 @@ def pretty_date_range(  # noqa: C901
         if date_from.year == date_to.year:
             if date_from.month == date_to.month:
                 if date_from.day == date_to.day:
-                    return date_from.strftime("%B %Y" if omit_days else "%-d %B %Y")
+                    return (
+                        date_from.strftime("%B %Y")
+                        if omit_days
+                        else f"{_format_day(date_from)} {date_from.strftime('%B %Y')}"
+                    )
 
                 if omit_days:
                     return date_to_string
-                return f"{date_from.strftime('%-d')} to {date_to_string}"
+                return f"{_format_day(date_from)} to {date_to_string}"
 
-            return f"{date_from.strftime('%B' if omit_days else '%-d %B')} to {date_to_string}"
+            if omit_days:
+                return f"{date_from.strftime('%B')} to {date_to_string}"
+            return f"{_format_day(date_from)} {date_from.strftime('%B')} to {date_to_string}"
 
-        return f"{date_from.strftime('%B %Y' if omit_days else '%-d %B %Y')} to {date_to_string}"
+        if omit_days:
+            return f"{date_from.strftime('%B %Y')} to {date_to_string}"
+        return f"{_format_day(date_from)} {date_from.strftime('%B %Y')} to {date_to_string}"
 
     if date_from:
         start = "from" if lowercase_first else "From"
-        return f"{start} {date_from.strftime('%B %Y' if omit_days else '%-d %B %Y')}"
+        if omit_days:
+            return f"{start} {date_from.strftime('%B %Y')}"
+        return f"{start} {_format_day(date_from)} {date_from.strftime('%B %Y')}"
 
     if date_to:
         start = "now to" if lowercase_first else "Now to"
-        return f"{start} {date_to.strftime('%B %Y' if omit_days else '%-d %B %Y')}"
+        if omit_days:
+            return f"{start} {date_to.strftime('%B %Y')}"
+        return f"{start} {_format_day(date_to)} {date_to.strftime('%B %Y')}"
 
     return ""
 
@@ -243,22 +269,28 @@ def pretty_datetime_range(  # noqa: C901
                         f"{date_from.strftime('%H:%M')} to {date_to.strftime('%H:%M')}"
                     )
 
-                return f"{date_from.strftime('%-d %B %Y, %H:%M')} to {date_to.strftime('%H:%M')}"
+                return (
+                    f"{_format_day(date_from)} {date_from.strftime('%B %Y, %H:%M')}"
+                    f" to {date_to.strftime('%H:%M')}"
+                )
 
             if hide_date_if_single_day:
                 return f"{date_from.strftime('%H:%M')}"
 
-            return f"{date_from.strftime('%-d %B %Y, %H:%M')}"
+            return f"{_format_day(date_from)} {date_from.strftime('%B %Y, %H:%M')}"
 
-        return f"{date_from.strftime('%-d %B %Y, %H:%M')} to {date_to.strftime('%-d %B %Y, %H:%M')}"
+        return (
+            f"{_format_day(date_from)} {date_from.strftime('%B %Y, %H:%M')}"
+            f" to {_format_day(date_to)} {date_to.strftime('%B %Y, %H:%M')}"
+        )
 
     if date_from:
         start = "from" if lowercase_first else "From"
-        return f"{start} {date_from.strftime('%-d %B %Y, %H:%M')}"
+        return f"{start} {_format_day(date_from)} {date_from.strftime('%B %Y, %H:%M')}"
 
     if date_to:
         start = "now to" if lowercase_first else "Now to"
-        return f"{start} {date_to.strftime('%-d %B %Y, %H:%M')}"
+        return f"{start} {_format_day(date_to)} {date_to.strftime('%B %Y, %H:%M')}"
 
     return ""
 
@@ -359,7 +391,7 @@ def group_by_year_and_month(
 
             if request_datetime:
                 month = request_datetime.strftime("%B")
-                month_index = int(request_datetime.strftime("%-m"))
+                month_index = _format_month_index(request_datetime)
                 year = request_datetime.strftime("%Y")
                 year_index = int(year)
                 existing_year_index = next(
@@ -482,4 +514,4 @@ def rfc_822_date_format(date: Union[datetime.date, datetime.datetime]) -> str:
     if not date:
         raise ValueError("No date provided")
 
-    return date.strftime("%a, %-d %b %Y %H:%M:%S GMT")
+    return f"{date.strftime('%a')}, {_format_day(date)} {date.strftime('%b %Y %H:%M:%S GMT')}"
