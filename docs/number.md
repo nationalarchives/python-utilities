@@ -11,7 +11,7 @@ Formats a number as an approximate, human-readable value.
 | Argument       | Description                       | Default  |
 | -------------- | --------------------------------- | -------- |
 | `value`        | The value to format               | [none]   |
-| `simple_units` | If `True`, use simple units       | `False`  |
+| `simple_units` | If `True`, use simple, SI units   | `False`  |
 | `prefix_text`  | Custom prefix for rounded numbers | `About ` |
 
 `prefix_text` can be a string or a tuple of two strings where the values are used when the value was rounded up or down.
