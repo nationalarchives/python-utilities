@@ -1,9 +1,9 @@
 import unittest
 
-from tna_utilities.number import numberish
+from tna_utilities.number import numberish, pretty_file_size
 
 
-class TestNumber(unittest.TestCase):
+class TestNumberish(unittest.TestCase):
 
     def test_happy(self):
         self.assertEqual(numberish(0), "None")
@@ -94,3 +94,58 @@ class TestNumber(unittest.TestCase):
             numberish({})
         with self.assertRaises(ValueError):
             numberish([])
+
+
+class TestPrettyFileSize(unittest.TestCase):
+
+    def test_pretty_file_size(self):
+        self.assertEqual(pretty_file_size(0), "0B")
+        self.assertEqual(pretty_file_size(999), "999B")
+        self.assertEqual(pretty_file_size(1000), "1kB")
+        self.assertEqual(pretty_file_size(1001), "1kB")
+        self.assertEqual(pretty_file_size(1337), "1kB")
+        self.assertEqual(pretty_file_size(1500), "2kB")
+        self.assertEqual(pretty_file_size(999999), "1000kB")
+        self.assertEqual(pretty_file_size(1000000), "1MB")
+        self.assertEqual(pretty_file_size(1500000), "1.5MB")
+        self.assertEqual(pretty_file_size(999999000), "1000MB")
+        self.assertEqual(pretty_file_size(999999499), "1000MB")
+        self.assertEqual(pretty_file_size(999999500), "1000MB")
+        self.assertEqual(pretty_file_size(999999999), "1000MB")
+        self.assertEqual(pretty_file_size(1000000000), "1GB")
+        self.assertEqual(pretty_file_size(999999999999), "1000GB")
+        self.assertEqual(pretty_file_size(1000000000000), "1TB")
+        self.assertEqual(pretty_file_size(999999999999999), "1000TB")
+        self.assertEqual(pretty_file_size(1000000000000000), "1PB")
+
+    def test_pretty_file_size_unsimplified(self):
+        self.assertEqual(pretty_file_size(0, simplify=False), "0B")
+        self.assertEqual(pretty_file_size(999, simplify=False), "999B")
+        self.assertEqual(pretty_file_size(1000, simplify=False), "1kB")
+        self.assertEqual(pretty_file_size(1001, simplify=False), "1.001kB")
+        self.assertEqual(pretty_file_size(1337, simplify=False), "1.337kB")
+        self.assertEqual(pretty_file_size(1500, simplify=False), "1.5kB")
+        self.assertEqual(pretty_file_size(999999, simplify=False), "999.999kB")
+        self.assertEqual(pretty_file_size(1000000, simplify=False), "1MB")
+        self.assertEqual(pretty_file_size(1500000, simplify=False), "1.5MB")
+        self.assertEqual(pretty_file_size(999999000, simplify=False), "999.999MB")
+        self.assertEqual(pretty_file_size(999999499, simplify=False), "999.999MB")
+        self.assertEqual(pretty_file_size(999999500, simplify=False), "1000MB")
+        self.assertEqual(pretty_file_size(999999999, simplify=False), "1000MB")
+        self.assertEqual(pretty_file_size(1000000000, simplify=False), "1GB")
+        self.assertEqual(pretty_file_size(999999999999, simplify=False), "1000GB")
+        self.assertEqual(pretty_file_size(1000000000000, simplify=False), "1TB")
+        self.assertEqual(pretty_file_size(999999999999999, simplify=False), "1000TB")
+        self.assertEqual(pretty_file_size(1000000000000000, simplify=False), "1PB")
+
+    def test_pretty_file_size_unhappy(self):
+        with self.assertRaises(ValueError):
+            pretty_file_size(1.234)
+        with self.assertRaises(ValueError):
+            pretty_file_size("one")
+        with self.assertRaises(ValueError):
+            pretty_file_size(None)
+        with self.assertRaises(ValueError):
+            pretty_file_size({})
+        with self.assertRaises(ValueError):
+            pretty_file_size([])

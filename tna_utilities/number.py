@@ -1,4 +1,5 @@
 import math
+import re
 from typing import Union
 
 
@@ -45,3 +46,23 @@ def numberish(
                 )
             return f"{prefix_text}{base_value_rounded:g}{unit}"
     return str(int(value))
+
+
+def pretty_file_size(bytes, simplify=True):
+    if not isinstance(bytes, int):
+        raise ValueError("file_size must be an integer")
+    bits_unit = 1000
+    suffixes = ["B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
+    i = 0
+    prettified_file_size = bytes
+    while prettified_file_size >= bits_unit and i < len(suffixes) - 1:
+        prettified_file_size /= bits_unit
+        i += 1
+    if prettified_file_size == 0:
+        return "0B"
+    if simplify:
+        prettified_file_size = f"{prettified_file_size:.{max(i - 1, 0)}f}"
+    else:
+        prettified_file_size = round(prettified_file_size, 3)
+    prettified_file_size = re.sub(r"(\.0*)$", "", str(prettified_file_size))
+    return f"{prettified_file_size}{suffixes[i]}"

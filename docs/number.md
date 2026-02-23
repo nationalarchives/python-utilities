@@ -30,3 +30,28 @@ print(numberish(123456789))
 print(numberish(1337, simple_units=True, prefix_text="~"))
 # ~1.3k
 ```
+
+## `pretty_file_size()`
+
+Added in `v1.3.0`.
+
+Formats file size to a human-readable string.
+
+### Arguments
+
+| Argument   | Description                                                | Default |
+| ---------- | ---------------------------------------------------------- | ------- |
+| `bytes`    | The number of bytes                                        | [none]  |
+| `simplify` | If `True`, simplify the string and remove fractional sizes | `True`  |
+
+### Example
+
+```python
+from tna_utilities.number import pretty_file_size
+
+print(pretty_file_size(1337))
+# 1kB
+
+print(pretty_file_size(1337, simplify=False))
+# 1.337kB
+```
