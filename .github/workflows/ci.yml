@@ -37,7 +37,8 @@ jobs:
       - name: Install Poetry (Windows)
         if: runner.os == 'Windows'
         run: |
-          (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | POETRY_HOME="${{ github.workspace }}\poetry" py -
+          $env:POETRY_HOME = '${{ github.workspace }}\poetry'
+          (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
           echo "${{ github.workspace }}\poetry" >> "$GITHUB_PATH"
       - name: DEBUG WINDOWS
         if: runner.os == 'Windows'
