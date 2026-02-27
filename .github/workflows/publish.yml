@@ -38,6 +38,7 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' }}
         run: |
           (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
+          set PATH=%PATH%;%APPDATA%\Python\Scripts
       - name: Install dependencies
         run: poetry install --with test
       - name: Run tests
