@@ -45,6 +45,7 @@ jobs:
           echo PATH
           echo %PATH%
           echo $PATH
+          echo $0
       - name: Show Poetry version
         run: |
           echo $HOME
