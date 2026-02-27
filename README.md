@@ -25,9 +25,17 @@ pip install tna-utilities
 ## Developing
 
 ```sh
+# Install the test dependencies
+poetry install --with test
+
 # Run the tests
-python -m unittest discover tests
+poetry run python -m unittest discover tests
 
 # Format the code
 ./tasks/format.sh
+
+# Build the package
+python -m pip install --upgrade pip
+pip install build
+python -m build
 ```
