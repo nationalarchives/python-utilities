@@ -34,7 +34,9 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' }}
         run: |
           (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
+          echo $PATH
           [Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", "User") + ";C:\Users\runneradmin\AppData\Roaming\Python\Scripts", "User")
+          echo $PATH
       - name: Show Poetry version
         run: poetry --version
       - name: Install dependencies
