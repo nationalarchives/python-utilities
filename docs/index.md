@@ -6,4 +6,8 @@
 - [Strings](./string.md)
 - [URLs](./url.md)
 
+## Optional modules
+
+- [Flask](./flask.md)
+
 [Read the changelog](https://github.com/nationalarchives/python-utilities/blob/main/CHANGELOG.md).

@@ -1,6 +1,6 @@
 # Number
 
-Added in `v1.2.0`.
+> Added in `v1.2.0`.
 
 ## `numberish()`
 
@@ -33,7 +33,7 @@ print(numberish(1337, simple_units=True, prefix_text="~"))
 
 ## `pretty_file_size()`
 
-Added in `v1.3.0`.
+> Added in `v1.3.0`.
 
 Formats file size to a human-readable string.
 

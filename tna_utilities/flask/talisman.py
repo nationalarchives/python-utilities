@@ -1,4 +1,6 @@
-from ..security import CspGenerator, security_headers
+import flask
+
+from ..security import CspGenerator, common_security_headers
 
 GOOGLE_CSP_POLICY = {
     "default-src": [CspGenerator.SELF, "*.gstatic.com"],
@@ -23,7 +25,7 @@ GOOGLE_CSP_POLICY = {
 }
 
 
-class TnaFlaskTalisman(object):
+class Talisman(object):
     def __init__(self, app=None, **kwargs):
         if app is not None:
             self.app = app
@@ -33,22 +35,50 @@ class TnaFlaskTalisman(object):
         self,
         content_security_policy: dict = {},
         allow_google_content_security_policy: bool = False,
+        security_headers: dict = {},
         referrer_policy: str = "strict-origin-when-cross-origin",
+        force_https: bool = True,
+        force_https_permanent: bool = False,
     ):
-        self.app.config["SESSION_COOKIE_SECURE"] = True
+        self.app.config["SESSION_COOKIE_SECURE"] = force_https and not self.app.debug
         self.app.config["SESSION_COOKIE_HTTPONLY"] = True
         self.app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
-        @self.app.after_request
-        def apply_extra_headers(response):
-            response.headers["Content-Security-Policy"] = self.csp(
-                content_security_policy, allow_google_content_security_policy
-            )
-            response.headers.update(security_headers())
-            response.headers["Referrer-Policy"] = referrer_policy
-            return response
+        self.content_security_policy = content_security_policy
+        self.allow_google_content_security_policy = allow_google_content_security_policy
+        self.security_headers = security_headers
+        self.referrer_policy = referrer_policy
+        self.force_https = force_https
+        self.force_https_permanent = force_https_permanent
 
-    def csp(
+        self.app.before_request(self._force_https_redirect)
+        self.app.after_request(self._apply_extra_headers)
+
+    def _force_https_redirect(self):
+        criteria = [
+            self.app.debug,
+            flask.request.is_secure,
+            flask.request.headers.get("X-Forwarded-Proto", "http") == "https",
+        ]
+
+        if self.force_https and not any(criteria):
+            if flask.request.url.startswith("http://"):
+                url = flask.request.url.replace("http://", "https://", 1)
+                code = 302
+                if self.force_https_permanent:
+                    code = 301
+                r = flask.redirect(url, code=code)
+                return r
+
+    def _apply_extra_headers(self, response):
+        response.headers["Content-Security-Policy"] = self._csp(
+            self.content_security_policy, self.allow_google_content_security_policy
+        )
+        response.headers.update(common_security_headers(**self.security_headers))
+        response.headers["Referrer-Policy"] = self.referrer_policy
+        return response
+
+    def _csp(
         self,
         content_security_policy: dict,
         allow_google_content_security_policy: bool = False,

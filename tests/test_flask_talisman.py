@@ -1,10 +1,10 @@
 import unittest
 
 from flask import Flask, session
-from tna_utilities.flask.talisman import TnaFlaskTalisman
+from tna_utilities.flask.talisman import Talisman
 
 
-class TestFlaskTalisman(unittest.TestCase):
+class TestTalisman(unittest.TestCase):
     def setUp(self):
         self.app = Flask(__name__)
         self.app.config["SECRET_KEY"] = "my_secret_key"
@@ -39,7 +39,7 @@ class TestFlaskTalisman(unittest.TestCase):
         self.assertNotIn("SameSite", rv.headers["Set-Cookie"])
 
     def test_default_talisman_app(self):
-        TnaFlaskTalisman(self.app)
+        Talisman(self.app, force_https=False)
 
         rv = self.test_client.get("/")
 
@@ -64,12 +64,12 @@ class TestFlaskTalisman(unittest.TestCase):
 
         self.assertIn("Set-Cookie", rv.headers)
         self.assertIn("session=", rv.headers["Set-Cookie"])
-        self.assertIn(" Secure", rv.headers["Set-Cookie"])
+        self.assertNotIn(" Secure", rv.headers["Set-Cookie"])  # force_https is False
         self.assertIn(" HttpOnly", rv.headers["Set-Cookie"])
         self.assertIn(" SameSite=Lax", rv.headers["Set-Cookie"])
 
     def test_talisman_app_google(self):
-        TnaFlaskTalisman(self.app, allow_google_content_security_policy=True)
+        Talisman(self.app, force_https=False, allow_google_content_security_policy=True)
 
         rv = self.test_client.get("/")
 
@@ -94,4 +94,37 @@ class TestFlaskTalisman(unittest.TestCase):
         self.assertIn(
             "font-src 'self' themes.googleusercontent.com *.gstatic.com;",
             rv.headers["Content-Security-Policy"],
+        )
+
+    def test_talisman_force_https(self):
+        Talisman(self.app)
+
+        rv = self.test_client.get("/")
+
+        self.assertEqual(rv.status_code, 302)
+
+        self.assertIn("Location", rv.headers)
+        self.assertEqual(
+            "https://localhost/",
+            rv.headers["Location"],
+        )
+
+        rv = self.test_client.get("/", follow_redirects=True)
+
+        self.assertEqual(rv.status_code, 200)
+
+        self.assertIn("Set-Cookie", rv.headers)
+        self.assertIn(" Secure", rv.headers["Set-Cookie"])
+
+    def test_talisman_force_https_permanent(self):
+        Talisman(self.app, force_https_permanent=True)
+
+        rv = self.test_client.get("/")
+
+        self.assertEqual(rv.status_code, 301)
+
+        self.assertIn("Location", rv.headers)
+        self.assertEqual(
+            "https://localhost/",
+            rv.headers["Location"],
         )

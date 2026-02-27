@@ -423,37 +423,19 @@ class CspGenerator:
         return "; ".join(parts) + ";"
 
 
-def security_headers(
+def common_security_headers(
     x_frame_options: str | None = None,
     x_permitted_cross_domain_policies: str | None = None,
     cross_origin_embedder_policy: str | None = None,
     cross_origin_opener_policy: str | None = None,
     cross_origin_resource_policy: str | None = None,
+    x_content_type_options: str | None = "nosniff",
 ) -> dict[str, str]:
     """
     Get a dictionary of common security headers.
     """
 
     headers = [
-        {
-            "header": "X-Frame-Options",
-            "values": ["DENY", "SAMEORIGIN"],
-            "default": "DENY",
-            "value": x_frame_options,
-        },
-        {
-            "header": "X-Permitted-Cross-Domain-Policies",
-            "values": [
-                "none",
-                "master-only",
-                "by-content-type",
-                "by-ftp-filename",
-                "all",
-                "none-this-response",
-            ],
-            "default": "none",
-            "value": x_permitted_cross_domain_policies,
-        },
         {
             "header": "Cross-Origin-Embedder-Policy",
             "values": ["unsafe-none", "require-corp", "credentialless"],
@@ -477,13 +459,42 @@ def security_headers(
             "default": "same-origin",
             "value": cross_origin_resource_policy,
         },
+        {
+            "header": "X-Content-Type-Options",
+            "values": [None, "nosniff"],
+            "default": "nosniff",
+            "value": x_content_type_options,
+        },
+        {
+            "header": "X-Frame-Options",
+            "values": ["DENY", "SAMEORIGIN"],
+            "default": "DENY",
+            "value": x_frame_options,
+        },
+        {
+            "header": "X-Permitted-Cross-Domain-Policies",
+            "values": [
+                "none",
+                "master-only",
+                "by-content-type",
+                "by-ftp-filename",
+                "all",
+                "none-this-response",
+            ],
+            "default": "none",
+            "value": x_permitted_cross_domain_policies,
+        },
     ]
 
-    return {
+    headers_dict = {
         header["header"]: (
             header["value"]
-            if header["value"] is not None and header["value"] in header["values"]
-            else header["default"]
+            if header["value"] in header["values"]
+            else (header["default"] or "")
         )
         for header in headers
+    }
+
+    return {
+        header: value for header, value in headers_dict.items() if value is not None
     }

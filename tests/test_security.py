@@ -1,6 +1,6 @@
 import unittest
 
-from tna_utilities.security import CspGenerator, security_headers
+from tna_utilities.security import CspGenerator, common_security_headers
 
 
 class TestSecurityCSP(unittest.TestCase):
@@ -277,54 +277,58 @@ class TestSecurityCSP(unittest.TestCase):
         self.assertIn("sandbox;", generator.get_csp())
 
 
-class TestSecurityHeaders(unittest.TestCase):
+class TestCommonSecurityHeaders(unittest.TestCase):
     def test_security_headers_default(self):
-        headers = security_headers()
+        headers = common_security_headers()
         self.assertDictEqual(
             headers,
             {
-                "X-Frame-Options": "DENY",
-                "X-Permitted-Cross-Domain-Policies": "none",
                 "Cross-Origin-Embedder-Policy": "unsafe-none",
                 "Cross-Origin-Opener-Policy": "same-origin",
                 "Cross-Origin-Resource-Policy": "same-origin",
+                "X-Content-Type-Options": "nosniff",
+                "X-Frame-Options": "DENY",
+                "X-Permitted-Cross-Domain-Policies": "none",
             },
         )
 
     def test_security_headers_invalid(self):
-        headers = security_headers(
-            x_frame_options=None,
-            x_permitted_cross_domain_policies="True",
+        headers = common_security_headers(
             cross_origin_embedder_policy="0",
             cross_origin_opener_policy="None",
             cross_origin_resource_policy="",
+            x_content_type_options="[]",
+            x_frame_options="()",
+            x_permitted_cross_domain_policies="True",
         )
         self.assertDictEqual(
             headers,
             {
-                "X-Frame-Options": "DENY",
-                "X-Permitted-Cross-Domain-Policies": "none",
                 "Cross-Origin-Embedder-Policy": "unsafe-none",
                 "Cross-Origin-Opener-Policy": "same-origin",
                 "Cross-Origin-Resource-Policy": "same-origin",
+                "X-Content-Type-Options": "nosniff",
+                "X-Frame-Options": "DENY",
+                "X-Permitted-Cross-Domain-Policies": "none",
             },
         )
 
     def test_security_headers_custom(self):
-        headers = security_headers(
-            x_frame_options="SAMEORIGIN",
-            x_permitted_cross_domain_policies="all",
+        headers = common_security_headers(
             cross_origin_embedder_policy="require-corp",
             cross_origin_opener_policy="noopener-allow-popups",
             cross_origin_resource_policy="cross-origin",
+            x_content_type_options=None,
+            x_frame_options="SAMEORIGIN",
+            x_permitted_cross_domain_policies="all",
         )
         self.assertDictEqual(
             headers,
             {
-                "X-Frame-Options": "SAMEORIGIN",
-                "X-Permitted-Cross-Domain-Policies": "all",
                 "Cross-Origin-Embedder-Policy": "require-corp",
                 "Cross-Origin-Opener-Policy": "noopener-allow-popups",
                 "Cross-Origin-Resource-Policy": "cross-origin",
+                "X-Frame-Options": "SAMEORIGIN",
+                "X-Permitted-Cross-Domain-Policies": "all",
             },
         )

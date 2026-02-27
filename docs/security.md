@@ -1,6 +1,6 @@
 # Security
 
-Added in `v1.3.0`.
+> Added in `v1.3.0`.
 
 ## `CspGenerator`
 
@@ -29,7 +29,9 @@ generator.get_csp()
 # default-src 'self'; script-src 'self' example.com; style-src 'self' example.com another.net; object-src example.com; worker-src 'none';
 ```
 
-## `security_headers`
+## `common_security_headers`
+
+> Renamed from `security_headers` in `v1.4.0`.
 
 Get a dictionary of common security headers.
 
@@ -37,11 +39,12 @@ Get a dictionary of common security headers.
 
 | Argument                            | Description                                                   | Default       |
 | ----------------------------------- | ------------------------------------------------------------- | ------------- |
-| `x_frame_options`                   | The option for the `X-Frame-Options` header                   | `DENY`        |
-| `x_permitted_cross_domain_policies` | The option for the `X-Permitted-Cross-Domain-Policies` header | `none`        |
 | `cross_origin_embedder_policy`      | The option for the `Cross-Origin-Embedder-Policy` header      | `unsafe-none` |
 | `cross_origin_opener_policy`        | The option for the `Cross-Origin-Opener-Policy` header        | `same-origin` |
 | `cross_origin_resource_policy`      | The option for the `Cross-Origin-Resource-Policy` header      | `same-origin` |
+| `x_content_type_options`            | The option for the `X-Content-Type-Options` header            | `no-sniff`    |
+| `x_frame_options`                   | The option for the `X-Frame-Options` header                   | `DENY`        |
+| `x_permitted_cross_domain_policies` | The option for the `X-Permitted-Cross-Domain-Policies` header | `none`        |
 
 ### Example
 
@@ -50,10 +53,11 @@ from tna_utilities.security import security_headers
 
 print(security_headers())
 # {
-#   "X-Frame-Options": "DENY",
-#   "X-Permitted-Cross-Domain-Policies": "none",
 #   "Cross-Origin-Embedder-Policy": "unsafe-none",
 #   "Cross-Origin-Opener-Policy": "same-origin",
 #   "Cross-Origin-Resource-Policy": "same-origin",
+#   "X-Permitted-Cross-Domain-Policies": "none",
+#   "X-Content-Type-Options": "no-sniff",
+#   "X-Frame-Options": "DENY",
 # }
 ```
