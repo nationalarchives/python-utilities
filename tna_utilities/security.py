@@ -40,18 +40,11 @@ class CspGenerator:
         if not allow_objects:
             self.directives["object-src"] = [self.NONE]
 
-    def add_directive(
-        self, directive: str, *values: str | list[str], omit_self=False, replace=False
-    ) -> "CspGenerator":
+    def _process_sources(self, *values: str | list[str]) -> list[str]:
         """
-        Add a directive.
+        Process the sources input, which can be a string or a list of strings, and return a flat list of sources.
         """
 
-        # If there are no sources, we don't add the directive
-        if not values:
-            return self
-
-        # Flatten the values into a single list of strings, splitting any strings that contain spaces into multiple sources
         processed_values: list[str] = []
         for value in values:
             if isinstance(value, str):
@@ -61,12 +54,27 @@ class CspGenerator:
                     if isinstance(item, str):
                         processed_values.extend(item.split(" "))
 
-        # If nothing valid was parsed, do not add the directive
-        if not processed_values:
-            return self
+        # Remove empty strings
+        processed_values = [src for src in processed_values if src]
 
         # Remove duplicates while preserving order
         processed_values = list(dict.fromkeys(processed_values))
+
+        return processed_values
+
+    def add_directive(
+        self, directive: str, *values: str | list[str], omit_self=False, replace=False
+    ) -> "CspGenerator":
+        """
+        Add a directive.
+        """
+
+        # Flatten the values into a single list of strings, splitting any strings that contain spaces into multiple sources
+        processed_values = self._process_sources(*values)
+
+        # If nothing valid was parsed, do not add the directive
+        if not processed_values:
+            return self
 
         # If the values are the same as the default-src, we don't add the directive for simplicity and to avoid redundancy
         if processed_values == self.default_src:
