@@ -31,25 +31,9 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install Poetry (Linux/Mac)
-        if: runner.os != 'Windows'
-        run: curl -sSL https://install.python-poetry.org | python -
-      - name: Install Poetry (Windows)
-        if: runner.os == 'Windows'
+      - name: Install Poetry
         run: |
-          (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
-          # SETX /M PATH "%PATH%;C:\Users\runneradmin\AppData\Roaming\Python\Scripts\poetry"
-          # set PATH=%PATH%;C:\Users\runneradmin\AppData\Roaming\Python\Scripts\poetry
-          # echo $HOME
-          # echo $GITHUB_PATH
-          # echo "C:\Users\runneradmin\AppData\Roaming\Python\Scripts\poetry" >> $GITHUB_PATH
-          # echo "C:\Users\runneradmin\AppData\Roaming\Python\Scripts\poetry" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          # echo C:\Users\runneradmin\AppData\Roaming\Python\Scripts\poetry >> %GITHUB_PATH%
-          echo "C:\Users\runneradmin\AppData\Roaming\Python\Scripts\poetry" >> "$GITHUB_PATH"
-      - name: Show Poetry version
-        run: |
-          echo $HOME
-          echo $GITHUB_PATH
+          pipx install poetry
           poetry --version
       - name: Install dependencies
         run: poetry install --with test
@@ -70,10 +54,10 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: "3.14"
-      - name: Install build dependencies
-        run: python -m pip install --upgrade pip
       - name: Install Poetry
-        run: curl -sSL https://install.python-poetry.org | python -
+        run: |
+          pipx install poetry
+          poetry --version
       - name: Install dependencies
         run: poetry install
       - name: Build package
