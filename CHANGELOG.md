@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- CSP directives are appended by default with the option to be overwritten
+
 ### Changed
+
+- Added a default of `object-src 'none'` to the `CspGenerator`
 
 ### Deprecated
 

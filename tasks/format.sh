@@ -1,4 +1,4 @@
 #!/bin/bash
 
-docker run --rm -v "$(pwd)":/app/ ghcr.io/nationalarchives/tna-python-dev:latest format
+docker run --rm -v "$(pwd)":/app/ ghcr.io/nationalarchives/tna-python-dev:preview format
 npx prettier --write .

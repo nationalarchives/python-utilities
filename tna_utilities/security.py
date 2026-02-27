@@ -22,7 +22,9 @@ class CspGenerator:
     NONE: str = "'none'"
     SELF: str = "'self'"
 
-    def __init__(self, default_src: str | list[str] | None = None) -> None:
+    def __init__(
+        self, default_src: str | list[str] | None = None, allow_objects=False
+    ) -> None:
         self.default_src: list[str] = []
         if default_src:
             if isinstance(default_src, list):
@@ -35,9 +37,11 @@ class CspGenerator:
         self.directives: dict[str, list[str]] = {
             "default-src": self.default_src,
         }
+        if not allow_objects:
+            self.directives["object-src"] = [self.NONE]
 
     def add_directive(
-        self, directive: str, *values: str | list[str], omit_self=False
+        self, directive: str, *values: str | list[str], omit_self=False, replace=False
     ) -> "CspGenerator":
         """
         Add a directive.
@@ -76,8 +80,19 @@ class CspGenerator:
         ):
             processed_values.insert(0, self.SELF)
 
-        # Add the directive to the directives dictionary
-        self.directives[directive] = processed_values
+        # Add the directive to the directives dictionary, replacing it if replace is True, the directive does not already exist or if the existing directive is just "'none'"
+        if (
+            directive not in self.directives
+            or replace
+            or self.directives.get(directive, []) == [self.NONE]
+        ):
+            self.directives[directive] = processed_values
+        else:
+            # If the directive already exists, we extend it with the new values, ensuring we don't add duplicates
+            existing_values = self.directives[directive]
+            for value in processed_values:
+                if value not in existing_values:
+                    existing_values.append(value)
 
         # Return self to allow for method chaining
         return self
@@ -90,95 +105,137 @@ class CspGenerator:
         self.directives[directive] = [self.NONE]
         return self
 
-    def base_uri(self, *sources: str | list[str], omit_self=False) -> "CspGenerator":
+    def base_uri(
+        self, *sources: str | list[str], omit_self=False, replace=False
+    ) -> "CspGenerator":
         """
         Add a base-uri directive.
         """
 
-        return self.add_directive("base-uri", *sources, omit_self=omit_self)
+        return self.add_directive(
+            "base-uri", *sources, omit_self=omit_self, replace=replace
+        )
 
-    def child_src(self, *sources: str | list[str], omit_self=False) -> "CspGenerator":
+    def child_src(
+        self, *sources: str | list[str], omit_self=False, replace=False
+    ) -> "CspGenerator":
         """
         Add a child-src directive.
         """
 
-        return self.add_directive("child-src", *sources, omit_self=omit_self)
+        return self.add_directive(
+            "child-src", *sources, omit_self=omit_self, replace=replace
+        )
 
-    def connect_src(self, *sources: str | list[str], omit_self=False) -> "CspGenerator":
+    def connect_src(
+        self, *sources: str | list[str], omit_self=False, replace=False
+    ) -> "CspGenerator":
         """
         Add a connect-src directive.
         """
 
-        return self.add_directive("connect-src", *sources, omit_self=omit_self)
+        return self.add_directive(
+            "connect-src", *sources, omit_self=omit_self, replace=replace
+        )
 
-    def font_src(self, *sources: str | list[str], omit_self=False) -> "CspGenerator":
+    def font_src(
+        self, *sources: str | list[str], omit_self=False, replace=False
+    ) -> "CspGenerator":
         """
         Add a font-src directive.
         """
 
-        return self.add_directive("font-src", *sources, omit_self=omit_self)
+        return self.add_directive(
+            "font-src", *sources, omit_self=omit_self, replace=replace
+        )
 
-    def form_action(self, *sources: str | list[str], omit_self=False) -> "CspGenerator":
+    def form_action(
+        self, *sources: str | list[str], omit_self=False, replace=False
+    ) -> "CspGenerator":
         """
         Add a form-action directive.
         """
 
-        return self.add_directive("form-action", *sources, omit_self=omit_self)
+        return self.add_directive(
+            "form-action", *sources, omit_self=omit_self, replace=replace
+        )
 
     def frame_ancestors(
-        self, *sources: str | list[str], omit_self=False
+        self, *sources: str | list[str], omit_self=False, replace=False
     ) -> "CspGenerator":
         """
         Add a frame-ancestors directive.
         """
 
-        return self.add_directive("frame-ancestors", *sources, omit_self=omit_self)
+        return self.add_directive(
+            "frame-ancestors", *sources, omit_self=omit_self, replace=replace
+        )
 
-    def frame_src(self, *sources: str | list[str], omit_self=False) -> "CspGenerator":
+    def frame_src(
+        self, *sources: str | list[str], omit_self=False, replace=False
+    ) -> "CspGenerator":
         """
         Add a frame-src directive.
         """
 
-        return self.add_directive("frame-src", *sources, omit_self=omit_self)
+        return self.add_directive(
+            "frame-src", *sources, omit_self=omit_self, replace=replace
+        )
 
-    def img_src(self, *sources: str | list[str], omit_self=False) -> "CspGenerator":
+    def img_src(
+        self, *sources: str | list[str], omit_self=False, replace=False
+    ) -> "CspGenerator":
         """
         Add a img-src directive.
         """
 
-        return self.add_directive("img-src", *sources, omit_self=omit_self)
+        return self.add_directive(
+            "img-src", *sources, omit_self=omit_self, replace=replace
+        )
 
     def manifest_src(
-        self, *sources: str | list[str], omit_self=False
+        self, *sources: str | list[str], omit_self=False, replace=False
     ) -> "CspGenerator":
         """
         Add a manifest-src directive.
         """
 
-        return self.add_directive("manifest-src", *sources, omit_self=omit_self)
+        return self.add_directive(
+            "manifest-src", *sources, omit_self=omit_self, replace=replace
+        )
 
-    def media_src(self, *sources: str | list[str], omit_self=False) -> "CspGenerator":
+    def media_src(
+        self, *sources: str | list[str], omit_self=False, replace=False
+    ) -> "CspGenerator":
         """
         Add a media-src directive.
         """
 
-        return self.add_directive("media-src", *sources, omit_self=omit_self)
+        return self.add_directive(
+            "media-src", *sources, omit_self=omit_self, replace=replace
+        )
 
-    def object_src(self, *sources: str | list[str], omit_self=False) -> "CspGenerator":
+    def object_src(
+        self, *sources: str | list[str], omit_self=False, replace=False
+    ) -> "CspGenerator":
         """
         Add a object-src directive.
         """
 
-        return self.add_directive("object-src", *sources, omit_self=omit_self)
+        return self.add_directive(
+            "object-src", *sources, omit_self=omit_self, replace=replace
+        )
 
     def prefetch_src(
-        self, *sources: str | list[str], omit_self=False
+        self, *sources: str | list[str], omit_self=False, replace=False
     ) -> "CspGenerator":
         """
         Add a prefetch-src directive.
         """
 
-        return self.add_directive("prefetch-src", *sources, omit_self=omit_self)
+        return self.add_directive(
+            "prefetch-src", *sources, omit_self=omit_self, replace=replace
+        )
 
     def report_uri(self, uri: str) -> "CspGenerator":
         """
@@ -247,62 +304,97 @@ class CspGenerator:
         self.directives["sandbox"] = sources
         return self
 
-    def script_src(self, *sources: str | list[str], omit_self=False) -> "CspGenerator":
+    def script_src(
+        self, *sources: str | list[str], omit_self=False, replace=False
+    ) -> "CspGenerator":
         """
         Add a script-src directive.
         """
 
-        return self.add_directive("script-src", *sources, omit_self=omit_self)
+        return self.add_directive(
+            "script-src", *sources, omit_self=omit_self, replace=replace
+        )
 
     def script_src_attr(
-        self, *sources: str | list[str], omit_self=False
+        self, *sources: str | list[str], omit_self=False, replace=False
     ) -> "CspGenerator":
         """
         Add a script-src-attr directive.
         """
 
-        return self.add_directive("script-src-attr", *sources, omit_self=omit_self)
+        return self.add_directive(
+            "script-src-attr", *sources, omit_self=omit_self, replace=replace
+        )
 
     def script_src_elem(
-        self, *sources: str | list[str], omit_self=False
+        self, *sources: str | list[str], omit_self=False, replace=False
     ) -> "CspGenerator":
         """
         Add a script-src-elem directive.
         """
 
-        return self.add_directive("script-src-elem", *sources, omit_self=omit_self)
+        return self.add_directive(
+            "script-src-elem", *sources, omit_self=omit_self, replace=replace
+        )
 
-    def style_src(self, *sources: str | list[str], omit_self=False) -> "CspGenerator":
+    def style_src(
+        self, *sources: str | list[str], omit_self=False, replace=False
+    ) -> "CspGenerator":
         """
         Add a style-src directive.
         """
 
-        return self.add_directive("style-src", *sources, omit_self=omit_self)
+        return self.add_directive(
+            "style-src", *sources, omit_self=omit_self, replace=replace
+        )
 
     def style_src_attr(
-        self, *sources: str | list[str], omit_self=False
+        self, *sources: str | list[str], omit_self=False, replace=False
     ) -> "CspGenerator":
         """
         Add a style-src-attr directive.
         """
 
-        return self.add_directive("style-src-attr", *sources, omit_self=omit_self)
+        return self.add_directive(
+            "style-src-attr", *sources, omit_self=omit_self, replace=replace
+        )
 
     def style_src_elem(
-        self, *sources: str | list[str], omit_self=False
+        self, *sources: str | list[str], omit_self=False, replace=False
     ) -> "CspGenerator":
         """
         Add a style-src-elem directive.
         """
 
-        return self.add_directive("style-src-elem", *sources, omit_self=omit_self)
+        return self.add_directive(
+            "style-src-elem", *sources, omit_self=omit_self, replace=replace
+        )
 
-    def worker_src(self, *sources: str | list[str], omit_self=False) -> "CspGenerator":
+    def worker_src(
+        self, *sources: str | list[str], omit_self=False, replace=False
+    ) -> "CspGenerator":
         """
         Add a worker-src directive.
         """
 
-        return self.add_directive("worker-src", *sources, omit_self=omit_self)
+        return self.add_directive(
+            "worker-src", *sources, omit_self=omit_self, replace=replace
+        )
+
+    def custom_src(
+        self,
+        directive_name: str,
+        *sources: str | list[str],
+        omit_self=False,
+        replace=False,
+    ) -> "CspGenerator":
+        """
+        Add a custom directive.
+        """
+
+        return self.add_directive(
+            directive_name, *sources, omit_self=omit_self, replace=replace
+        )
 
     def get_csp(self) -> str:
         """

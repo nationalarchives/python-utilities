@@ -12,22 +12,29 @@ class TestSecurityCSP(unittest.TestCase):
 
     def test_init(self):
         generator = CspGenerator()
-        self.assertEqual(generator.get_csp(), "default-src 'self';")
+        self.assertEqual(generator.get_csp(), "default-src 'self'; object-src 'none';")
 
     def test_init_none(self):
         generator = CspGenerator(CspGenerator.NONE)
-        self.assertEqual(generator.get_csp(), "default-src 'none';")
+        self.assertEqual(generator.get_csp(), "default-src 'none'; object-src 'none';")
 
     def test_init_list(self):
         generator = CspGenerator([CspGenerator.NONE, self.test_domain])
-        self.assertEqual(generator.get_csp(), f"default-src 'none' {self.test_domain};")
+        self.assertEqual(
+            generator.get_csp(),
+            f"default-src 'none' {self.test_domain}; object-src 'none';",
+        )
 
     def test_init_empty_string(self):
         generator = CspGenerator("")
-        self.assertEqual(generator.get_csp(), "default-src 'self';")
+        self.assertEqual(generator.get_csp(), "default-src 'self'; object-src 'none';")
 
     def test_init_list_of_empty_strings(self):
         generator = CspGenerator([""])
+        self.assertEqual(generator.get_csp(), "default-src 'self'; object-src 'none';")
+
+    def test_init_allow_objects(self):
+        generator = CspGenerator([""], allow_objects=True)
         self.assertEqual(generator.get_csp(), "default-src 'self';")
 
     def test_add_directive(self):
@@ -156,10 +163,36 @@ class TestSecurityCSP(unittest.TestCase):
 
     def test_add_multiple_directives(self):
         generator = CspGenerator()
-        generator.script_src(self.test_domain).style_src(self.test_domain_2)
+        generator.script_src(self.test_domain)
+        generator.style_src(self.test_domain_2)
         self.assertIn("default-src 'self';", generator.get_csp())
         self.assertIn(f"script-src 'self' {self.test_domain};", generator.get_csp())
         self.assertIn(f"style-src 'self' {self.test_domain_2};", generator.get_csp())
+
+    def test_add_multiple_same_directives(self):
+        generator = CspGenerator()
+        generator.script_src(self.test_domain)
+        generator.script_src(self.test_domain_2)
+        self.assertIn("default-src 'self';", generator.get_csp())
+        self.assertIn(
+            f"script-src 'self' {self.test_domain} {self.test_domain_2};",
+            generator.get_csp(),
+        )
+
+    def test_add_multiple_same_directives_replace(self):
+        generator = CspGenerator()
+        generator.script_src(self.test_domain)
+        generator.script_src(self.test_domain_2, replace=True)
+        self.assertIn("default-src 'self';", generator.get_csp())
+        self.assertIn(f"script-src 'self' {self.test_domain_2};", generator.get_csp())
+
+    def test_add_custom_directive(self):
+        generator = CspGenerator()
+        generator.custom_src("custom-directive", self.test_domain)
+        self.assertIn("default-src 'self';", generator.get_csp())
+        self.assertIn(
+            f"custom-directive 'self' {self.test_domain};", generator.get_csp()
+        )
 
     def test_add_directive_sources(self):
         directives = [
