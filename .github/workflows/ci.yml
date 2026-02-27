@@ -27,7 +27,7 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install Poetry (pipx) 
+      - name: Install Poetry (pipx)
         run: pipx install poetry
       # - name: Install Poetry (Linux/Mac)
       #   if: runner.os != 'Windows'
