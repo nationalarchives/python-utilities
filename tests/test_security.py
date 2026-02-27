@@ -237,7 +237,7 @@ class TestSecurityCSP(unittest.TestCase):
         generator = CspGenerator()
         generator.report_uri("")
         self.assertIn("default-src 'self';", generator.get_csp())
-        self.assertNotIn(f"report-uri", generator.get_csp())
+        self.assertNotIn("report-uri", generator.get_csp())
 
     def test_add_report_to(self):
         generator = CspGenerator()
@@ -250,7 +250,7 @@ class TestSecurityCSP(unittest.TestCase):
         generator = CspGenerator()
         generator.report_to("")
         self.assertIn("default-src 'self';", generator.get_csp())
-        self.assertNotIn(f"report-to", generator.get_csp())
+        self.assertNotIn("report-to", generator.get_csp())
 
     def test_add_require_trusted_types_for(self):
         generator = CspGenerator()
