@@ -39,7 +39,8 @@ jobs:
         run: |
           (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
           # SETX /M PATH "%PATH%;C:\Users\runneradmin\AppData\Roaming\Python\Scripts\poetry"
-          set PATH=%PATH%;C:\Users\runneradmin\AppData\Roaming\Python\Scripts\poetry
+          # set PATH=%PATH%;C:\Users\runneradmin\AppData\Roaming\Python\Scripts\poetry
+          echo "C:\Users\runneradmin\AppData\Roaming\Python\Scripts\poetry" >> $GITHUB_PATH
       - name: Show Poetry version
         run: poetry --version
       - name: Install dependencies
