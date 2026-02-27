@@ -29,8 +29,9 @@ class CspGenerator:
                 self.default_src.extend(default_src)
             else:
                 self.default_src.append(default_src)
-        else:
-            self.default_src.append(self.SELF)
+        self.default_src = [src for src in self.default_src if src]
+        if not self.default_src:
+            self.default_src = [self.SELF]
         self.directives: dict[str, list[str]] = {
             "default-src": self.default_src,
         }
@@ -188,7 +189,8 @@ class CspGenerator:
         For new implementations, it is recommended to use report-to instead of report-uri.
         """
 
-        self.directives["report-uri"] = [uri]
+        if uri:
+            self.directives["report-uri"] = [uri]
         return self
 
     def report_to(self, endpoint_name: str) -> "CspGenerator":
@@ -205,7 +207,8 @@ class CspGenerator:
             Reporting-Endpoints: csp-endpoint="https://example.com/csp-reports"
         """
 
-        self.directives["report-to"] = [endpoint_name]
+        if endpoint_name:
+            self.directives["report-to"] = [endpoint_name]
         return self
 
     def require_trusted_types_for(self) -> "CspGenerator":

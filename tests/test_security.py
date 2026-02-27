@@ -22,6 +22,14 @@ class TestSecurityCSP(unittest.TestCase):
         generator = CspGenerator([CspGenerator.NONE, self.test_domain])
         self.assertEqual(generator.get_csp(), f"default-src 'none' {self.test_domain};")
 
+    def test_init_empty_string(self):
+        generator = CspGenerator("")
+        self.assertEqual(generator.get_csp(), "default-src 'self';")
+
+    def test_init_list_of_empty_strings(self):
+        generator = CspGenerator([""])
+        self.assertEqual(generator.get_csp(), "default-src 'self';")
+
     def test_add_directive(self):
         generator = CspGenerator()
         generator.script_src(self.test_domain)
@@ -192,12 +200,24 @@ class TestSecurityCSP(unittest.TestCase):
         self.assertIn("default-src 'self';", generator.get_csp())
         self.assertIn(f"report-uri {report_uri};", generator.get_csp())
 
+    def test_add_empty_report_uri(self):
+        generator = CspGenerator()
+        generator.report_uri("")
+        self.assertIn("default-src 'self';", generator.get_csp())
+        self.assertNotIn(f"report-uri", generator.get_csp())
+
     def test_add_report_to(self):
         generator = CspGenerator()
         report_endpoint_name = "csp_report_endpoint"
         generator.report_to(report_endpoint_name)
         self.assertIn("default-src 'self';", generator.get_csp())
         self.assertIn(f"report-to {report_endpoint_name};", generator.get_csp())
+
+    def test_add_empty_report_to(self):
+        generator = CspGenerator()
+        generator.report_to("")
+        self.assertIn("default-src 'self';", generator.get_csp())
+        self.assertNotIn(f"report-to", generator.get_csp())
 
     def test_add_require_trusted_types_for(self):
         generator = CspGenerator()
