@@ -34,8 +34,7 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' }}
         run: |
           (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
-          SETX /?
-          SETX /M "%path%;C:\Users\runneradmin\AppData\Roaming\Python\Scripts"
+          SETX /M PATH "%PATH%;C:\Users\runneradmin\AppData\Roaming\Python\Scripts"
       - name: Show Poetry version
         run: poetry --version
       - name: Install dependencies
