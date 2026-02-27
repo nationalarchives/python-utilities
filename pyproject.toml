@@ -1,6 +1,6 @@
 [project]
 name = "tna-utilities"
-version = "1.3.0"
+version = "1.4.0-0"
 requires-python = ">=3.10"
 authors = [
   {name = "Andrew Hosgood", email = "andrew.hosgood@nationalarchives.gov.uk"},
@@ -25,15 +25,19 @@ classifiers = [
 [project.optional-dependencies]
 flask = ["Flask"]
 
-[tool.poetry.group.test]
-optional = true
-
-[tool.poetry.group.test.dependencies]
-Flask = "^3"
-
 [project.urls]
 Homepage = "https://pypi.org/project/tna-utilities/"
 Documentation = "https://nationalarchives.github.io/python-utilities/"
 Repository = "https://github.com/nationalarchives/python-utilities"
 "Bug Tracker" = "https://github.com/nationalarchives/python-utilities/issues"
 Changelog = "https://github.com/nationalarchives/python-utilities/blob/main/CHANGELOG.md"
+
+[tool.poetry.group.test]
+optional = true
+
+[tool.poetry.group.test.dependencies]
+Flask = "^3"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
