@@ -1,3 +1,6 @@
+from collections import OrderedDict
+
+
 class CspGenerator:
     """
     A utility class for generating a Content Security Policy (CSP) header value.
@@ -34,9 +37,11 @@ class CspGenerator:
         self.default_src = [src for src in self.default_src if src]
         if not self.default_src:
             self.default_src = [self.SELF]
-        self.directives: dict[str, list[str]] = {
-            "default-src": self.default_src,
-        }
+        self.directives: OrderedDict[str, list[str]] = OrderedDict(
+            {
+                "default-src": self.default_src,
+            }
+        )
         if not allow_objects:
             self.directives["object-src"] = [self.NONE]
 
