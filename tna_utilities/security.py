@@ -15,11 +15,8 @@ class CspGenerator:
            .connect_src(["'self'", "https://api.example.com"]) \
            .font_src("'self'")
 
-    The ``default_src`` argument to ``__init__`` controls the initial
-    ``default-src`` directive. If it is omitted, a default of ``'self'`` is
-    used. Helper methods such as ``base_uri``, ``child_src``, ``connect_src``,
-    and ``font_src`` delegate to :meth:`add_directive` to add or override
-    specific CSP directives.
+    :param default_src: The sources for the default-src directive, which serves as a fallback for any directives that are not explicitly set. This can be a string or a list of strings. If not provided, it defaults to "'self'".
+    :param allow_objects: If True, allows the use of the object-src directive with a default value of "'self'". If False (the default), disallows the use of the object-src directive by setting it to "'none'".
     """
 
     NONE: str = "'none'"
@@ -72,6 +69,11 @@ class CspGenerator:
     ) -> "CspGenerator":
         """
         Add a directive.
+
+        :param directive: The name of the directive to add (e.g. "script-src").
+        :param values: The sources for the directive, which can be strings or lists of strings. If a string contains spaces, it will be split into multiple sources.
+        :param omit_self: If True, the 'self' source will not be automatically added if it is not included in the provided sources. Defaults to False.
+        :param replace: If True, the directive will be replaced if it already exists. If False (the default), the new sources will be added to the existing directive, ensuring no duplicates. If the existing directive is set to "'none'", it will be replaced regardless of the value of replace.
         """
 
         # Flatten the values into a single list of strings, splitting any strings that contain spaces into multiple sources
@@ -450,6 +452,13 @@ def common_security_headers(
 ) -> dict[str, str]:
     """
     Get a dictionary of common security headers.
+
+    :param x_frame_options: The value for the X-Frame-Options header. Valid values are "DENY" and "SAMEORIGIN". If not provided, it defaults to "DENY".
+    :param x_permitted_cross_domain_policies: The value for the X-Permitted-Cross-Domain-Policies header. Valid values are "none", "master-only", "by-content-type", "by-ftp-filename", "all", and "none-this-response". If not provided, it defaults to "none".
+    :param cross_origin_embedder_policy: The value for the Cross-Origin-Embedder-Policy header. Valid values are "unsafe-none", "require-corp", and "credentialless". If not provided, it defaults to "unsafe-none".
+    :param cross_origin_opener_policy: The value for the Cross-Origin-Opener-Policy header. Valid values are "same-origin", "same-origin-allow-popups", "unsafe-none", and "noopener-allow-popups". If not provided, it defaults to "same-origin".
+    :param cross_origin_resource_policy: The value for the Cross-Origin-Resource-Policy header. Valid values are "same-origin", "same-site", and "cross-origin". If not provided, it defaults to "same-origin".
+    :param x_content_type_options: The value for the X-Content-Type-Options header. Valid values are None and "nosniff". If not provided, it defaults to "nosniff".
     """
 
     headers = [

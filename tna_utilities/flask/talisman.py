@@ -26,6 +26,14 @@ GOOGLE_CSP_POLICY = {
 
 
 class Talisman(object):
+    """
+    A stripped-down and opinionated reproduction of [wntrblm/flask-talisman](https://github.com/wntrblm/flask-talisman) which is a fork of [GoogleCloudPlatform/flask-talisman](https://github.com/GoogleCloudPlatform/flask-talisman).
+
+    Neither GoogleCloudPlatform/flask-talisman nor wntrblm/flask-talisman appears to be actively maintained.
+
+    :param app: The Flask application instance to which the Talisman extension should be applied.
+    """
+
     def __init__(self, app=None, **kwargs):
         if app is not None:
             self.app = app
@@ -40,6 +48,17 @@ class Talisman(object):
         force_https: bool = True,
         force_https_permanent: bool = False,
     ):
+        """
+        Initialises the Talisman extension for the Flask app.
+
+        :param content_security_policy: A dictionary defining the Content Security Policy directives and their values.
+        :param allow_google_content_security_policy: If True, includes Google's recommended Content Security Policy directives in addition to the custom directives specified in content_security_policy.
+        :param security_headers: A dictionary of additional security headers to apply to responses, where the keys are header names and the values are header values.
+        :param referrer_policy: The Referrer-Policy header value to apply to responses. Defaults to "strict-origin-when-cross-origin".
+        :param force_https: If True, forces incoming requests to be redirected to HTTPS if they are not already secure and the application is not in debug mode. Defaults to True.
+        :param force_https_permanent: If True, uses a permanent redirect (HTTP 301) when forcing HTTPS, otherwise uses a temporary redirect (HTTP 302). Defaults to False.
+        """
+
         self.app.config["SESSION_COOKIE_SECURE"] = force_https and not self.app.debug
         self.app.config["SESSION_COOKIE_HTTPONLY"] = True
         self.app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
@@ -55,6 +74,10 @@ class Talisman(object):
         self.app.after_request(self._apply_extra_headers)
 
     def _force_https_redirect(self):
+        """
+        Redirects incoming requests to HTTPS if the request is not secure and the application is not in debug mode.
+        """
+
         criteria = [
             self.app.debug,
             flask.request.is_secure,
@@ -71,6 +94,10 @@ class Talisman(object):
                 return r
 
     def _apply_extra_headers(self, response):
+        """
+        Applies the configured security headers to the response.
+        """
+
         response.headers["Content-Security-Policy"] = self._csp(
             self.content_security_policy, self.allow_google_content_security_policy
         )
@@ -83,6 +110,10 @@ class Talisman(object):
         content_security_policy: dict,
         allow_google_content_security_policy: bool = False,
     ):
+        """
+        Generates a Content-Security-Policy header value based on the provided content security policy configuration and the option to include Google's recommended content security policy directives.
+        """
+
         csp = CspGenerator()
 
         csp.base_uri(content_security_policy.get("base-uri", ""))
