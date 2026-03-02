@@ -47,6 +47,7 @@ jobs:
       - test
     environment: pypi
     permissions:
+      contents: read
       id-token: write
     steps:
       - uses: actions/checkout@v6
