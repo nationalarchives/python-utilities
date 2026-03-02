@@ -28,18 +28,18 @@ class CspGenerator:
     def __init__(
         self, default_src: str | list[str] | None = None, allow_objects=False
     ) -> None:
-        self.default_src: list[str] = []
+        self.default_src_sources: list[str] = []
         if default_src:
             if isinstance(default_src, list):
-                self.default_src.extend(default_src)
+                self.default_src_sources.extend(default_src)
             else:
-                self.default_src.append(default_src)
-        self.default_src = [src for src in self.default_src if src]
-        if not self.default_src:
-            self.default_src = [self.SELF]
+                self.default_src_sources.append(default_src)
+        self.default_src_sources = [src for src in self.default_src_sources if src]
+        if not self.default_src_sources:
+            self.default_src_sources = [self.SELF]
         self.directives: OrderedDict[str, list[str]] = OrderedDict(
             {
-                "default-src": self.default_src,
+                "default-src": self.default_src_sources,
             }
         )
         if not allow_objects:
@@ -82,7 +82,7 @@ class CspGenerator:
             return self
 
         # If the values are the same as the default-src, we don't add the directive for simplicity and to avoid redundancy
-        if processed_values == self.default_src:
+        if processed_values == self.default_src_sources:
             return self
 
         # Unless omit_self is True, add 'self' when either it or 'none' is not specified in the sources
@@ -149,6 +149,17 @@ class CspGenerator:
 
         return self.add_directive(
             "connect-src", *sources, omit_self=omit_self, replace=replace
+        )
+
+    def default_src(
+        self, *sources: str | list[str], omit_self=False, replace=False
+    ) -> "CspGenerator":
+        """
+        Add a default-src directive.
+        """
+
+        return self.add_directive(
+            "default-src", *sources, omit_self=omit_self, replace=replace
         )
 
     def font_src(
@@ -409,7 +420,7 @@ class CspGenerator:
             directive_name, *sources, omit_self=omit_self, replace=replace
         )
 
-    def get_csp(self) -> str:
+    def to_string(self) -> str:
         """
         Get the complete CSP as a string.
         """
@@ -421,6 +432,12 @@ class CspGenerator:
                 directive_str += " " + " ".join(sources)
             parts.append(directive_str)
         return "; ".join(parts) + ";"
+
+    def __str__(self) -> str:
+        return self.to_string()
+
+    def to_dict(self) -> dict[str, list[str]]:
+        return dict(self.directives)
 
 
 def common_security_headers(

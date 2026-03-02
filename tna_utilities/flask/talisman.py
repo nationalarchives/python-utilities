@@ -112,10 +112,10 @@ class Talisman(object):
             csp.require_trusted_types_for()
 
         if allow_google_content_security_policy:
-            csp.add_directive("default-src", *GOOGLE_CSP_POLICY["default-src"])
-            csp.add_directive("font-src", *GOOGLE_CSP_POLICY["font-src"])
-            csp.add_directive("frame-src", *GOOGLE_CSP_POLICY["frame-src"])
-            csp.add_directive("script-src", *GOOGLE_CSP_POLICY["script-src"])
-            csp.add_directive("style-src", *GOOGLE_CSP_POLICY["style-src"])
+            csp.default_src(*GOOGLE_CSP_POLICY["default-src"])
+            csp.font_src(*GOOGLE_CSP_POLICY["font-src"])
+            csp.frame_src(*GOOGLE_CSP_POLICY["frame-src"])
+            csp.script_src(*GOOGLE_CSP_POLICY["script-src"])
+            csp.style_src(*GOOGLE_CSP_POLICY["style-src"])
 
-        return csp.get_csp()
+        return csp.to_string()

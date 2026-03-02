@@ -10,12 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - CSP directives are appended by default with the option to be overwritten
-- Flask Talisman module added ``
+- Flask Talisman module added `tna_utilities.flask.talisman`
 
 ### Changed
 
 - Added a default of `object-src 'none'` to the `CspGenerator`
 - Renamed `security_headers` function to `common_security_headers`
+- Updated `CspGenerator.get_csp()` method to `CspGenerator.to_string()`
 
 ### Deprecated
 

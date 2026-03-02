@@ -25,7 +25,7 @@ generator.object_src("example.com", omit_self=True)
 # Disallow a directive
 generator.disallow("worker-src")
 
-generator.get_csp()
+generator.to_string()
 # default-src 'self'; script-src 'self' example.com; style-src 'self' example.com another.net; object-src example.com; worker-src 'none';
 ```
 
