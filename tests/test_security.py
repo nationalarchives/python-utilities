@@ -12,7 +12,9 @@ class TestSecurityCSP(unittest.TestCase):
 
     def test_init(self):
         generator = CspGenerator()
-        self.assertEqual(generator.to_string(), "default-src 'self'; object-src 'none';")
+        self.assertEqual(
+            generator.to_string(), "default-src 'self'; object-src 'none';"
+        )
 
     def test_init_str_output(self):
         generator = CspGenerator()
@@ -26,7 +28,9 @@ class TestSecurityCSP(unittest.TestCase):
 
     def test_init_none(self):
         generator = CspGenerator(CspGenerator.NONE)
-        self.assertEqual(generator.to_string(), "default-src 'none'; object-src 'none';")
+        self.assertEqual(
+            generator.to_string(), "default-src 'none'; object-src 'none';"
+        )
 
     def test_init_list(self):
         generator = CspGenerator([CspGenerator.NONE, self.test_domain])
@@ -37,11 +41,15 @@ class TestSecurityCSP(unittest.TestCase):
 
     def test_init_empty_string(self):
         generator = CspGenerator("")
-        self.assertEqual(generator.to_string(), "default-src 'self'; object-src 'none';")
+        self.assertEqual(
+            generator.to_string(), "default-src 'self'; object-src 'none';"
+        )
 
     def test_init_list_of_empty_strings(self):
         generator = CspGenerator([""])
-        self.assertEqual(generator.to_string(), "default-src 'self'; object-src 'none';")
+        self.assertEqual(
+            generator.to_string(), "default-src 'self'; object-src 'none';"
+        )
 
     def test_init_allow_objects(self):
         generator = CspGenerator([""], allow_objects=True)
@@ -152,7 +160,8 @@ class TestSecurityCSP(unittest.TestCase):
         generator.script_src([self.test_domain, self.test_domain_2], omit_self=True)
         self.assertIn("default-src 'self';", generator.to_string())
         self.assertIn(
-            f"script-src {self.test_domain} {self.test_domain_2};", generator.to_string()
+            f"script-src {self.test_domain} {self.test_domain_2};",
+            generator.to_string(),
         )
 
     def test_add_directive_omit_self_existing_none(self):
