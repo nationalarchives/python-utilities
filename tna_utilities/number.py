@@ -3,6 +3,22 @@ import re
 from typing import Union
 
 
+def round_to_significant_figures(value: float, sig_figs: int = 1) -> float:
+    """
+    Round a positive float to the given number of significant figures.
+
+    This computes the appropriate number of decimal places for ``round`` based
+    on the order of magnitude of ``value``. For example, with ``sig_figs=1``,
+    values are rounded to one significant figure (e.g. 1234 -> 1000, 0.0123 -> 0.01).
+    """
+    if value == 0:
+        return 0.0
+    # Determine how many decimal places are needed so that ``round`` keeps
+    # ``sig_figs`` significant digits.
+    decimal_places = -int(math.floor(math.log10(abs(value)))) + (sig_figs - 1)
+    return round(value, decimal_places)
+
+
 def numberish(
     value: Union[float, int],
     simple_units: bool = False,
@@ -27,10 +43,9 @@ def numberish(
             base_value = value / threshold
             if base_value.is_integer():
                 return f"{int(base_value)}{unit}"
-            base_value_rounded = round(
-                base_value,
-                -int(math.floor(math.log10(abs(base_value)))) + 1,
-            )
+            # Round to one significant figure to produce a human-friendly value,
+            # e.g. 1234 -> 1000, 1.23 -> 1, 0.0123 -> 0.01.
+            base_value_rounded = round_to_significant_figures(base_value, 1)
             if base_value_rounded == base_value:
                 prefix_text = ""
             elif isinstance(prefix_text, tuple):
