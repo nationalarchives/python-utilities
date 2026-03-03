@@ -379,7 +379,7 @@ def group_by_year_and_month(
 
     grouped = []
 
-    for item in items.get("items", []):
+    for item in items:
         if request_date := item.get(date_key):
             if isinstance(request_date, (datetime.datetime, datetime.date)):
                 request_datetime = request_date
