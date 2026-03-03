@@ -51,12 +51,12 @@ def numberish(
 def pretty_file_size(bytes, simplify=True):
     if not isinstance(bytes, int):
         raise ValueError("file_size must be an integer")
-    bits_unit = 1000
+    byte_unit = 1000
     suffixes = ["B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
     i = 0
     prettified_file_size = bytes
-    while prettified_file_size >= bits_unit and i < len(suffixes) - 1:
-        prettified_file_size /= bits_unit
+    while prettified_file_size >= byte_unit and i < len(suffixes) - 1:
+        prettified_file_size /= byte_unit
         i += 1
     if prettified_file_size == 0:
         return "0B"
