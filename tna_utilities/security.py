@@ -212,7 +212,7 @@ class CspGenerator:
         self, *sources: str | list[str], omit_self=False, replace=False
     ) -> "CspGenerator":
         """
-        Add a img-src directive.
+        Add an img-src directive.
         """
 
         return self.add_directive(
@@ -245,7 +245,7 @@ class CspGenerator:
         self, *sources: str | list[str], omit_self=False, replace=False
     ) -> "CspGenerator":
         """
-        Add a object-src directive.
+        Add an object-src directive.
         """
 
         return self.add_directive(
