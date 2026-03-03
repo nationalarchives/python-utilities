@@ -295,7 +295,7 @@ def pretty_datetime_range(  # noqa: C901
     return ""
 
 
-def pretty_age(date, just_now_seconds: int = 5, lowercase_first: bool = False) -> str:
+def pretty_age(date: datetime.datetime, just_now_seconds: int = 5, lowercase_first: bool = False) -> str:
     if not date:
         raise ValueError("Date must be provided")
 
