@@ -295,7 +295,9 @@ def pretty_datetime_range(  # noqa: C901
     return ""
 
 
-def pretty_age(date: datetime.datetime, just_now_seconds: int = 5, lowercase_first: bool = False) -> str:
+def pretty_age(
+    date: datetime.datetime, just_now_seconds: int = 5, lowercase_first: bool = False
+) -> str:
     if not date:
         raise ValueError("Date must be provided")
 
@@ -306,7 +308,9 @@ def pretty_age(date: datetime.datetime, just_now_seconds: int = 5, lowercase_fir
         date = date.replace(microsecond=0)
     else:
         # For date objects, convert to a UTC datetime at midnight
-        date = datetime.datetime.combine(date, datetime.time.min, tzinfo=datetime.timezone.utc)
+        date = datetime.datetime.combine(
+            date, datetime.time.min, tzinfo=datetime.timezone.utc
+        )
 
     now = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0)
 
@@ -380,7 +384,7 @@ def is_today_in_date_range(
 
 def group_by_year_and_month(
     items: list[dict], date_key: str, reverse: bool = False
-) -> dict:  # noqa: C901
+) -> list[dict]:  # noqa: C901
     """
     Groups a list of items by year and month based on a date key in each item.
     """
@@ -446,32 +450,36 @@ def group_by_year_and_month(
         for month_group in year_group["items"]:
             month_group["items"].sort(
                 key=lambda x: (
-                    x.get(date_key)
-                    if isinstance(
-                        x.get(date_key), (datetime.date, datetime.datetime)
-                    )
-                    else (
-                        get_date_from_string(x.get(date_key))
-                        if x.get(date_key) is not None
-                        else (
-                            datetime.datetime.max if reverse else datetime.datetime.min
-                        )
-                    )
-                )
-                if isinstance(
-                    x.get(date_key), (datetime.date, datetime.datetime)
-                )
-                else (
                     (
-                        get_date_from_string(x.get(date_key))
-                        if x.get(date_key) is not None
+                        x.get(date_key)
+                        if isinstance(
+                            x.get(date_key), (datetime.date, datetime.datetime)
+                        )
+                        else (
+                            get_date_from_string(x.get(date_key))
+                            if x.get(date_key) is not None
+                            else (
+                                datetime.datetime.max
+                                if reverse
+                                else datetime.datetime.min
+                            )
+                        )
+                    )
+                    if isinstance(x.get(date_key), (datetime.date, datetime.datetime))
+                    else (
+                        (
+                            get_date_from_string(x.get(date_key))
+                            if x.get(date_key) is not None
+                            else (
+                                datetime.datetime.max
+                                if reverse
+                                else datetime.datetime.min
+                            )
+                        )
+                        if isinstance(x.get(date_key), str)
                         else (
                             datetime.datetime.max if reverse else datetime.datetime.min
                         )
-                    )
-                    if isinstance(x.get(date_key), str)
-                    else (
-                        datetime.datetime.max if reverse else datetime.datetime.min
                     )
                 ),
                 reverse=reverse,

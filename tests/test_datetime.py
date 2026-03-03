@@ -775,7 +775,7 @@ class TestGroupByYearAndMonth(unittest.TestCase):
             {"id": 6, "date": "2022-06-15"},
             {"id": 7, "date": "foobar"},
         ]
-        result = group_by_year_and_month({"items": input_data}, "date")
+        result = group_by_year_and_month(input_data, "date")
         expected = [
             {
                 "heading": "2021",
@@ -828,7 +828,7 @@ class TestGroupByYearAndMonth(unittest.TestCase):
             {"id": 6, "date": datetime.date(2022, 6, 15)},
             {"id": 7, "date": None},
         ]
-        result = group_by_year_and_month({"items": input_data}, "date")
+        result = group_by_year_and_month(input_data, "date")
         expected = [
             {
                 "heading": "2021",
@@ -882,7 +882,7 @@ class TestGroupByYearAndMonth(unittest.TestCase):
             {"id": 6, "date": "2022-06-15"},
             {"id": 7, "date": "foobar"},
         ]
-        result = group_by_year_and_month({"items": input_data}, "date", reverse=True)
+        result = group_by_year_and_month(input_data, "date", reverse=True)
         expected = [
             {
                 "heading": "2022",
@@ -935,7 +935,7 @@ class TestGroupByYearAndMonth(unittest.TestCase):
             {"id": 6, "date": datetime.date(2022, 6, 15)},
             {"id": 7, "date": None},
         ]
-        result = group_by_year_and_month({"items": input_data}, "date", reverse=True)
+        result = group_by_year_and_month(input_data, "date", reverse=True)
         expected = [
             {
                 "heading": "2022",
