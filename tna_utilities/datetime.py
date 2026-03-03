@@ -299,8 +299,16 @@ def pretty_age(date, just_now_seconds: int = 5, lowercase_first: bool = False) -
     if not date:
         raise ValueError("Date must be provided")
 
-    date = date.replace(microsecond=0)
-    now = datetime.datetime.now().replace(microsecond=0)
+    # Normalise input date to be timezone-aware in UTC for consistent comparison
+    if isinstance(date, datetime.datetime):
+        if date.tzinfo is None:
+            date = date.replace(tzinfo=datetime.timezone.utc)
+        date = date.replace(microsecond=0)
+    else:
+        # For date objects, convert to a UTC datetime at midnight
+        date = datetime.datetime.combine(date, datetime.time.min, tzinfo=datetime.timezone.utc)
+
+    now = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0)
 
     future = now < date
     delta = date - now if future else now - date
