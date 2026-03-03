@@ -439,8 +439,32 @@ def group_by_year_and_month(
             month_group["items"].sort(
                 key=lambda x: (
                     x.get(date_key)
-                    if isinstance(x.get(date_key), (datetime.date, datetime.datetime))
-                    else get_date_from_string(x.get(date_key))
+                    if isinstance(
+                        x.get(date_key), (datetime.date, datetime.datetime)
+                    )
+                    else (
+                        get_date_from_string(x.get(date_key))
+                        if x.get(date_key) is not None
+                        else (
+                            datetime.datetime.max if reverse else datetime.datetime.min
+                        )
+                    )
+                )
+                if isinstance(
+                    x.get(date_key), (datetime.date, datetime.datetime)
+                )
+                else (
+                    (
+                        get_date_from_string(x.get(date_key))
+                        if x.get(date_key) is not None
+                        else (
+                            datetime.datetime.max if reverse else datetime.datetime.min
+                        )
+                    )
+                    if isinstance(x.get(date_key), str)
+                    else (
+                        datetime.datetime.max if reverse else datetime.datetime.min
+                    )
                 ),
                 reverse=reverse,
             )
