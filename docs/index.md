@@ -3,7 +3,7 @@
 - [Currency](./currency.md)
 - [Dates and times](./dates-and-times.md)
 - [Security](./security.md)
-- [Strings](./string.md)
+- [String](./string.md)
 - [URLs](./url.md)
 
 ## Optional modules
