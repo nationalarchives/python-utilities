@@ -98,6 +98,8 @@ class Talisman(object):
                 r = flask.redirect(target, code=code)
                 return r
 
+        return None
+
     def _apply_extra_headers(self, response):
         """
         Applies the configured security headers to the response.
