@@ -98,13 +98,13 @@ class TestTalisman(unittest.TestCase):
     def test_talisman_force_https(self):
         Talisman(self.app)
 
-        rv = self.test_client.get("/")
+        rv = self.test_client.get("http://localhost/foobar?test=1#abc")
 
         self.assertEqual(rv.status_code, 302)
 
         self.assertIn("Location", rv.headers)
         self.assertEqual(
-            "https://localhost/",
+            "https://localhost/foobar?test=1",
             rv.headers["Location"],
         )
 
@@ -118,12 +118,12 @@ class TestTalisman(unittest.TestCase):
     def test_talisman_force_https_permanent(self):
         Talisman(self.app, force_https_permanent=True)
 
-        rv = self.test_client.get("/")
+        rv = self.test_client.get("http://localhost/foobar?test=1#abc")
 
         self.assertEqual(rv.status_code, 301)
 
         self.assertIn("Location", rv.headers)
         self.assertEqual(
-            "https://localhost/",
+            "https://localhost/foobar?test=1",
             rv.headers["Location"],
         )
