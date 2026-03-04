@@ -43,7 +43,6 @@ Get a dictionary of common security headers.
 | `cross_origin_opener_policy`        | The option for the `Cross-Origin-Opener-Policy` header        | `same-origin` |
 | `cross_origin_resource_policy`      | The option for the `Cross-Origin-Resource-Policy` header      | `same-origin` |
 | `x_content_type_options`            | The option for the `X-Content-Type-Options` header            | `no-sniff`    |
-| `x_frame_options`                   | The option for the `X-Frame-Options` header                   | `DENY`        |
 | `x_permitted_cross_domain_policies` | The option for the `X-Permitted-Cross-Domain-Policies` header | `none`        |
 
 ### Example
@@ -58,6 +57,5 @@ print(security_headers())
 #   "Cross-Origin-Resource-Policy": "same-origin",
 #   "X-Permitted-Cross-Domain-Policies": "none",
 #   "X-Content-Type-Options": "no-sniff",
-#   "X-Frame-Options": "DENY",
 # }
 ```

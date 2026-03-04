@@ -17,10 +17,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added a default of `object-src 'none'` to the `CspGenerator`
 - Renamed `security_headers` function to `common_security_headers`
 - Updated `CspGenerator.get_csp()` method to `CspGenerator.to_string()`
+- Moved the simplification step of generating a CSP string to the `to_string()` method
+- By default, disallow `frame-ancestors` and `child-src` in CSP
 
 ### Deprecated
 
 ### Removed
+
+- Removed support for deprecated `X-Frame-Options` header in `common_security_headers`
 
 ### Fixed
 

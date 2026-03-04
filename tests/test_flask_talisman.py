@@ -26,7 +26,6 @@ class TestTalisman(unittest.TestCase):
 
         self.assertNotIn("Content-Security-Policy", rv.headers)
 
-        self.assertNotIn("X-Frame-Options", rv.headers)
         self.assertNotIn("X-Permitted-Cross-Domain-Policies", rv.headers)
         self.assertNotIn("Cross-Origin-Embedder-Policy", rv.headers)
         self.assertNotIn("Cross-Origin-Opener-Policy", rv.headers)
@@ -47,12 +46,10 @@ class TestTalisman(unittest.TestCase):
 
         self.assertIn("Content-Security-Policy", rv.headers)
         self.assertEqual(
-            "default-src 'self'; object-src 'none';",
+            "default-src 'self'; object-src 'none'; frame-ancestors 'none'; child-src 'none';",
             rv.headers["Content-Security-Policy"],
         )
 
-        self.assertIn("X-Frame-Options", rv.headers)
-        self.assertEqual("DENY", rv.headers["X-Frame-Options"])
         self.assertIn("X-Permitted-Cross-Domain-Policies", rv.headers)
         self.assertEqual("none", rv.headers["X-Permitted-Cross-Domain-Policies"])
         self.assertIn("Cross-Origin-Embedder-Policy", rv.headers)
@@ -76,23 +73,25 @@ class TestTalisman(unittest.TestCase):
         self.assertEqual(rv.status_code, 200)
 
         self.assertIn("Content-Security-Policy", rv.headers)
-        self.assertIn(
-            "default-src 'self' *.gstatic.com;", rv.headers["Content-Security-Policy"]
-        )
-        self.assertIn(
-            "script-src 'self' ajax.googleapis.com *.googleanalytics.com *.google-analytics.com;",
-            rv.headers["Content-Security-Policy"],
-        )
-        self.assertIn(
-            "style-src 'self' ajax.googleapis.com fonts.googleapis.com *.gstatic.com;",
-            rv.headers["Content-Security-Policy"],
-        )
+        self.assertIn("default-src 'self';", rv.headers["Content-Security-Policy"])
         self.assertIn(
             "frame-src 'self' www.google.com www.youtube.com;",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
-            "font-src 'self' themes.googleusercontent.com *.gstatic.com;",
+            "font-src 'self' *.gstatic.com;",
+            rv.headers["Content-Security-Policy"],
+        )
+        self.assertIn(
+            "img-src 'self' img.youtube.com;",
+            rv.headers["Content-Security-Policy"],
+        )
+        self.assertIn(
+            "script-src 'self' ajax.googleapis.com *.googleanalytics.com *.google-analytics.com www.youtube.com;",
+            rv.headers["Content-Security-Policy"],
+        )
+        self.assertIn(
+            "style-src 'self' ajax.googleapis.com fonts.googleapis.com *.gstatic.com;",
             rv.headers["Content-Security-Policy"],
         )
 

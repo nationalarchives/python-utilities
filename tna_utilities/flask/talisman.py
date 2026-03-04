@@ -3,21 +3,22 @@ import flask
 from ..security import CspGenerator, common_security_headers
 
 GOOGLE_CSP_POLICY = {
-    "default-src": [CspGenerator.SELF, "*.gstatic.com"],
+    # "default-src": ["*.gstatic.com"],
     # Fonts from fonts.google.com
-    "font-src": [CspGenerator.SELF, "themes.googleusercontent.com", "*.gstatic.com"],
+    "font-src": ["*.gstatic.com"],
     # <iframe> based embedding for Maps and Youtube
-    "frame-src": [CspGenerator.SELF, "www.google.com", "www.youtube.com"],
+    "frame-src": ["www.google.com", "www.youtube.com"],
+    # YouTube video thumbnails
+    "img-src": ["img.youtube.com"],
     # Assorted Google-hosted Libraries/APIs
     "script-src": [
-        CspGenerator.SELF,
         "ajax.googleapis.com",
         "*.googleanalytics.com",
         "*.google-analytics.com",
+        "www.youtube.com",
     ],
-    # Used by generated code from http://www.google.com/fonts
+    # Google Fonts stylesheets and YouTube embedded player styles
     "style-src": [
-        CspGenerator.SELF,
         "ajax.googleapis.com",
         "fonts.googleapis.com",
         "*.gstatic.com",
@@ -143,10 +144,7 @@ class Talisman(object):
             csp.require_trusted_types_for()
 
         if allow_google_content_security_policy:
-            csp.default_src(*GOOGLE_CSP_POLICY["default-src"])
-            csp.font_src(*GOOGLE_CSP_POLICY["font-src"])
-            csp.frame_src(*GOOGLE_CSP_POLICY["frame-src"])
-            csp.script_src(*GOOGLE_CSP_POLICY["script-src"])
-            csp.style_src(*GOOGLE_CSP_POLICY["style-src"])
+            for x, y in GOOGLE_CSP_POLICY.items():
+                csp.add_directive(x, *y)
 
         return csp.to_string()

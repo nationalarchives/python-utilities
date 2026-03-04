@@ -19,11 +19,20 @@ class CspGenerator:
     :param allow_objects: If True, allows the use of the object-src directive with a default value of "'self'". If False (the default), disallows the use of the object-src directive by setting it to "'none'".
     """
 
-    NONE: str = "'none'"
-    SELF: str = "'self'"
+    NONE = "'none'"
+    SELF = "'self'"
+    STRICT_DYNAMIC = "'strict-dynamic'"
+    UNSAFE_EVAL = "'unsafe-eval'"
+    UNSAFE_HASHES = "'unsafe-hashes'"
+    UNSAFE_INLINE = "'unsafe-inline'"
+    WASM_UNSAFE_EVAL = "'wasm-unsafe-eval'"
 
     def __init__(
-        self, default_src: str | list[str] | None = None, allow_objects=False
+        self,
+        default_src: str | list[str] | None = None,
+        allow_objects=False,
+        allow_iframe_embedding=False,
+        allow_children=False,
     ) -> None:
         self.default_src_sources: list[str] = []
         if default_src:
@@ -40,7 +49,11 @@ class CspGenerator:
             }
         )
         if not allow_objects:
-            self.directives["object-src"] = [self.NONE]
+            self.disallow("object-src")
+        if not allow_iframe_embedding:
+            self.disallow("frame-ancestors")
+        if not allow_children:
+            self.disallow("child-src")
 
     def _process_sources(self, *values: str | list[str]) -> list[str]:
         """
@@ -81,10 +94,6 @@ class CspGenerator:
 
         # If nothing valid was parsed, do not add the directive
         if not processed_values:
-            return self
-
-        # If the values are the same as the default-src, we don't add the directive for simplicity and to avoid redundancy
-        if processed_values == self.default_src_sources:
             return self
 
         # Unless omit_self is True, add 'self' when either it or 'none' is not specified in the sources
@@ -422,13 +431,21 @@ class CspGenerator:
             directive_name, *sources, omit_self=omit_self, replace=replace
         )
 
-    def to_string(self) -> str:
+    def to_string(self, simplify=False) -> str:
         """
         Get the complete CSP as a string.
         """
 
-        parts: list[str] = []
-        for directive, sources in self.directives.items():
+        directives = self.directives.copy()
+        if simplify:
+            default_src = self.directives.get("default-src")
+            directives = {
+                k: v
+                for k, v in directives.items()
+                if k == "default-src" or v != default_src
+            }
+        parts = []
+        for directive, sources in directives.items():
             directive_str = directive
             if sources:
                 directive_str += " " + " ".join(sources)
@@ -443,7 +460,6 @@ class CspGenerator:
 
 
 def common_security_headers(
-    x_frame_options: str | None = None,
     x_permitted_cross_domain_policies: str | None = None,
     cross_origin_embedder_policy: str | None = None,
     cross_origin_opener_policy: str | None = None,
@@ -453,7 +469,6 @@ def common_security_headers(
     """
     Get a dictionary of common security headers.
 
-    :param x_frame_options: The value for the X-Frame-Options header. Valid values are "DENY" and "SAMEORIGIN". If not provided, it defaults to "DENY".
     :param x_permitted_cross_domain_policies: The value for the X-Permitted-Cross-Domain-Policies header. Valid values are "none", "master-only", "by-content-type", "by-ftp-filename", "all", and "none-this-response". If not provided, it defaults to "none".
     :param cross_origin_embedder_policy: The value for the Cross-Origin-Embedder-Policy header. Valid values are "unsafe-none", "require-corp", and "credentialless". If not provided, it defaults to "unsafe-none".
     :param cross_origin_opener_policy: The value for the Cross-Origin-Opener-Policy header. Valid values are "same-origin", "same-origin-allow-popups", "unsafe-none", and "noopener-allow-popups". If not provided, it defaults to "same-origin".
@@ -490,12 +505,6 @@ def common_security_headers(
             "values": [None, "nosniff"],
             "default": "nosniff",
             "value": x_content_type_options,
-        },
-        {
-            "header": "X-Frame-Options",
-            "values": ["DENY", "SAMEORIGIN"],
-            "default": "DENY",
-            "value": x_frame_options,
         },
         {
             "header": "X-Permitted-Cross-Domain-Policies",

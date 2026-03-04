@@ -13,47 +13,91 @@ class TestSecurityCSP(unittest.TestCase):
     def test_init(self):
         generator = CspGenerator()
         self.assertEqual(
-            generator.to_string(), "default-src 'self'; object-src 'none';"
+            generator.to_string(),
+            "default-src 'self'; object-src 'none'; frame-ancestors 'none'; child-src 'none';",
         )
 
     def test_init_str_output(self):
         generator = CspGenerator()
-        self.assertEqual(str(generator), "default-src 'self'; object-src 'none';")
+        self.assertEqual(
+            str(generator),
+            "default-src 'self'; object-src 'none'; frame-ancestors 'none'; child-src 'none';",
+        )
 
     def test_init_dict_output(self):
         generator = CspGenerator()
         self.assertEqual(
-            generator.to_dict(), {"default-src": ["'self'"], "object-src": ["'none'"]}
+            generator.to_dict(),
+            {
+                "default-src": ["'self'"],
+                "object-src": ["'none'"],
+                "frame-ancestors": ["'none'"],
+                "child-src": ["'none'"],
+            },
         )
 
     def test_init_none(self):
         generator = CspGenerator(CspGenerator.NONE)
         self.assertEqual(
-            generator.to_string(), "default-src 'none'; object-src 'none';"
+            generator.to_string(),
+            "default-src 'none'; object-src 'none'; frame-ancestors 'none'; child-src 'none';",
         )
 
     def test_init_list(self):
         generator = CspGenerator([CspGenerator.NONE, self.test_domain])
         self.assertEqual(
             generator.to_string(),
-            f"default-src 'none' {self.test_domain}; object-src 'none';",
+            f"default-src 'none' {self.test_domain}; object-src 'none'; frame-ancestors 'none'; child-src 'none';",
         )
 
     def test_init_empty_string(self):
         generator = CspGenerator("")
         self.assertEqual(
-            generator.to_string(), "default-src 'self'; object-src 'none';"
+            generator.to_string(),
+            "default-src 'self'; object-src 'none'; frame-ancestors 'none'; child-src 'none';",
         )
 
     def test_init_list_of_empty_strings(self):
         generator = CspGenerator([""])
         self.assertEqual(
-            generator.to_string(), "default-src 'self'; object-src 'none';"
+            generator.to_string(),
+            "default-src 'self'; object-src 'none'; frame-ancestors 'none'; child-src 'none';",
         )
 
     def test_init_allow_objects(self):
         generator = CspGenerator([""], allow_objects=True)
+        self.assertEqual(
+            generator.to_string(),
+            "default-src 'self'; frame-ancestors 'none'; child-src 'none';",
+        )
+
+    def test_init_allow_iframe_embedding(self):
+        generator = CspGenerator([""], allow_iframe_embedding=True)
+        self.assertEqual(
+            generator.to_string(),
+            "default-src 'self'; object-src 'none'; child-src 'none';",
+        )
+
+    def test_init_allow_children(self):
+        generator = CspGenerator([""], allow_children=True)
+        self.assertEqual(
+            generator.to_string(),
+            "default-src 'self'; object-src 'none'; frame-ancestors 'none';",
+        )
+
+    def test_init_allow_all_optional(self):
+        generator = CspGenerator(
+            [""], allow_objects=True, allow_iframe_embedding=True, allow_children=True
+        )
         self.assertEqual(generator.to_string(), "default-src 'self';")
+
+    def test_init_overwrite_default_disallows(self):
+        generator = CspGenerator(CspGenerator.NONE)
+        generator.object_src(self.test_domain, omit_self=True)
+        self.assertEqual(
+            generator.to_string(),
+            f"default-src 'none'; object-src {self.test_domain}; frame-ancestors 'none'; child-src 'none';",
+        )
 
     def test_add_directive(self):
         generator = CspGenerator()
@@ -131,11 +175,19 @@ class TestSecurityCSP(unittest.TestCase):
             generator.to_string(),
         )
 
-    def test_add_directive_duplicated_self(self):
+    def test_no_simplify_duplicated_directives(self):
         generator = CspGenerator()
         generator.script_src(CspGenerator.SELF)
-        self.assertIn("default-src 'self';", generator.to_string())
-        self.assertNotIn("script-src 'self';", generator.to_string())
+        csp = generator.to_string()
+        self.assertIn("default-src 'self';", csp)
+        self.assertIn("script-src 'self';", csp)
+
+    def test_simplify_duplicated_directives(self):
+        generator = CspGenerator()
+        generator.script_src(CspGenerator.SELF)
+        csp = generator.to_string(simplify=True)
+        self.assertIn("default-src 'self';", csp)
+        self.assertNotIn("script-src", csp)
 
     def test_add_directive_existing_self(self):
         generator = CspGenerator()
@@ -306,7 +358,6 @@ class TestCommonSecurityHeaders(unittest.TestCase):
                 "Cross-Origin-Opener-Policy": "same-origin",
                 "Cross-Origin-Resource-Policy": "same-origin",
                 "X-Content-Type-Options": "nosniff",
-                "X-Frame-Options": "DENY",
                 "X-Permitted-Cross-Domain-Policies": "none",
             },
         )
@@ -317,7 +368,6 @@ class TestCommonSecurityHeaders(unittest.TestCase):
             cross_origin_opener_policy="None",
             cross_origin_resource_policy="",
             x_content_type_options="[]",
-            x_frame_options="()",
             x_permitted_cross_domain_policies="True",
         )
         self.assertDictEqual(
@@ -327,7 +377,6 @@ class TestCommonSecurityHeaders(unittest.TestCase):
                 "Cross-Origin-Opener-Policy": "same-origin",
                 "Cross-Origin-Resource-Policy": "same-origin",
                 "X-Content-Type-Options": "nosniff",
-                "X-Frame-Options": "DENY",
                 "X-Permitted-Cross-Domain-Policies": "none",
             },
         )
@@ -338,7 +387,6 @@ class TestCommonSecurityHeaders(unittest.TestCase):
             cross_origin_opener_policy="noopener-allow-popups",
             cross_origin_resource_policy="cross-origin",
             x_content_type_options=None,
-            x_frame_options="SAMEORIGIN",
             x_permitted_cross_domain_policies="all",
         )
         self.assertDictEqual(
@@ -347,7 +395,6 @@ class TestCommonSecurityHeaders(unittest.TestCase):
                 "Cross-Origin-Embedder-Policy": "require-corp",
                 "Cross-Origin-Opener-Policy": "noopener-allow-popups",
                 "Cross-Origin-Resource-Policy": "cross-origin",
-                "X-Frame-Options": "SAMEORIGIN",
                 "X-Permitted-Cross-Domain-Policies": "all",
             },
         )
