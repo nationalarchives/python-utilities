@@ -1,3 +1,5 @@
+from urllib.parse import urlparse, urlunparse
+
 import flask
 
 from ..security import CspGenerator, common_security_headers
@@ -87,11 +89,13 @@ class Talisman(object):
 
         if self.force_https and not any(criteria):
             if flask.request.url.startswith("http://"):
-                url = flask.request.url.replace("http://", "https://", 1)
+                parsed = urlparse(flask.request.url)
+                secure_parsed = parsed._replace(scheme="https", fragment="")
+                target = urlunparse(secure_parsed)
                 code = 302
                 if self.force_https_permanent:
                     code = 301
-                r = flask.redirect(url, code=code)
+                r = flask.redirect(target, code=code)
                 return r
 
     def _apply_extra_headers(self, response):
