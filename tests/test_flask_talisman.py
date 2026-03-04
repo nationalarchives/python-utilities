@@ -99,9 +99,7 @@ class TestTalisman(unittest.TestCase):
         Talisman(self.app)
 
         rv = self.test_client.get("http://localhost/foobar?test=1#abc")
-
         self.assertEqual(rv.status_code, 302)
-
         self.assertIn("Location", rv.headers)
         self.assertEqual(
             "https://localhost/foobar?test=1",
@@ -109,9 +107,7 @@ class TestTalisman(unittest.TestCase):
         )
 
         rv = self.test_client.get("/", follow_redirects=True)
-
         self.assertEqual(rv.status_code, 200)
-
         self.assertIn("Set-Cookie", rv.headers)
         self.assertIn(" Secure", rv.headers["Set-Cookie"])
 
@@ -119,9 +115,7 @@ class TestTalisman(unittest.TestCase):
         Talisman(self.app, force_https_permanent=True)
 
         rv = self.test_client.get("http://localhost/foobar?test=1#abc")
-
         self.assertEqual(rv.status_code, 301)
-
         self.assertIn("Location", rv.headers)
         self.assertEqual(
             "https://localhost/foobar?test=1",
