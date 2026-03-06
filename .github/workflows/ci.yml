@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Check formatting
-        run: ./tasks/checkformat.sh
+        run: bash ./tasks/checkformat.sh
 
   test:
     strategy:
@@ -30,9 +30,7 @@ jobs:
       - name: Install Poetry
         run: pipx install poetry
       - name: Install dependencies and run tests
-        run: |
-          poetry install --with test
-          poetry run python -m unittest discover tests
+        run: bash ./tasks/test.sh
 
   build:
     runs-on: ubuntu-latest
@@ -43,4 +41,4 @@ jobs:
       - name: Install Poetry
         run: pipx install poetry
       - name: Install dependencies and build package
-        run: ./tasks/build.sh
+        run: bash ./tasks/build.sh
