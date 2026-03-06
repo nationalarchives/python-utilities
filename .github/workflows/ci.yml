@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Check formatting
-        run: docker run --rm -v "$(pwd)":/app/ ghcr.io/nationalarchives/tna-python-dev:latest checkformat
+        run: ./tasks/checkformat.sh
 
   test:
     strategy:
@@ -28,13 +28,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Poetry
-        run: |
-          pipx install poetry
-          poetry --version
-      - name: Install dependencies
-        run: poetry install --with test
-      - name: Run tests
-        run: poetry run python -m unittest discover tests
+        run: pipx install poetry
+      - name: Install dependencies and run tests
+        run: ./tasks/test.sh
 
   build:
     runs-on: ubuntu-latest
@@ -43,10 +39,6 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
       - name: Install Poetry
-        run: |
-          pipx install poetry
-          poetry --version
-      - name: Install dependencies
-        run: poetry install --only-root
-      - name: Build package
-        run: poetry build
+        run: pipx install poetry
+      - name: Install dependencies and build package
+        run: ./tasks/build.sh

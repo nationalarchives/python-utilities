@@ -29,11 +29,8 @@ pip install tna-utilities[flask]
 ## Developing
 
 ```sh
-# Install the test dependencies
-poetry install --with test
-
-# Run the tests
-poetry run python -m unittest discover tests
+# Install the test dependencies and run the tests
+./tasks/test.sh
 
 # Format the code
 ./tasks/format.sh
