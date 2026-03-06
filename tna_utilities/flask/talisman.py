@@ -121,7 +121,7 @@ class Talisman(object):
         Generates a Content-Security-Policy header value based on the provided content security policy configuration and the option to include Google's recommended content security policy directives.
         """
 
-        csp = CspGenerator()
+        csp = CspGenerator(default_src=content_security_policy.get("default-src", ""))
 
         csp.base_uri(content_security_policy.get("base-uri", ""))
         csp.child_src(content_security_policy.get("child-src", ""))

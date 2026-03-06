@@ -95,6 +95,55 @@ class TestTalisman(unittest.TestCase):
             rv.headers["Content-Security-Policy"],
         )
 
+    def test_talisman_app_custom_csp(self):
+        Talisman(
+            self.app,
+            force_https=False,
+            content_security_policy={
+                "default-src": ["'self'", "example.com"],
+                "img-src": ["'self'", "img.example.com"],
+            },
+        )
+
+        rv = self.test_client.get("/")
+
+        self.assertEqual(rv.status_code, 200)
+
+        self.assertIn("Content-Security-Policy", rv.headers)
+        self.assertIn(
+            "default-src 'self' example.com;",
+            rv.headers["Content-Security-Policy"],
+        )
+        self.assertIn(
+            "img-src 'self' img.example.com;",
+            rv.headers["Content-Security-Policy"],
+        )
+
+    def test_talisman_app_custom_csp_with_google(self):
+        Talisman(
+            self.app,
+            force_https=False,
+            content_security_policy={
+                "default-src": ["'self'", "example.com"],
+                "img-src": ["'self'", "img.example.com"],
+            },
+            allow_google_content_security_policy=True,
+        )
+
+        rv = self.test_client.get("/")
+
+        self.assertEqual(rv.status_code, 200)
+
+        self.assertIn("Content-Security-Policy", rv.headers)
+        self.assertIn(
+            "default-src 'self' example.com;",
+            rv.headers["Content-Security-Policy"],
+        )
+        self.assertIn(
+            "img-src 'self' img.example.com img.youtube.com;",
+            rv.headers["Content-Security-Policy"],
+        )
+
     def test_talisman_force_https(self):
         Talisman(self.app)
 
