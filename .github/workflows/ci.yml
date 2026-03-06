@@ -30,7 +30,9 @@ jobs:
       - name: Install Poetry
         run: pipx install poetry
       - name: Install dependencies and run tests
-        run: ./tasks/test.sh
+        run: |
+          poetry install --with test
+          poetry run python -m unittest discover tests
 
   build:
     runs-on: ubuntu-latest
