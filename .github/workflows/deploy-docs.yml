@@ -10,7 +10,7 @@ on:
 
 permissions:
   contents: read
-  actions: read
+  # actions: read
   pages: write
   id-token: write
 
@@ -31,9 +31,9 @@ jobs:
       - name: Build documentation
         run: docker run -v ${PWD}:/docs squidfunk/mkdocs-material build
       - name: Setup Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: site
       - name: Deploy to GitHub Pages

@@ -134,7 +134,7 @@ print(pretty_datetime_range(datetime.datetime(2000, 1, 1, 12, 30, 0), None))
 
 Formats a datetime into a human-readable delta.
 
-Added in `v1.2.0`.
+> Added in `v1.2.0`.
 
 ### Arguments
 
