@@ -1,5 +1,4 @@
-import unittest
-from unittest import mock
+from unittest import TestCase, mock
 
 from tna_utilities.api import ResourceForbidden, ResourceNotFound, SimpleJsonApiClient
 
@@ -27,7 +26,7 @@ def mocked_requests(*args, **kwargs):
     return MockResponse(None, 404)
 
 
-class TestSimpleJsonApiClient(unittest.TestCase):
+class TestSimpleJsonApiClient(TestCase):
     @mock.patch("requests.request", side_effect=mocked_requests)
     def test_happy(self, mock_get):
         client = SimpleJsonApiClient("http://mockapi.com/")
