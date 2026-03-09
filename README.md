@@ -36,7 +36,5 @@ pip install tna-utilities[flask]
 ./tasks/format.sh
 
 # Build the package
-python -m pip install --upgrade pip
-pip install build
-python -m build
+./tasks/build.sh
 ```
