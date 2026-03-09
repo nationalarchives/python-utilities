@@ -62,9 +62,12 @@ class Talisman(object):
         :param force_https_permanent: If True, uses a permanent redirect (HTTP 301) when forcing HTTPS, otherwise uses a temporary redirect (HTTP 302). Defaults to False.
         """
 
-        self.app.config["SESSION_COOKIE_SECURE"] = force_https and not self.app.debug
-        self.app.config["SESSION_COOKIE_HTTPONLY"] = True
-        self.app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+        self.app.config.update(
+            SESSION_COOKIE_SECURE=force_https and not self.app.debug,
+            SESSION_COOKIE_HTTPONLY=True,
+            SESSION_COOKIE_SAMESITE="Lax",
+            PERMANENT_SESSION_LIFETIME=86400,  # 1 day
+        )
 
         self.content_security_policy = content_security_policy
         self.allow_google_content_security_policy = allow_google_content_security_policy
