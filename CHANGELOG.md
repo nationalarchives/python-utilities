@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated `CspGenerator.get_csp()` method to `CspGenerator.to_string()`
 - Moved the simplification step of generating a CSP string to the `to_string()` method
 - By default, disallow `frame-ancestors` and `child-src` in CSP
+- `datetime.group_by_year_and_month` now accepts a list of items rather than a dict that requires an `items` key
 
 ### Deprecated
 
