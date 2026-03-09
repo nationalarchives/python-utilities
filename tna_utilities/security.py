@@ -30,7 +30,7 @@ class CspGenerator:
     def __init__(
         self,
         default_src: str | list[str] | None = None,
-        allow_objects=False,
+        allow_objects: bool = False,
         allow_iframe_embedding=False,
         allow_children: bool = False,
     ) -> None:
