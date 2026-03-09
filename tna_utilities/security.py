@@ -32,7 +32,7 @@ class CspGenerator:
         default_src: str | list[str] | None = None,
         allow_objects=False,
         allow_iframe_embedding=False,
-        allow_children=False,
+        allow_children: bool = False,
     ) -> None:
         self.default_src_sources: list[str] = []
         if default_src:
