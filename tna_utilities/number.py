@@ -11,6 +11,7 @@ def round_to_significant_figures(value: float, sig_figs: int = 1) -> float:
     on the order of magnitude of ``value``. For example, with ``sig_figs=1``,
     values are rounded to one significant figure (e.g. 1234 -> 1000, 0.0123 -> 0.01).
     """
+    
     if value == 0:
         return 0.0
     # Determine how many decimal places are needed so that ``round`` keeps
@@ -65,7 +66,7 @@ def numberish(
 
 def pretty_file_size(bytes, simplify=True):
     if not isinstance(bytes, int):
-        raise ValueError("file_size must be an integer")
+        raise ValueError("bytes must be an integer")
     byte_unit = 1000
     suffixes = ["B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
     i = 0

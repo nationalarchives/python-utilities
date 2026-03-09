@@ -20,14 +20,21 @@ poetry add tna-utilities
 
 # Install with pip
 pip install tna-utilities
+
+# Install with extra Flask utilities
+poetry add tna-utilities[flask]
+pip install tna-utilities[flask]
 ```
 
 ## Developing
 
 ```sh
-# Run the tests
-python -m unittest discover tests
+# Install the test dependencies and run the tests
+./tasks/test.sh
 
 # Format the code
 ./tasks/format.sh
+
+# Build the package
+./tasks/build.sh
 ```
