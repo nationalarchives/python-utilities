@@ -70,30 +70,33 @@ class SimpleJsonApiClient:
         Make a GET request to the specified path of the API endpoint.
         """
 
-        return self.call("GET", path)
+        url = f"{self.api_url}/{path.lstrip('/')}"
+        try:
+            response = requests.get(
+                url,
+                params=self.params,
+                headers=self.headers,
+            )
+        except ConnectionError:
+            raise Exception("A connection error occured")
+        except Timeout:
+            raise Exception("The request timed out")
+        except TooManyRedirects:
+            raise Exception("Too many redirects")
+        except Exception as e:
+            raise Exception(e)
+        return self._handle_response(response)
 
-    def post(self, path: str = "/", data: dict | None = None, json: dict | None = None):
+    def post(
+        self, path: str = "/", data: dict | None = None, json: dict | str | None = None
+    ):
         """
         Make a POST request to the specified path of the API endpoint.
         """
 
-        return self.call("POST", path, data=data, json=json)
-
-    def call(
-        self,
-        method: str,
-        path: str = "/",
-        data: dict | None = None,
-        json: dict | None = None,
-    ):
-        """
-        Internal method to make an API call using the specified HTTP method and path.
-        """
-
         url = f"{self.api_url}/{path.lstrip('/')}"
         try:
-            response = requests.request(
-                method,
+            response = requests.post(
                 url,
                 params=self.params,
                 headers=self.headers,
