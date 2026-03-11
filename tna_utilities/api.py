@@ -72,14 +72,20 @@ class SimpleJsonApiClient:
 
         return self.call("GET", path)
 
-    def post(self, path: str = "/"):
+    def post(self, path: str = "/", data: dict | None = None, json: dict | None = None):
         """
         Make a POST request to the specified path of the API endpoint.
         """
 
-        return self.call("POST", path)
+        return self.call("POST", path, data=data, json=json)
 
-    def call(self, method: str, path: str = "/"):
+    def call(
+        self,
+        method: str,
+        path: str = "/",
+        data: dict | None = None,
+        json: dict | None = None,
+    ):
         """
         Internal method to make an API call using the specified HTTP method and path.
         """
@@ -91,6 +97,8 @@ class SimpleJsonApiClient:
                 url,
                 params=self.params,
                 headers=self.headers,
+                data=data,
+                json=json,
             )
         except ConnectionError:
             raise Exception("A connection error occured")
