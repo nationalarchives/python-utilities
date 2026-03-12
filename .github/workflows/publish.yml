@@ -54,4 +54,4 @@ jobs:
       - name: Install dependencies and build package
         run: bash ./tasks/build.sh
       - name: Publish package to PyPI
-        run: poetry publish
+        uses: pypa/gh-action-pypi-publish@release/v1
