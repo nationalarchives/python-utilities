@@ -118,6 +118,7 @@ def pretty_date(
 def pretty_datetime(
     date: Union[str, datetime.datetime],
     show_day: bool = False,
+    show_seconds: bool = False,
 ) -> str:
     """
     Formats a date and time into the format used by The National Archives.
@@ -128,7 +129,11 @@ def pretty_datetime(
 
     if isinstance(date, datetime.datetime):
         if show_day:
+            if show_seconds:
+                return f"{date.strftime('%A')} {_format_day(date)} {date.strftime('%B %Y, %H:%M:%S')}"
             return f"{date.strftime('%A')} {_format_day(date)} {date.strftime('%B %Y, %H:%M')}"
+        if show_seconds:
+            return f"{_format_day(date)} {date.strftime('%B %Y, %H:%M:%S')}"
         return f"{_format_day(date)} {date.strftime('%B %Y, %H:%M')}"
 
     if isinstance(date, datetime.date):
@@ -136,9 +141,13 @@ def pretty_datetime(
 
     date = get_date_from_string(date)
     if show_day:
+        if show_seconds:
+            return f"{date.strftime('%A')} {_format_day(date)} {date.strftime('%B %Y, %H:%M:%S')}"
         return (
             f"{date.strftime('%A')} {_format_day(date)} {date.strftime('%B %Y, %H:%M')}"
         )
+    if show_seconds:
+        return f"{_format_day(date)} {date.strftime('%B %Y, %H:%M:%S')}"
     return f"{_format_day(date)} {date.strftime('%B %Y, %H:%M')}"
 
 
@@ -152,13 +161,17 @@ def pretty_date_range(  # noqa: C901
     Formats a date range into the format used by The National Archives.
     """
 
-    if not date_from or not isinstance(date_from, (datetime.date, datetime.datetime)):
+    if isinstance(date_from, datetime.date):
+        pass
+    elif isinstance(date_from, str):
         try:
             date_from = get_date_from_string(date_from)
         except ValueError:
             date_from = None
 
-    if not date_to or not isinstance(date_to, (datetime.date, datetime.datetime)):
+    if isinstance(date_to, datetime.date):
+        pass
+    elif isinstance(date_to, str):
         try:
             date_to = get_date_from_string(date_to)
         except ValueError:
@@ -228,28 +241,31 @@ def pretty_datetime_range(  # noqa: C901
     date_to: Optional[Union[str, datetime.date, datetime.datetime]],
     lowercase_first: bool = False,
     hide_date_if_single_day: bool = False,
+    show_seconds: bool = False,
 ) -> str:
     """
     Formats a date/time range into the format used by The National Archives.
     """
 
-    if not date_from or not isinstance(date_from, datetime.datetime):
-        if date_from and isinstance(date_from, datetime.date):
-            raise TypeError("From date object provided, datetime object expected")
-        else:
-            try:
-                date_from = get_date_from_string(date_from)
-            except ValueError:
-                date_from = None
+    if isinstance(date_from, datetime.datetime):
+        pass
+    elif isinstance(date_from, datetime.date):
+        raise TypeError("From date object provided, datetime object expected")
+    elif isinstance(date_from, str):
+        try:
+            date_from = get_date_from_string(date_from)
+        except ValueError:
+            date_from = None
 
-    if not date_to or not isinstance(date_to, datetime.datetime):
-        if date_to and isinstance(date_to, datetime.date):
-            raise TypeError("To date object provided, datetime object expected")
-        else:
-            try:
-                date_to = get_date_from_string(date_to)
-            except ValueError:
-                date_to = None
+    if isinstance(date_to, datetime.datetime):
+        pass
+    elif isinstance(date_to, datetime.date):
+        raise TypeError("To date object provided, datetime object expected")
+    elif isinstance(date_to, str):
+        try:
+            date_to = get_date_from_string(date_to)
+        except ValueError:
+            date_to = None
 
     if not date_from and not date_to:
         raise ValueError("No dates provided")
@@ -265,20 +281,38 @@ def pretty_datetime_range(  # noqa: C901
         ):
             if date_from.hour != date_to.hour or date_from.minute != date_to.minute:
                 if hide_date_if_single_day:
+                    if show_seconds:
+                        return f"{date_from.strftime('%H:%M:%S')} to {date_to.strftime('%H:%M:%S')}"
                     return (
                         f"{date_from.strftime('%H:%M')} to {date_to.strftime('%H:%M')}"
                     )
 
+                if show_seconds:
+                    return (
+                        f"{_format_day(date_from)} {date_from.strftime('%B %Y, %H:%M:%S')}"
+                        f" to {date_to.strftime('%H:%M:%S')}"
+                    )
                 return (
                     f"{_format_day(date_from)} {date_from.strftime('%B %Y, %H:%M')}"
                     f" to {date_to.strftime('%H:%M')}"
                 )
 
             if hide_date_if_single_day:
+                if show_seconds:
+                    return f"{date_from.strftime('%H:%M:%S')}"
                 return f"{date_from.strftime('%H:%M')}"
 
+            if show_seconds:
+                return (
+                    f"{_format_day(date_from)} {date_from.strftime('%B %Y, %H:%M:%S')}"
+                )
             return f"{_format_day(date_from)} {date_from.strftime('%B %Y, %H:%M')}"
 
+        if show_seconds:
+            return (
+                f"{_format_day(date_from)} {date_from.strftime('%B %Y, %H:%M:%S')}"
+                f" to {_format_day(date_to)} {date_to.strftime('%B %Y, %H:%M:%S')}"
+            )
         return (
             f"{_format_day(date_from)} {date_from.strftime('%B %Y, %H:%M')}"
             f" to {_format_day(date_to)} {date_to.strftime('%B %Y, %H:%M')}"
@@ -286,10 +320,16 @@ def pretty_datetime_range(  # noqa: C901
 
     if date_from:
         start = "from" if lowercase_first else "From"
+        if show_seconds:
+            return f"{start} {_format_day(date_from)} {date_from.strftime('%B %Y, %H:%M:%S')}"
         return f"{start} {_format_day(date_from)} {date_from.strftime('%B %Y, %H:%M')}"
 
     if date_to:
         start = "now to" if lowercase_first else "Now to"
+        if show_seconds:
+            return (
+                f"{start} {_format_day(date_to)} {date_to.strftime('%B %Y, %H:%M:%S')}"
+            )
         return f"{start} {_format_day(date_to)} {date_to.strftime('%B %Y, %H:%M')}"
 
     return ""

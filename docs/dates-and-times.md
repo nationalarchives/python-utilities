@@ -51,10 +51,11 @@ Formats a date and time into the format used by The National Archives.
 
 ### Arguments
 
-| Argument   | Description                             | Default |
-| ---------- | --------------------------------------- | ------- |
-| `date`     | The date to format                      | [none]  |
-| `show_day` | If `True`, show the day (Monday-Sunday) | `False` |
+| Argument       | Description                                     | Default |
+| -------------- | ----------------------------------------------- | ------- |
+| `date`         | The date to format                              | [none]  |
+| `show_day`     | If `True`, show the day (Monday-Sunday)         | `False` |
+| `show_seconds` | If `True`, show the seconds (added in `v1.4.0`) | `False` |
 
 ### Example
 
@@ -80,6 +81,7 @@ Formats a date range into the format used by The National Archives.
 | `date_to`         | The end date                                                                                | [none]  |
 | `omit_days`       | If `True`, don't output the day of month, only the month and year range                     | `False` |
 | `lowercase_first` | If `True`, use `from` and `now to` for ranges that normally start `From...` and `Now to...` | `False` |
+| `show_seconds`    | If `True`, show the seconds (added in `v1.4.0`)                                             | `False` |
 
 ### Example
 
