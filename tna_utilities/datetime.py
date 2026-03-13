@@ -432,19 +432,19 @@ def group_by_year_and_month(
     grouped = []
 
     for item in items:
-        if request_date := item.get(date_key):
-            if isinstance(request_date, (datetime.datetime, datetime.date)):
-                request_datetime = request_date
+        if item_date := item.get(date_key):
+            if isinstance(item_date, (datetime.datetime, datetime.date)):
+                item_datetime = item_date
             else:
                 try:
-                    request_datetime = get_date_from_string(request_date)
+                    item_datetime = get_date_from_string(item_date)
                 except ValueError:
                     continue
 
-            if request_datetime:
-                month = request_datetime.strftime("%B")
-                month_index = _format_month_index(request_datetime)
-                year = request_datetime.strftime("%Y")
+            if item_datetime:
+                month = item_datetime.strftime("%B")
+                month_index = _format_month_index(item_datetime)
+                year = item_datetime.strftime("%Y")
                 year_index = int(year)
                 existing_year_index = next(
                     (i for i, d in enumerate(grouped) if d["index"] == year_index), None
