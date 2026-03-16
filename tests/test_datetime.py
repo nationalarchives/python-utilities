@@ -175,6 +175,31 @@ class TestPrettyDatetime(unittest.TestCase):
             pretty_datetime(date, show_day=True), "Saturday 1 January 2000, 12:30"
         )
 
+    def test_happy_datetime_with_seconds(self):
+        date = datetime.datetime(2000, 1, 1, 12, 30, 0)
+        self.assertEqual(
+            pretty_datetime(date, show_seconds=True), "1 January 2000, 12:30:00"
+        )
+        self.assertEqual(
+            pretty_datetime(date, show_day=True, show_seconds=True),
+            "Saturday 1 January 2000, 12:30:00",
+        )
+
+    def test_happy_string_with_seconds(self):
+        self.assertEqual(
+            pretty_datetime("2000-01-01T12:00:00Z", show_seconds=True),
+            "1 January 2000, 12:00:00",
+        )
+        self.assertEqual(
+            pretty_datetime("2000-01-01", show_seconds=True), "1 January 2000, 00:00:00"
+        )
+        self.assertEqual(
+            pretty_datetime("2000-01", show_seconds=True), "1 January 2000, 00:00:00"
+        )
+        self.assertEqual(
+            pretty_datetime("2000", show_seconds=True), "1 January 2000, 00:00:00"
+        )
+
     def test_unhappy_date(self):
         date = datetime.date(2000, 1, 1)
         with self.assertRaises(TypeError):
@@ -527,6 +552,235 @@ class TestPrettyDatetimeRange(unittest.TestCase):
                 hide_date_if_single_day=True,
             ),
             "1 January 2000, 12:30 to 2 January 2000, 00:00",
+        )
+
+    def test_happy_datetime_with_seconds(self):
+        start_date = datetime.datetime(2000, 1, 1, 12, 30, 0)
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, datetime.datetime(2000, 1, 1, 12, 30, 0), show_seconds=True
+            ),
+            "1 January 2000, 12:30:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, datetime.datetime(2000, 1, 1, 12, 31, 0), show_seconds=True
+            ),
+            "1 January 2000, 12:30:00 to 12:31:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, datetime.datetime(2000, 1, 1, 23, 59, 59), show_seconds=True
+            ),
+            "1 January 2000, 12:30:00 to 23:59:59",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, datetime.datetime(2000, 1, 2, 0, 0, 0), show_seconds=True
+            ),
+            "1 January 2000, 12:30:00 to 2 January 2000, 00:00:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, datetime.datetime(2000, 1, 2, 14, 45, 0), show_seconds=True
+            ),
+            "1 January 2000, 12:30:00 to 2 January 2000, 14:45:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, datetime.datetime(2000, 1, 31, 14, 45, 0), show_seconds=True
+            ),
+            "1 January 2000, 12:30:00 to 31 January 2000, 14:45:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, datetime.datetime(2000, 2, 1, 14, 45, 0), show_seconds=True
+            ),
+            "1 January 2000, 12:30:00 to 1 February 2000, 14:45:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date,
+                datetime.datetime(2000, 12, 31, 14, 45, 0),
+                show_seconds=True,
+            ),
+            "1 January 2000, 12:30:00 to 31 December 2000, 14:45:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, datetime.datetime(2001, 1, 1, 14, 45, 0), show_seconds=True
+            ),
+            "1 January 2000, 12:30:00 to 1 January 2001, 14:45:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date,
+                datetime.datetime(2001, 12, 31, 14, 45, 0),
+                show_seconds=True,
+            ),
+            "1 January 2000, 12:30:00 to 31 December 2001, 14:45:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(start_date, None, show_seconds=True),
+            "From 1 January 2000, 12:30:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                None, datetime.datetime(2001, 12, 31, 14, 45, 0), show_seconds=True
+            ),
+            "Now to 31 December 2001, 14:45:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, None, lowercase_first=True, show_seconds=True
+            ),
+            "from 1 January 2000, 12:30:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                None,
+                datetime.datetime(2001, 12, 31, 14, 45, 0),
+                lowercase_first=True,
+                show_seconds=True,
+            ),
+            "now to 31 December 2001, 14:45:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date,
+                datetime.datetime(2000, 1, 1, 12, 30, 0),
+                hide_date_if_single_day=True,
+                show_seconds=True,
+            ),
+            "12:30:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date,
+                datetime.datetime(2000, 1, 1, 12, 45, 0),
+                hide_date_if_single_day=True,
+                show_seconds=True,
+            ),
+            "12:30:00 to 12:45:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date,
+                datetime.datetime(2000, 1, 2, 0, 0, 0),
+                hide_date_if_single_day=True,
+                show_seconds=True,
+            ),
+            "1 January 2000, 12:30:00 to 2 January 2000, 00:00:00",
+        )
+
+    def test_happy_string_with_seconds(self):
+        start_date = "2000-01-01T12:30:00Z"
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, "2000-01-01T12:30:00Z", show_seconds=True
+            ),
+            "1 January 2000, 12:30:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, "2000-01-01T12:31:00Z", show_seconds=True
+            ),
+            "1 January 2000, 12:30:00 to 12:31:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, "2000-01-01T23:59:59Z", show_seconds=True
+            ),
+            "1 January 2000, 12:30:00 to 23:59:59",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, "2000-01-02T00:00:00Z", show_seconds=True
+            ),
+            "1 January 2000, 12:30:00 to 2 January 2000, 00:00:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, "2000-01-02T14:45:00Z", show_seconds=True
+            ),
+            "1 January 2000, 12:30:00 to 2 January 2000, 14:45:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, "2000-01-31T14:45:00Z", show_seconds=True
+            ),
+            "1 January 2000, 12:30:00 to 31 January 2000, 14:45:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, "2000-02-01T14:45:00Z", show_seconds=True
+            ),
+            "1 January 2000, 12:30:00 to 1 February 2000, 14:45:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, "2000-12-31T14:45:00Z", show_seconds=True
+            ),
+            "1 January 2000, 12:30:00 to 31 December 2000, 14:45:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, "2001-01-01T14:45:00Z", show_seconds=True
+            ),
+            "1 January 2000, 12:30:00 to 1 January 2001, 14:45:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, "2001-12-31T14:45:00Z", show_seconds=True
+            ),
+            "1 January 2000, 12:30:00 to 31 December 2001, 14:45:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(start_date, None, show_seconds=True),
+            "From 1 January 2000, 12:30:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(None, "2001-12-31T14:45:00Z", show_seconds=True),
+            "Now to 31 December 2001, 14:45:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date, None, lowercase_first=True, show_seconds=True
+            ),
+            "from 1 January 2000, 12:30:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                None, "2001-12-31T14:45:00Z", lowercase_first=True, show_seconds=True
+            ),
+            "now to 31 December 2001, 14:45:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date,
+                "2000-01-01T12:30:00Z",
+                hide_date_if_single_day=True,
+                show_seconds=True,
+            ),
+            "12:30:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date,
+                "2000-01-01T12:45:00Z",
+                hide_date_if_single_day=True,
+                show_seconds=True,
+            ),
+            "12:30:00 to 12:45:00",
+        )
+        self.assertEqual(
+            pretty_datetime_range(
+                start_date,
+                "2000-01-02T00:00:00Z",
+                hide_date_if_single_day=True,
+                show_seconds=True,
+            ),
+            "1 January 2000, 12:30:00 to 2 January 2000, 00:00:00",
         )
 
     def test_unhappy_date(self):

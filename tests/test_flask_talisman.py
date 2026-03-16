@@ -65,6 +65,20 @@ class TestTalisman(unittest.TestCase):
         self.assertIn(" HttpOnly", rv.headers["Set-Cookie"])
         self.assertIn(" SameSite=Lax", rv.headers["Set-Cookie"])
 
+    def test_default_talisman_app_delayed(self):
+        talisman = Talisman()
+        talisman.init_app(self.app, force_https=False)
+
+        rv = self.test_client.get("/")
+
+        self.assertEqual(rv.status_code, 200)
+
+        self.assertIn("Content-Security-Policy", rv.headers)
+        self.assertEqual(
+            "default-src 'self'; object-src 'none'; frame-ancestors 'none'; child-src 'none';",
+            rv.headers["Content-Security-Policy"],
+        )
+
     def test_talisman_app_google(self):
         Talisman(self.app, force_https=False, allow_google_content_security_policy=True)
 
