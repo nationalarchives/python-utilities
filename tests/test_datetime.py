@@ -17,6 +17,10 @@ from tna_utilities.datetime import (
 )
 
 
+def now():
+    return datetime.datetime.now()
+
+
 class TestGetDateFromString(unittest.TestCase):
     def test_happy_dd_mm_yyyy(self):
         self.assertEqual(
@@ -97,9 +101,9 @@ class TestGetDateFromString(unittest.TestCase):
         with self.assertRaises(ValueError):
             get_date_from_string("")
         with self.assertRaises(ValueError):
-            get_date_from_string(None)
+            get_date_from_string(None)  # type: ignore
         with self.assertRaises(ValueError):
-            get_date_from_string(False)
+            get_date_from_string(False)  # type: ignore
 
 
 class TestPrettyDate(unittest.TestCase):
@@ -140,7 +144,7 @@ class TestPrettyDate(unittest.TestCase):
 
     def test_unhappy_none(self):
         with self.assertRaises(ValueError):
-            pretty_date(None)
+            pretty_date(None)  # type: ignore
 
 
 class TestPrettyDatetime(unittest.TestCase):
@@ -203,11 +207,11 @@ class TestPrettyDatetime(unittest.TestCase):
     def test_unhappy_date(self):
         date = datetime.date(2000, 1, 1)
         with self.assertRaises(TypeError):
-            pretty_datetime(date)
+            pretty_datetime(date)  # type: ignore
 
     def test_unhappy_none(self):
         with self.assertRaises(ValueError):
-            pretty_datetime(None)
+            pretty_datetime(None)  # type: ignore
 
 
 class TestPrettyDateRange(unittest.TestCase):
@@ -803,143 +807,155 @@ class TestPrettyDatetimeRange(unittest.TestCase):
 class TestPrettyAge(unittest.TestCase):
     def test_happy_past(self):
         self.assertEqual(
-            pretty_age(datetime.datetime.now()),
+            pretty_age(now()),
             "Just now",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() - datetime.timedelta(seconds=1)),
+            pretty_age(now() - datetime.timedelta(seconds=1)),
             "Just now",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() - datetime.timedelta(seconds=5)),
+            pretty_age(now() - datetime.timedelta(seconds=5)),
             "Just now",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() - datetime.timedelta(seconds=6)),
+            pretty_age(now() - datetime.timedelta(seconds=6)),
             "6 seconds ago",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() - datetime.timedelta(seconds=60)),
+            pretty_age(now() - datetime.timedelta(seconds=60)),
             "1 minute ago",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() - datetime.timedelta(seconds=1337)),
+            pretty_age(now() - datetime.timedelta(seconds=1337)),
             "22 minutes ago",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() - datetime.timedelta(minutes=1)),
+            pretty_age(now() - datetime.timedelta(minutes=1)),
             "1 minute ago",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() - datetime.timedelta(minutes=60)),
+            pretty_age(now() - datetime.timedelta(minutes=60)),
             "1 hour ago",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() - datetime.timedelta(hours=1)),
+            pretty_age(now() - datetime.timedelta(hours=1)),
             "1 hour ago",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() - datetime.timedelta(hours=24)),
+            pretty_age(now() - datetime.timedelta(hours=24)),
             "1 day ago",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() - datetime.timedelta(days=1)),
+            pretty_age(now() - datetime.timedelta(days=1)),
             "1 day ago",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() - datetime.timedelta(days=30)),
+            pretty_age(now() - datetime.timedelta(days=30)),
             "30 days ago",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() - datetime.timedelta(days=31)),
+            pretty_age(now() - datetime.timedelta(days=31)),
             "1 month ago",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() - datetime.timedelta(days=365)),
+            pretty_age(now() - datetime.timedelta(days=365)),
             "12 months ago",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() - datetime.timedelta(days=366)),
+            pretty_age(now() - datetime.timedelta(days=366)),
             "1 year ago",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() - datetime.timedelta(days=3651)),
+            pretty_age(now() - datetime.timedelta(days=3651)),
             "10 years ago",
         )
 
     def test_happy_future(self):
         self.assertEqual(
-            pretty_age(datetime.datetime.now() + datetime.timedelta(seconds=1)),
+            pretty_age(now() + datetime.timedelta(seconds=1)),
             "In 1 second",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() + datetime.timedelta(seconds=5)),
+            pretty_age(now() + datetime.timedelta(seconds=5)),
             "In 5 seconds",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() + datetime.timedelta(seconds=6)),
+            pretty_age(now() + datetime.timedelta(seconds=6)),
             "In 6 seconds",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() + datetime.timedelta(seconds=60)),
+            pretty_age(now() + datetime.timedelta(seconds=60)),
             "In 1 minute",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() + datetime.timedelta(seconds=1337)),
+            pretty_age(now() + datetime.timedelta(seconds=1337)),
             "In 22 minutes",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() + datetime.timedelta(minutes=1)),
+            pretty_age(now() + datetime.timedelta(minutes=1)),
             "In 1 minute",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() + datetime.timedelta(minutes=60)),
+            pretty_age(now() + datetime.timedelta(minutes=60)),
             "In 1 hour",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() + datetime.timedelta(hours=1)),
+            pretty_age(now() + datetime.timedelta(hours=1)),
             "In 1 hour",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() + datetime.timedelta(hours=24)),
+            pretty_age(now() + datetime.timedelta(hours=24)),
             "In 1 day",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() + datetime.timedelta(days=1)),
+            pretty_age(now() + datetime.timedelta(days=1)),
             "In 1 day",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() + datetime.timedelta(days=30)),
+            pretty_age(now() + datetime.timedelta(days=30)),
             "In 30 days",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() + datetime.timedelta(days=31)),
+            pretty_age(now() + datetime.timedelta(days=31)),
             "In 1 month",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() + datetime.timedelta(days=365)),
+            pretty_age(now() + datetime.timedelta(days=365)),
             "In 12 months",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() + datetime.timedelta(days=366)),
+            pretty_age(now() + datetime.timedelta(days=366)),
             "In 1 year",
         )
         self.assertEqual(
-            pretty_age(datetime.datetime.now() + datetime.timedelta(days=3651)),
+            pretty_age(now() + datetime.timedelta(days=3651)),
             "In 10 years",
+        )
+
+    def test_happy_timezone(self):
+
+        self.assertEqual(
+            pretty_age(
+                datetime.datetime.now(
+                    tz=datetime.timezone(datetime.timedelta(hours=-8))
+                )
+                + datetime.timedelta(seconds=1)
+            ),
+            "In 1 second",
         )
 
     def test_happy_just_now(self):
         self.assertEqual(
             pretty_age(
-                datetime.datetime.now() - datetime.timedelta(seconds=1),
+                now() - datetime.timedelta(seconds=1),
                 just_now_seconds=1,
             ),
             "Just now",
         )
         self.assertEqual(
             pretty_age(
-                datetime.datetime.now() - datetime.timedelta(seconds=2),
+                now() - datetime.timedelta(seconds=2),
                 just_now_seconds=1,
             ),
             "2 seconds ago",
@@ -948,14 +964,14 @@ class TestPrettyAge(unittest.TestCase):
     def test_happy_lowercase(self):
         self.assertEqual(
             pretty_age(
-                datetime.datetime.now() - datetime.timedelta(seconds=1),
+                now() - datetime.timedelta(seconds=1),
                 lowercase_first=True,
             ),
             "just now",
         )
         self.assertEqual(
             pretty_age(
-                datetime.datetime.now() + datetime.timedelta(seconds=1),
+                now() + datetime.timedelta(seconds=1),
                 lowercase_first=True,
             ),
             "in 1 second",
@@ -963,14 +979,14 @@ class TestPrettyAge(unittest.TestCase):
 
     def test_unhappy_none(self):
         with self.assertRaises(ValueError):
-            pretty_age(None)
+            pretty_age(None)  # type: ignore
 
 
 class TestIsTodayOrFuture(unittest.TestCase):
     def test_happy(self):
         self.assertTrue(is_today_or_future(datetime.date(2999, 1, 1)))
         self.assertFalse(is_today_or_future(datetime.date(2000, 1, 1)))
-        today = datetime.datetime.now()
+        today = now()
         self.assertTrue(is_today_or_future(today))
         tomorrow = today + datetime.timedelta(days=1)
         self.assertTrue(is_today_or_future(tomorrow))
@@ -979,7 +995,7 @@ class TestIsTodayOrFuture(unittest.TestCase):
 
     def test_unhappy(self):
         with self.assertRaises(ValueError):
-            is_today_or_future(None)
+            is_today_or_future(None)  # type: ignore
 
 
 class TestIsTodayInDateRange(unittest.TestCase):
@@ -996,25 +1012,25 @@ class TestIsTodayInDateRange(unittest.TestCase):
 
     def test_unhappy_string(self):
         with self.assertRaises(ValueError):
-            is_today_in_date_range(None, "2023-10-31")
+            is_today_in_date_range(None, "2023-10-31")  # type: ignore
         with self.assertRaises(ValueError):
-            is_today_in_date_range("2023-10-01", None)
+            is_today_in_date_range("2023-10-01", None)  # type: ignore
         with self.assertRaises(ValueError):
-            is_today_in_date_range(None, None)
+            is_today_in_date_range(None, None)  # type: ignore
 
     def test_unhappy_invalid(self):
         with self.assertRaises(ValueError):
-            is_today_in_date_range(None, "foo")
+            is_today_in_date_range(None, "foo")  # type: ignore
         with self.assertRaises(ValueError):
-            is_today_in_date_range("bar", None)
+            is_today_in_date_range("bar", None)  # type: ignore
 
     def test_unhappy_date(self):
         with self.assertRaises(ValueError):
-            is_today_in_date_range(None, datetime.date(2023, 10, 31))
+            is_today_in_date_range(None, datetime.date(2023, 10, 31))  # type: ignore
         with self.assertRaises(ValueError):
-            is_today_in_date_range(datetime.date(2023, 10, 31), None)
+            is_today_in_date_range(datetime.date(2023, 10, 31), None)  # type: ignore
         with self.assertRaises(ValueError):
-            is_today_in_date_range(None, None)
+            is_today_in_date_range(None, None)  # type: ignore
 
 
 class TestGroupByYearAndMonth(unittest.TestCase):

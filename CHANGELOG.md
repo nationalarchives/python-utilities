@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Handle empty lists for initialisation of `CspGenerator`
 - Don't add `report-to` or `report-uri` for blank strings in `CspGenerator`
+- Time comparisons fixed for datetimes with timezones other than UTC in `pretty_age()`
 
 ### Security
 
