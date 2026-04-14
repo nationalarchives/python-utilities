@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CSP directives are appended by default with the option to be overwritten
 - Flask Talisman module added `tna_utilities.flask.talisman`
 - Added ability to show seconds in `pretty_datetime` and `pretty_datetime_range`
+- Added a new basic API client
 
 ### Changed
 

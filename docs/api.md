@@ -37,6 +37,21 @@ You can catch and handle some of the more common exceptions:
 - `tna_utilities.flask.api.ResourceNotFound`
 - `tna_utilities.flask.api.ResourceUnauthorized`
 
+You can also catch [expections raised by `requests`](https://requests.readthedocs.io/en/latest/_modules/requests/exceptions/).
+
+```python
+from requests import Timeout
+from tna_utilities.flask.api import SimpleJsonApiClient
+
+client = SimpleJsonApiClient("https://wagtail.nationalarchives.gov.uk/api/v2")
+
+try:
+    pages = client.get("pages")
+except Timeout:
+    print("The request timed out")
+    pages = []
+```
+
 ### Headers
 
 ```python
