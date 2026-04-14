@@ -1,0 +1,156 @@
+import requests
+from requests import JSONDecodeError, Response, codes
+
+
+class ResourceNotFound(Exception):
+    pass
+
+
+class ResourceForbidden(Exception):
+    pass
+
+
+class ResourceUnauthorized(Exception):
+    pass
+
+
+class SimpleJsonApiClient:
+    """
+    A simple JSON API client that provides basic functionality for making GET requests to a specified API endpoint.
+
+    It allows for the addition of custom headers and parameters, and handles common HTTP response codes, including 200 (OK), 400 (Bad Request), 403 (Forbidden), and 404 (Not Found).
+
+    The client also includes error handling for connection issues, timeouts, and non-JSON responses.
+
+    :param api_url: The base URL of the API.
+    :param default_headers: Optional dictionary of default headers to include in every request.
+    :param default_params: Optional dictionary of default parameters to include in every request.
+    """
+
+    def __init__(
+        self, api_url: str, default_headers: dict = {}, default_params: dict = {}
+    ):
+        self.api_url: str = api_url.rstrip("/")
+        self.headers: dict = (
+            {
+                "Cache-Control": "no-cache",
+                "Accept": "application/json",
+            }
+            if default_headers
+            else default_headers
+        )
+        self.params: dict = default_params
+
+    def add_default_parameter(self, key: str, value) -> "SimpleJsonApiClient":
+        """
+        Add a single default parameter to the requests.
+        """
+
+        self.params[key] = value
+        return self
+
+    def add_default_parameters(self, params: dict) -> "SimpleJsonApiClient":
+        """
+        Add multiple default parameters to the requests.
+        """
+
+        self.params = self.params | params
+        return self
+
+    def add_default_header(self, key: str, value) -> "SimpleJsonApiClient":
+        """
+        Add a single default header to the requests.
+        """
+
+        self.headers[key] = value
+        return self
+
+    def add_default_headers(self, headers: dict) -> "SimpleJsonApiClient":
+        """
+        Add multiple default headers to the requests.
+        """
+
+        self.headers = self.headers | headers
+        return self
+
+    def _normalise_url(self, path: str) -> str:
+        """
+        Normalise a URL, avoiding duplicated slashes
+        """
+
+        return f"{self.api_url}/{path.lstrip('/')}"
+
+    def get(
+        self,
+        path: str = "/",
+        params: dict | None = None,
+        headers: dict | None = None,
+        timeout: int = 10,
+    ) -> dict:
+        """
+        Make a GET request to the specified path of the API endpoint.
+
+        :param path: The path to append to the base API URL for the request.
+        :param params: Optional dictionary of query parameters to include in the request. These will be merged with any default parameters set for the client.
+        :param headers: Optional dictionary of headers to include in the request. These will be merged with any default headers set for the client.
+        """
+
+        url = self._normalise_url(path)
+        response = requests.get(
+            url,
+            params=self.params if params is None else {**self.params, **params},
+            headers=self.headers if headers is None else {**self.headers, **headers},
+            timeout=timeout,
+        )
+        return self._handle_response(response)
+
+    def post(
+        self,
+        path: str = "/",
+        data: dict | None = None,
+        json: dict | str | None = None,
+        params: dict | None = None,
+        headers: dict | None = None,
+        timeout: int = 10,
+    ) -> dict:
+        """
+        Make a POST request to the specified path of the API endpoint.
+
+        :param path: The path to append to the base API URL for the request.
+        :param data: Optional dictionary, list of tuples, bytes, or file-like
+        object to include in the request body.
+        :param json: Optional JSON serialisable Python object to send in the request body.
+        :param params: Optional dictionary of query parameters to include in the request. These will be merged with any default parameters set for the client.
+        :param headers: Optional dictionary of headers to include in the request. These will be merged with any default headers set for the client.
+        """
+
+        url = self._normalise_url(path)
+        response = requests.post(
+            url,
+            params=self.params if params is None else {**self.params, **params},
+            headers=self.headers if headers is None else {**self.headers, **headers},
+            data=data,
+            json=json,
+            timeout=timeout,
+        )
+        return self._handle_response(response)
+
+    def _handle_response(self, response: Response) -> dict:
+        """
+        Handle the API response, checking for common HTTP status codes and returning the JSON content if the request was successful.
+        """
+
+        if response.status_code == codes.ok:
+            try:
+                return response.json()
+            except JSONDecodeError:
+                raise Exception("Non-JSON response provided")
+        if response.status_code == 400:
+            raise Exception("Bad request")
+        if response.status_code == 401:
+            raise ResourceUnauthorized("Unauthorised")
+        if response.status_code == 403:
+            raise ResourceForbidden("Forbidden")
+        if response.status_code == 404:
+            raise ResourceNotFound("Resource not found")
+        raise Exception(f"Request failed with {response.status_code}")

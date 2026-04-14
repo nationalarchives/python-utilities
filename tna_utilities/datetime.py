@@ -70,7 +70,7 @@ def _format_month_index(date: datetime.date) -> int:
 
 
 def pretty_date(
-    date: Union[str, datetime.date, datetime.datetime],
+    date: Union[str, datetime.date],
     show_day: bool = False,
 ) -> str:
     """
@@ -152,8 +152,8 @@ def pretty_datetime(
 
 
 def pretty_date_range(  # noqa: C901
-    date_from: Optional[Union[str, datetime.datetime]],
-    date_to: Optional[Union[str, datetime.datetime]],
+    date_from: Optional[Union[str, datetime.date]],
+    date_to: Optional[Union[str, datetime.date]],
     omit_days: bool = False,
     lowercase_first: bool = False,
 ) -> str:
@@ -341,18 +341,14 @@ def pretty_age(
     if not date:
         raise ValueError("Date must be provided")
 
-    # Normalise input date to be timezone-aware in UTC for consistent comparison
+    now = datetime.datetime.now().replace(microsecond=0)
+
     if isinstance(date, datetime.datetime):
-        if date.tzinfo is None:
-            date = date.replace(tzinfo=datetime.timezone.utc)
+        if date.tzinfo is not None:
+            now = datetime.datetime.now(tz=date.tzinfo).replace(microsecond=0)
         date = date.replace(microsecond=0)
     else:
-        # For date objects, convert to a UTC datetime at midnight
-        date = datetime.datetime.combine(
-            date, datetime.time.min, tzinfo=datetime.timezone.utc
-        )
-
-    now = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0)
+        date = datetime.datetime.combine(date, datetime.time.min)
 
     future = now < date
     delta = date - now if future else now - date

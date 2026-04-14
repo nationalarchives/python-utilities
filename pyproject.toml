@@ -21,6 +21,9 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
 ]
+dependencies = [
+  "requests"
+]
 
 [project.optional-dependencies]
 flask = ["Flask"]
@@ -37,6 +40,7 @@ optional = true
 
 [tool.poetry.group.test.dependencies]
 Flask = "^3"
+requests = "^2"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
