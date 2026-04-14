@@ -1,5 +1,5 @@
 import requests
-from requests import JSONDecodeError, Response, Timeout, TooManyRedirects, codes
+from requests import JSONDecodeError, Response, codes
 
 
 class ResourceNotFound(Exception):
@@ -7,6 +7,10 @@ class ResourceNotFound(Exception):
 
 
 class ResourceForbidden(Exception):
+    pass
+
+
+class ResourceUnauthorized(Exception):
     pass
 
 
@@ -19,12 +23,12 @@ class SimpleJsonApiClient:
     The client also includes error handling for connection issues, timeouts, and non-JSON responses.
 
     :param api_url: The base URL of the API.
-    :param defaultHeaders: Optional dictionary of default headers to include in every request.
-    :param defaultParams: Optional dictionary of default parameters to include in every request.
+    :param default_headers: Optional dictionary of default headers to include in every request.
+    :param default_params: Optional dictionary of default parameters to include in every request.
     """
 
     def __init__(
-        self, api_url: str, defaultHeaders: dict = {}, defaultParams: dict = {}
+        self, api_url: str, default_headers: dict = {}, default_params: dict = {}
     ):
         self.api_url: str = api_url.rstrip("/")
         self.headers: dict = (
@@ -32,88 +36,106 @@ class SimpleJsonApiClient:
                 "Cache-Control": "no-cache",
                 "Accept": "application/json",
             }
-            if defaultHeaders
-            else defaultHeaders
+            if default_headers
+            else default_headers
         )
-        self.params: dict = defaultParams
+        self.params: dict = default_params
 
-    def add_parameter(self, key: str, value):
+    def add_default_parameter(self, key: str, value) -> "SimpleJsonApiClient":
         """
-        Add a single parameter to the request.
+        Add a single default parameter to the requests.
         """
 
         self.params[key] = value
+        return self
 
-    def add_parameters(self, params: dict):
+    def add_default_parameters(self, params: dict) -> "SimpleJsonApiClient":
         """
-        Add multiple parameters to the request.
+        Add multiple default parameters to the requests.
         """
 
         self.params = self.params | params
+        return self
 
-    def add_header(self, key: str, value):
+    def add_default_header(self, key: str, value) -> "SimpleJsonApiClient":
         """
-        Add a single header to the request.
+        Add a single default header to the requests.
         """
 
         self.headers[key] = value
+        return self
 
-    def add_headers(self, headers: dict):
+    def add_default_headers(self, headers: dict) -> "SimpleJsonApiClient":
         """
-        Add multiple headers to the request.
+        Add multiple default headers to the requests.
         """
 
         self.headers = self.headers | headers
+        return self
 
-    def get(self, path: str = "/"):
+    def _normalise_url(self, path: str) -> str:
+        """
+        Normalise a URL, avoiding duplicated slashes
+        """
+
+        return f"{self.api_url}/{path.lstrip('/')}"
+
+    def get(
+        self,
+        path: str = "/",
+        params: dict | None = None,
+        headers: dict | None = None,
+        timeout: int = 10,
+    ) -> dict:
         """
         Make a GET request to the specified path of the API endpoint.
+
+        :param path: The path to append to the base API URL for the request.
+        :param params: Optional dictionary of query parameters to include in the request. These will be merged with any default parameters set for the client.
+        :param headers: Optional dictionary of headers to include in the request. These will be merged with any default headers set for the client.
         """
 
-        url = f"{self.api_url}/{path.lstrip('/')}"
-        try:
-            response = requests.get(
-                url,
-                params=self.params,
-                headers=self.headers,
-            )
-        except ConnectionError:
-            raise Exception("A connection error occured")
-        except Timeout:
-            raise Exception("The request timed out")
-        except TooManyRedirects:
-            raise Exception("Too many redirects")
-        except Exception as e:
-            raise Exception(e)
+        url = self._normalise_url(path)
+        response = requests.get(
+            url,
+            params=self.params if params is None else {**self.params, **params},
+            headers=self.headers if headers is None else {**self.headers, **headers},
+            timeout=timeout,
+        )
         return self._handle_response(response)
 
     def post(
-        self, path: str = "/", data: dict | None = None, json: dict | str | None = None
-    ):
+        self,
+        path: str = "/",
+        data: dict | None = None,
+        json: dict | str | None = None,
+        params: dict | None = None,
+        headers: dict | None = None,
+        timeout: int = 10,
+    ) -> dict:
         """
         Make a POST request to the specified path of the API endpoint.
+
+        :param path: The path to append to the base API URL for the request.
+        :param data: Optional dictionary, list of tuples, bytes, or file-like
+        object to include in the request body.
+        :param json: Optional JSON serialisable Python object to send in the request body.
+        :param params: Optional dictionary of query parameters to include in the request. These will be merged with any default parameters set for the client.
+        :param headers: Optional dictionary of headers to include in the request. These will be merged with any default headers set for the client.
         """
 
-        url = f"{self.api_url}/{path.lstrip('/')}"
-        try:
-            response = requests.post(
-                url,
-                params=self.params,
-                headers=self.headers,
-                data=data,
-                json=json,
-            )
-        except ConnectionError:
-            raise Exception("A connection error occured")
-        except Timeout:
-            raise Exception("The request timed out")
-        except TooManyRedirects:
-            raise Exception("Too many redirects")
-        except Exception as e:
-            raise Exception(e)
+        url = self._normalise_url(path)
+        response = requests.post(
+            url,
+            params=self.params if params is None else {**self.params, **params},
+            headers=self.headers if headers is None else {**self.headers, **headers},
+            data=data,
+            json=json,
+            timeout=timeout,
+        )
         return self._handle_response(response)
 
-    def _handle_response(self, response: Response):
+    def _handle_response(self, response: Response) -> dict:
         """
         Handle the API response, checking for common HTTP status codes and returning the JSON content if the request was successful.
         """
@@ -125,8 +147,10 @@ class SimpleJsonApiClient:
                 raise Exception("Non-JSON response provided")
         if response.status_code == 400:
             raise Exception("Bad request")
+        if response.status_code == 401:
+            raise ResourceUnauthorized("Unauthorised")
         if response.status_code == 403:
             raise ResourceForbidden("Forbidden")
         if response.status_code == 404:
             raise ResourceNotFound("Resource not found")
-        raise Exception("Request failed")
+        raise Exception(f"Request failed with {response.status_code}")

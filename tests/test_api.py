@@ -1,7 +1,13 @@
 import json
 from unittest import TestCase, mock
 
-from tna_utilities.api import ResourceForbidden, ResourceNotFound, SimpleJsonApiClient
+from requests import Timeout
+from tna_utilities.api import (
+    ResourceForbidden,
+    ResourceNotFound,
+    ResourceUnauthorized,
+    SimpleJsonApiClient,
+)
 
 MOCK_API_BASE_URL = "http://mockapi.com/"
 
@@ -22,10 +28,14 @@ def mocked_requests_get(*args, **kwargs):
         return MockResponse({"foo": "bar"}, 200)
     elif args[0] == f"{MOCK_API_BASE_URL}badrequest":
         return MockResponse(None, 400)
+    elif args[0] == f"{MOCK_API_BASE_URL}unauthorized":
+        return MockResponse(None, 401)
     elif args[0] == f"{MOCK_API_BASE_URL}forbidden":
         return MockResponse(None, 403)
     elif args[0] == f"{MOCK_API_BASE_URL}servererror":
         return MockResponse(None, 500)
+    elif args[0] == f"{MOCK_API_BASE_URL}timeout":
+        raise Timeout("Request timed out")
 
     return MockResponse(None, 404)
 
@@ -62,12 +72,6 @@ class TestSimpleJsonApiClient(TestCase):
         response = client.get("/happy")
         self.assertEqual(type(response), dict)
         self.assertDictEqual(response, {"foo": "bar"})
-        # called_mock_get_urls = [call.args[0] for call in mock_get.call_args_list]
-        # self.assertIn(
-        #     f"{MOCK_API_BASE_URL}happy",
-        #     called_mock_get_urls,
-        # )
-        # self.assertEqual(len(called_mock_get_urls), 1)
 
     @mock.patch("requests.get", side_effect=mocked_requests_get)
     @mock.patch("requests.post", side_effect=mocked_requests_post)
@@ -85,10 +89,24 @@ class TestSimpleJsonApiClient(TestCase):
 
     @mock.patch("requests.get", side_effect=mocked_requests_get)
     @mock.patch("requests.post", side_effect=mocked_requests_post)
+    def test_resource_unauthorized(self, mock_get, mock_post):
+        client = SimpleJsonApiClient(MOCK_API_BASE_URL)
+        with self.assertRaises(ResourceUnauthorized):
+            client.get("/unauthorized")
+
+    @mock.patch("requests.get", side_effect=mocked_requests_get)
+    @mock.patch("requests.post", side_effect=mocked_requests_post)
     def test_resource_forbidden(self, mock_get, mock_post):
         client = SimpleJsonApiClient(MOCK_API_BASE_URL)
         with self.assertRaises(ResourceForbidden):
             client.get("/forbidden")
+
+    @mock.patch("requests.get", side_effect=mocked_requests_get)
+    @mock.patch("requests.post", side_effect=mocked_requests_post)
+    def test_resource_timeout(self, mock_get, mock_post):
+        client = SimpleJsonApiClient(MOCK_API_BASE_URL)
+        with self.assertRaises(Timeout):
+            client.get("/timeout")
 
     @mock.patch("requests.get", side_effect=mocked_requests_get)
     @mock.patch("requests.post", side_effect=mocked_requests_post)
