@@ -5,7 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nationalarchives/python-utilities/compare/v1.3.0...HEAD)
+## [Unreleased](https://github.com/nationalarchives/python-utilities/compare/v1.4.0...HEAD)
+
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [1.4.0](https://github.com/nationalarchives/python-utilities/compare/v1.3.0...v1.4.0) - 2026-04-14
 
 ### Added
 
@@ -23,8 +37,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - By default, disallow `frame-ancestors` and `child-src` in CSP
 - `datetime.group_by_year_and_month` now accepts a list of items rather than a dict that requires an `items` key
 
-### Deprecated
-
 ### Removed
 
 - Removed support for deprecated `X-Frame-Options` header in `common_security_headers`
@@ -34,8 +46,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Handle empty lists for initialisation of `CspGenerator`
 - Don't add `report-to` or `report-uri` for blank strings in `CspGenerator`
 - Time comparisons fixed for datetimes with timezones other than UTC in `pretty_age()`
-
-### Security
 
 ## [1.3.0](https://github.com/nationalarchives/python-utilities/compare/v1.2.0...v1.3.0) - 2026-01-02
 
