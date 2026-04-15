@@ -129,29 +129,35 @@ class Talisman(object):
 
         csp = CspGenerator(default_src=content_security_policy.get("default-src", ""))
 
-        csp.base_uri(content_security_policy.get("base-uri", ""))
-        csp.child_src(content_security_policy.get("child-src", ""))
-        csp.connect_src(content_security_policy.get("connect-src", ""))
-        csp.font_src(content_security_policy.get("font-src", ""))
-        csp.form_action(content_security_policy.get("form-action", ""))
-        csp.frame_ancestors(content_security_policy.get("frame-ancestors", ""))
-        csp.frame_src(content_security_policy.get("frame-src", ""))
-        csp.img_src(content_security_policy.get("img-src", ""))
-        csp.manifest_src(content_security_policy.get("manifest-src", ""))
-        csp.media_src(content_security_policy.get("media-src", ""))
-        csp.object_src(content_security_policy.get("object-src", ""))
-        csp.prefetch_src(content_security_policy.get("prefetch-src", ""))
-        csp.report_uri(content_security_policy.get("report-uri", ""))
-        csp.report_to(content_security_policy.get("report-to", ""))
-        csp.script_src(content_security_policy.get("script-src", ""))
-        csp.script_src_attr(content_security_policy.get("script-src-attr", ""))
-        csp.script_src_elem(content_security_policy.get("script-src-elem", ""))
-        csp.style_src(content_security_policy.get("style-src", ""))
-        csp.style_src_attr(content_security_policy.get("style-src-attr", ""))
-        csp.style_src_elem(content_security_policy.get("style-src-elem", ""))
-        csp.worker_src(content_security_policy.get("worker-src", ""))
+        property_methods = [
+            ("base-uri", csp.base_uri),
+            ("child-src", csp.child_src),
+            ("connect-src", csp.connect_src),
+            ("font-src", csp.font_src),
+            ("form-action", csp.form_action),
+            ("frame-ancestors", csp.frame_ancestors),
+            ("frame-src", csp.frame_src),
+            ("img-src", csp.img_src),
+            ("manifest-src", csp.manifest_src),
+            ("media-src", csp.media_src),
+            ("object-src", csp.object_src),
+            ("prefetch-src", csp.prefetch_src),
+            ("report-uri", csp.report_uri),
+            ("report-to", csp.report_to),
+            ("script-src", csp.script_src),
+            ("script-src-attr", csp.script_src_attr),
+            ("script-src-elem", csp.script_src_elem),
+            ("style-src", csp.style_src),
+            ("style-src-attr", csp.style_src_attr),
+            ("style-src-elem", csp.style_src_elem),
+            ("worker-src", csp.worker_src),
+        ]
+        for directive, method in property_methods:
+            method(content_security_policy.get(directive, ""))
+
         if "sandbox" in content_security_policy:
             csp.sandbox(content_security_policy["sandbox"])
+
         if content_security_policy.get("require-trusted-types-for", False):
             csp.require_trusted_types_for()
 
