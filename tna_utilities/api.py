@@ -158,4 +158,13 @@ class SimpleJsonApiClient:
             raise ResourceForbidden("Forbidden")
         if response.status_code == 404:
             raise ResourceNotFound("Resource not found")
-        raise Exception(f"Request failed with {response.status_code}")
+        body_preview = (response.text or "").strip()
+        if body_preview:
+            body_preview = body_preview[:500]
+            raise Exception(
+                f"Request failed with status {response.status_code} for URL {response.url}. "
+                f"Response body: {body_preview}"
+            )
+        raise Exception(
+            f"Request failed with status {response.status_code} for URL {response.url}"
+        )
