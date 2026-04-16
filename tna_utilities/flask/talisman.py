@@ -5,25 +5,28 @@ import flask
 from ..security import CspGenerator, common_security_headers
 
 GOOGLE_CSP_POLICY = {
-    # "default-src": ["*.gstatic.com"],
-    # Fonts from fonts.google.com
-    "font-src": ["*.gstatic.com"],
-    # <iframe> based embedding for Maps and Youtube
-    "frame-src": ["www.google.com", "www.youtube.com"],
-    # YouTube video thumbnails
-    "img-src": ["img.youtube.com"],
-    # Assorted Google-hosted Libraries/APIs
-    "script-src": [
-        "ajax.googleapis.com",
-        "*.googleanalytics.com",
-        "*.google-analytics.com",
-        "www.youtube.com",
+    "font-src": ["*.gstatic.com"],  # Google Fonts from fonts.google.com
+    "frame-src": [
+        "www.google.com",  # <iframe> based embeds for Google Maps
+        "www.youtube.com",  # <iframe> based embeds for Youtube
     ],
-    # Google Fonts stylesheets and YouTube embedded player styles
+    "img-src": [
+        "img.youtube.com",  # YouTube video thumbnails
+        "i.ytimg.com",  # YouTube video thumbnails
+        "www.googletagmanager.com",  # GTM
+    ],
+    "script-src": [
+        "ajax.googleapis.com",  # Assorted Google-hosted Libraries/APIs
+        "*.googleanalytics.com",  # GA4
+        "*.google-analytics.com",  # GA4
+        "www.youtube.com",  # YouTube embeds
+        "*.gstatic.com",  # Google Translate
+        "www.googletagmanager.com",  # GTM
+    ],
     "style-src": [
-        "ajax.googleapis.com",
-        "fonts.googleapis.com",
-        "*.gstatic.com",
+        "ajax.googleapis.com",  # YouTube embedded player styles
+        "fonts.googleapis.com",  # Google Fonts stylesheets
+        "*.gstatic.com",  # Assorted Google stylesheets
     ],
 }
 

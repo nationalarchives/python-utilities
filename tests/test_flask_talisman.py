@@ -97,11 +97,11 @@ class TestTalisman(unittest.TestCase):
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
-            "img-src 'self' img.youtube.com;",
+            "img-src 'self' img.youtube.com i.ytimg.com www.googletagmanager.com;",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
-            "script-src 'self' ajax.googleapis.com *.googleanalytics.com *.google-analytics.com www.youtube.com;",
+            "script-src 'self' ajax.googleapis.com *.googleanalytics.com *.google-analytics.com www.youtube.com *.gstatic.com www.googletagmanager.com;",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
@@ -154,7 +154,7 @@ class TestTalisman(unittest.TestCase):
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
-            "img-src 'self' img.example.com img.youtube.com;",
+            "img-src 'self' img.example.com img.youtube.com i.ytimg.com www.googletagmanager.com;",
             rv.headers["Content-Security-Policy"],
         )
 
