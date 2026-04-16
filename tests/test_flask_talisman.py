@@ -79,7 +79,7 @@ class TestTalisman(unittest.TestCase):
             rv.headers["Content-Security-Policy"],
         )
 
-    def test_talisman_app_google(self):
+    def test_talisman_google_csp(self):
         Talisman(self.app, force_https=False, allow_google_content_security_policy=True)
 
         rv = self.test_client.get("/")
@@ -109,7 +109,50 @@ class TestTalisman(unittest.TestCase):
             rv.headers["Content-Security-Policy"],
         )
 
-    def test_talisman_app_custom_csp(self):
+    def test_talisman_typekit_csp(self):
+        Talisman(
+            self.app, force_https=False, allow_typekit_content_security_policy=True
+        )
+
+        rv = self.test_client.get("/")
+
+        self.assertEqual(rv.status_code, 200)
+
+        self.assertIn("Content-Security-Policy", rv.headers)
+        self.assertIn(
+            "font-src 'self' use.typekit.net;", rv.headers["Content-Security-Policy"]
+        )
+        self.assertIn(
+            "style-src 'self' *.typekit.net;", rv.headers["Content-Security-Policy"]
+        )
+
+    def test_talisman_google_and_typekit_csp(self):
+        Talisman(
+            self.app,
+            force_https=False,
+            allow_google_content_security_policy=True,
+            allow_typekit_content_security_policy=True,
+        )
+
+        rv = self.test_client.get("/")
+
+        self.assertEqual(rv.status_code, 200)
+
+        self.assertIn("Content-Security-Policy", rv.headers)
+        self.assertIn(
+            "font-src 'self' *.gstatic.com use.typekit.net;",
+            rv.headers["Content-Security-Policy"],
+        )
+        self.assertIn(
+            "style-src 'self' ajax.googleapis.com fonts.googleapis.com *.gstatic.com *.typekit.net;",
+            rv.headers["Content-Security-Policy"],
+        )
+        self.assertIn(
+            "img-src 'self' img.youtube.com i.ytimg.com www.googletagmanager.com;",
+            rv.headers["Content-Security-Policy"],
+        )
+
+    def test_talisman_custom_csp(self):
         Talisman(
             self.app,
             force_https=False,
@@ -133,7 +176,7 @@ class TestTalisman(unittest.TestCase):
             rv.headers["Content-Security-Policy"],
         )
 
-    def test_talisman_app_custom_csp_with_google(self):
+    def test_talisman_custom_csp_with_google(self):
         Talisman(
             self.app,
             force_https=False,

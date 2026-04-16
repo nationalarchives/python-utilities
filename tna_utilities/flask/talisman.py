@@ -4,8 +4,8 @@ import flask
 
 from ..security import CspGenerator, common_security_headers
 
-GOOGLE_CSP_POLICY = {
-    "font-src": ["*.gstatic.com"],  # Google Fonts from fonts.google.com
+GOOGLE_CSP_DIRECTIVES = {
+    "font-src": ["*.gstatic.com"],  # Fonts from fonts.google.com
     "frame-src": [
         "www.google.com",  # <iframe> based embeds for Google Maps
         "www.youtube.com",  # <iframe> based embeds for Youtube
@@ -30,10 +30,17 @@ GOOGLE_CSP_POLICY = {
     ],
 }
 
+TYPEKIT_CSP_DIRECTIVES = {
+    # Adobe Typekit fonts
+    "font-src": ["use.typekit.net"],
+    # Adobe Typekit stylesheets
+    "style-src": ["*.typekit.net"],
+}
+
 
 class Talisman(object):
     """
-    A stripped-down and opinionated reproduction of [wntrblm/flask-talisman](https://github.com/wntrblm/flask-talisman) which is a fork of [GoogleCloudPlatform/flask-talisman](https://github.com/GoogleCloudPlatform/flask-talisman).
+    A stripped-down and opinionated reproduction of [wntrblm/flask-talisman](https://github.com/wntrblm/flask-talisman) which is in turn a fork of [GoogleCloudPlatform/flask-talisman](https://github.com/GoogleCloudPlatform/flask-talisman).
 
     Neither GoogleCloudPlatform/flask-talisman nor wntrblm/flask-talisman appears to be actively maintained.
 
@@ -50,6 +57,7 @@ class Talisman(object):
         app: flask.Flask,
         content_security_policy: dict = {},
         allow_google_content_security_policy: bool = False,
+        allow_typekit_content_security_policy: bool = False,
         security_headers: dict = {},
         referrer_policy: str = "strict-origin-when-cross-origin",
         force_https: bool = True,
@@ -60,6 +68,7 @@ class Talisman(object):
 
         :param content_security_policy: A dictionary defining the Content Security Policy directives and their values.
         :param allow_google_content_security_policy: If True, includes Google's recommended Content Security Policy directives in addition to the custom directives specified in content_security_policy.
+        :param allow_typekit_content_security_policy: If True, includes Adobe Typekit's recommended Content Security Policy directives in addition to the custom directives specified in content_security_policy.
         :param security_headers: A dictionary of additional security headers to apply to responses, where the keys are header names and the values are header values.
         :param referrer_policy: The Referrer-Policy header value to apply to responses. Defaults to "strict-origin-when-cross-origin".
         :param force_https: If True, forces incoming requests to be redirected to HTTPS if they are not already secure and the application is not in debug mode. Defaults to True.
@@ -77,6 +86,9 @@ class Talisman(object):
 
         self.content_security_policy = content_security_policy
         self.allow_google_content_security_policy = allow_google_content_security_policy
+        self.allow_typekit_content_security_policy = (
+            allow_typekit_content_security_policy
+        )
         self.security_headers = security_headers
         self.referrer_policy = referrer_policy
         self.force_https = force_https
@@ -115,7 +127,9 @@ class Talisman(object):
         """
 
         response.headers["Content-Security-Policy"] = self._csp(
-            self.content_security_policy, self.allow_google_content_security_policy
+            self.content_security_policy,
+            self.allow_google_content_security_policy,
+            self.allow_typekit_content_security_policy,
         )
         response.headers.update(common_security_headers(**self.security_headers))
         response.headers["Referrer-Policy"] = self.referrer_policy
@@ -125,6 +139,7 @@ class Talisman(object):
         self,
         content_security_policy: dict,
         allow_google_content_security_policy: bool = False,
+        allow_typekit_content_security_policy: bool = False,
     ):
         """
         Generates a Content-Security-Policy header value based on the provided content security policy configuration and the option to include Google's recommended content security policy directives.
@@ -165,7 +180,11 @@ class Talisman(object):
             csp.require_trusted_types_for()
 
         if allow_google_content_security_policy:
-            for x, y in GOOGLE_CSP_POLICY.items():
+            for x, y in GOOGLE_CSP_DIRECTIVES.items():
+                csp.add_directive(x, *y)
+
+        if allow_typekit_content_security_policy:
+            for x, y in TYPEKIT_CSP_DIRECTIVES.items():
                 csp.add_directive(x, *y)
 
         return csp.to_string()
