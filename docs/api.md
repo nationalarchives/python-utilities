@@ -5,7 +5,7 @@
 ### Simple example
 
 ```python
-from tna_utilities.flask.api import SimpleJsonApiClient
+from tna_utilities.api import SimpleJsonApiClient
 
 # Create an API client with a base URL
 client = SimpleJsonApiClient("https://wagtail.nationalarchives.gov.uk/api/v2")
@@ -20,28 +20,28 @@ global_notifications = client.get("global-notifications")
 ### Handling errors
 
 ```python
-from tna_utilities.flask.api import SimpleJsonApiClient
+from tna_utilities.api import SimpleJsonApiClient
 
 client = SimpleJsonApiClient("https://wagtail.nationalarchives.gov.uk/api/v2")
 
 try:
     pages = client.get("pages")
 except Exception as error:
-    print(f"An error occured with the API: {error}")
+    print(f"An error occurred with the API: {error}")
     pages = []
 ```
 
 You can catch and handle some of the more common exceptions:
 
-- `tna_utilities.flask.api.ResourceForbidden`
-- `tna_utilities.flask.api.ResourceNotFound`
-- `tna_utilities.flask.api.ResourceUnauthorized`
+- `tna_utilities.api.ResourceForbidden`
+- `tna_utilities.api.ResourceNotFound`
+- `tna_utilities.api.ResourceUnauthorized`
 
-You can also catch [expections raised by `requests`](https://requests.readthedocs.io/en/latest/_modules/requests/exceptions/).
+You can also catch [exceptions raised by `requests`](https://requests.readthedocs.io/en/latest/_modules/requests/exceptions/).
 
 ```python
 from requests import Timeout
-from tna_utilities.flask.api import SimpleJsonApiClient
+from tna_utilities.api import SimpleJsonApiClient
 
 client = SimpleJsonApiClient("https://wagtail.nationalarchives.gov.uk/api/v2")
 
@@ -55,7 +55,7 @@ except Timeout:
 ### Headers
 
 ```python
-from tna_utilities.flask.api import SimpleJsonApiClient
+from tna_utilities.api import SimpleJsonApiClient
 
 # Set a default header for any request from the client
 client = SimpleJsonApiClient(
@@ -66,7 +66,7 @@ client = SimpleJsonApiClient(
 )
 
 # Append a default header to all requests
-client.add_header("Authorization", "Token abc123")
+client.add_default_header("Authorization", "Token abc123")
 
 # Add a specific header to the GET request
 #   Host: my.test.client.com
@@ -87,7 +87,7 @@ global_notifications = client.get("global-notifications")
 ### Query parameters
 
 ```python
-from tna_utilities.flask.api import SimpleJsonApiClient
+from tna_utilities.api import SimpleJsonApiClient
 
 # Append a default query parameter to all requests
 client = SimpleJsonApiClient(
@@ -98,7 +98,7 @@ client = SimpleJsonApiClient(
 )
 
 # Append a default query parameter to all requests
-client.add_parameter("limit", "100")
+client.add_default_parameter("limit", "100")
 
 # https://wagtail.nationalarchives.gov.uk/api/v2/pages/?format=json&limit=100&offset=400
 pages = client.get(
