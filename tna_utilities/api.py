@@ -127,6 +127,7 @@ class SimpleJsonApiClient:
         :param json: Optional JSON serialisable Python object to send in the request body.
         :param params: Optional dictionary of query parameters to include in the request. These will be merged with any default parameters set for the client.
         :param headers: Optional dictionary of headers to include in the request. These will be merged with any default headers set for the client.
+        :param timeout: Request timeout in seconds.
         """
 
         url = self._normalise_url(path)
