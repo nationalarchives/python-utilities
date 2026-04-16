@@ -276,7 +276,7 @@ class CspGenerator:
         """
         Add a report-uri directive.
 
-        The report-uri directive is deprecated in favor of report-to however, it is still supported by a few browsers.
+        The report-uri directive is deprecated in favor of report-to, however, it is still supported by a few browsers.
 
         For new implementations, it is recommended to use report-to instead of report-uri.
         """
