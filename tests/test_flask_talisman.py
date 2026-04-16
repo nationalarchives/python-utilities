@@ -89,7 +89,11 @@ class TestTalisman(unittest.TestCase):
         self.assertIn("Content-Security-Policy", rv.headers)
         self.assertIn("default-src 'self';", rv.headers["Content-Security-Policy"])
         self.assertIn(
-            "frame-src 'self' www.google.com www.youtube.com;",
+            "connect-src 'self' *.google-analytics.com www.googletagmanager.com;",
+            rv.headers["Content-Security-Policy"],
+        )
+        self.assertIn(
+            "frame-src 'self' www.google.com www.youtube.com www.youtube-nocookie.com;",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(

@@ -9,6 +9,7 @@ GOOGLE_CSP_DIRECTIVES = {
     "frame-src": [
         "www.google.com",  # <iframe> based embeds for Google Maps
         "www.youtube.com",  # <iframe> based embeds for Youtube
+        "www.youtube-nocookie.com",  # <iframe> based embeds for Youtube without cookies
     ],
     "img-src": [
         "img.youtube.com",  # YouTube video thumbnails
@@ -27,6 +28,10 @@ GOOGLE_CSP_DIRECTIVES = {
         "ajax.googleapis.com",  # YouTube embedded player styles
         "fonts.googleapis.com",  # Google Fonts stylesheets
         "*.gstatic.com",  # Assorted Google stylesheets
+    ],
+    "connect-src": [
+        "*.google-analytics.com",  # GA4
+        "www.googletagmanager.com",  # GTM
     ],
 }
 
