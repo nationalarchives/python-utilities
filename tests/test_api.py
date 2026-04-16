@@ -130,3 +130,88 @@ class TestSimpleJsonApiClient(TestCase):
         response = client.post("/post", json=json.dumps({"foo": "bar"}))
         self.assertEqual(type(response), dict)
         self.assertDictEqual(response, {"response": "success"})
+
+    def test_default_headers(self):
+        client = SimpleJsonApiClient(MOCK_API_BASE_URL)
+        self.assertDictEqual(
+            client.headers,
+            {
+                "Cache-Control": "no-cache",
+                "Accept": "application/json",
+            },
+        )
+
+    def test_blank_default_headers(self):
+        client = SimpleJsonApiClient(MOCK_API_BASE_URL, default_headers={})
+        self.assertDictEqual(
+            client.headers,
+            {},
+        )
+
+    def test_appending_to_default_headers(self):
+        client = SimpleJsonApiClient(MOCK_API_BASE_URL)
+        client.add_default_header("Authorization", "Bearer token")
+        self.assertDictEqual(
+            client.headers,
+            {
+                "Cache-Control": "no-cache",
+                "Accept": "application/json",
+                "Authorization": "Bearer token",
+            },
+        )
+
+    def test_updating_default_headers(self):
+        client = SimpleJsonApiClient(MOCK_API_BASE_URL)
+        client.add_default_header("Accept", "application/xml")
+        self.assertDictEqual(
+            client.headers,
+            {
+                "Cache-Control": "no-cache",
+                "Accept": "application/xml",
+            },
+        )
+
+    def test_appending_headers(self):
+        client = SimpleJsonApiClient(
+            MOCK_API_BASE_URL,
+            default_headers={"Authorization": "Bearer token"},
+        )
+        client.add_default_header("Cache-Control", "no-cache")
+        self.assertDictEqual(
+            client.headers,
+            {
+                "Cache-Control": "no-cache",
+                "Authorization": "Bearer token",
+            },
+        )
+
+    def test_custom_default_headers(self):
+        client = SimpleJsonApiClient(
+            MOCK_API_BASE_URL, default_headers={"Authorization": "Bearer token"}
+        )
+        self.assertDictEqual(
+            client.headers,
+            {
+                "Authorization": "Bearer token",
+            },
+        )
+
+    def test_default_params(self):
+        client = SimpleJsonApiClient(
+            MOCK_API_BASE_URL, default_params={"api_key": "secret"}
+        )
+        self.assertDictEqual(client.params, {"api_key": "secret"})
+
+    def test_appending_to_default_params(self):
+        client = SimpleJsonApiClient(
+            MOCK_API_BASE_URL, default_params={"api_key": "secret"}
+        )
+        client.add_default_parameter("user_id", "12345")
+        self.assertDictEqual(client.params, {"api_key": "secret", "user_id": "12345"})
+
+    def test_updating_default_params(self):
+        client = SimpleJsonApiClient(
+            MOCK_API_BASE_URL, default_params={"api_key": "secret"}
+        )
+        client.add_default_parameter("api_key", "new_secret")
+        self.assertDictEqual(client.params, {"api_key": "new_secret"})

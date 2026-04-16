@@ -28,7 +28,10 @@ class SimpleJsonApiClient:
     """
 
     def __init__(
-        self, api_url: str, default_headers: dict = {}, default_params: dict = {}
+        self,
+        api_url: str,
+        default_headers: dict | None = None,
+        default_params: dict | None = None,
     ):
         self.api_url: str = api_url.rstrip("/")
         self.headers: dict = (
@@ -36,26 +39,12 @@ class SimpleJsonApiClient:
                 "Cache-Control": "no-cache",
                 "Accept": "application/json",
             }
-            if default_headers
-            else default_headers
+            if default_headers is None
+            else default_headers.copy()
         )
-        self.params: dict = default_params
-
-    def add_default_parameter(self, key: str, value) -> "SimpleJsonApiClient":
-        """
-        Add a single default parameter to the requests.
-        """
-
-        self.params[key] = value
-        return self
-
-    def add_default_parameters(self, params: dict) -> "SimpleJsonApiClient":
-        """
-        Add multiple default parameters to the requests.
-        """
-
-        self.params = self.params | params
-        return self
+        if default_params is None:
+            default_params = {}
+        self.params: dict = default_params.copy()
 
     def add_default_header(self, key: str, value) -> "SimpleJsonApiClient":
         """
@@ -71,6 +60,22 @@ class SimpleJsonApiClient:
         """
 
         self.headers = self.headers | headers
+        return self
+
+    def add_default_parameter(self, key: str, value) -> "SimpleJsonApiClient":
+        """
+        Add a single default parameter to the requests.
+        """
+
+        self.params[key] = value
+        return self
+
+    def add_default_parameters(self, params: dict) -> "SimpleJsonApiClient":
+        """
+        Add multiple default parameters to the requests.
+        """
+
+        self.params = self.params | params
         return self
 
     def _normalise_url(self, path: str) -> str:
