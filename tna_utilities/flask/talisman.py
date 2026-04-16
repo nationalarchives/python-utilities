@@ -60,10 +60,10 @@ class Talisman(object):
     def init_app(
         self,
         app: flask.Flask,
-        content_security_policy: dict = {},
+        content_security_policy: dict | None = None,
         allow_google_content_security_policy: bool = False,
         allow_typekit_content_security_policy: bool = False,
-        security_headers: dict = {},
+        security_headers: dict | None = None,
         referrer_policy: str = "strict-origin-when-cross-origin",
         force_https: bool = True,
         force_https_permanent: bool = False,
@@ -79,6 +79,9 @@ class Talisman(object):
         :param force_https: If True, forces incoming requests to be redirected to HTTPS if they are not already secure and the application is not in debug mode. Defaults to True.
         :param force_https_permanent: If True, uses a permanent redirect (HTTP 301) when forcing HTTPS, otherwise uses a temporary redirect (HTTP 302). Defaults to False.
         """
+
+        content_security_policy = content_security_policy or {}
+        security_headers = security_headers or {}
 
         self.app = app
 

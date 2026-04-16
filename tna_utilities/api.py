@@ -98,6 +98,7 @@ class SimpleJsonApiClient:
         :param path: The path to append to the base API URL for the request.
         :param params: Optional dictionary of query parameters to include in the request. These will be merged with any default parameters set for the client.
         :param headers: Optional dictionary of headers to include in the request. These will be merged with any default headers set for the client.
+        :param timeout: Timeout in seconds for the request. Defaults to 10.
         """
 
         url = self._normalise_url(path)
@@ -127,6 +128,7 @@ class SimpleJsonApiClient:
         :param json: Optional JSON serialisable Python object to send in the request body.
         :param params: Optional dictionary of query parameters to include in the request. These will be merged with any default parameters set for the client.
         :param headers: Optional dictionary of headers to include in the request. These will be merged with any default headers set for the client.
+        :param timeout: Request timeout in seconds.
         """
 
         url = self._normalise_url(path)
@@ -151,11 +153,24 @@ class SimpleJsonApiClient:
             except JSONDecodeError:
                 raise Exception("Non-JSON response provided")
         if response.status_code == 400:
-            raise Exception("Bad request")
+            try:
+                error_body = response.json()
+            except JSONDecodeError:
+                error_body = response.text
+            raise Exception(f"Bad request for URL '{response.url}': {error_body}")
         if response.status_code == 401:
             raise ResourceUnauthorized("Unauthorised")
         if response.status_code == 403:
             raise ResourceForbidden("Forbidden")
         if response.status_code == 404:
             raise ResourceNotFound("Resource not found")
-        raise Exception(f"Request failed with {response.status_code}")
+        body_preview = (response.text or "").strip()
+        if body_preview:
+            body_preview = body_preview[:500]
+            raise Exception(
+                f"Request failed with status {response.status_code} for URL {response.url}. "
+                f"Response body: {body_preview}"
+            )
+        raise Exception(
+            f"Request failed with status {response.status_code} for URL {response.url}"
+        )
