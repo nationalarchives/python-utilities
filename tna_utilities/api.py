@@ -98,6 +98,7 @@ class SimpleJsonApiClient:
         :param path: The path to append to the base API URL for the request.
         :param params: Optional dictionary of query parameters to include in the request. These will be merged with any default parameters set for the client.
         :param headers: Optional dictionary of headers to include in the request. These will be merged with any default headers set for the client.
+        :param timeout: Timeout in seconds for the request. Defaults to 10.
         """
 
         url = self._normalise_url(path)
