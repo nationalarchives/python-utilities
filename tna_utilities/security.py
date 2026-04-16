@@ -434,6 +434,13 @@ class CspGenerator:
     def to_string(self, simplify=False) -> str:
         """
         Get the complete CSP as a string.
+
+        :param simplify: If True, omit directives whose source list is identical
+            to the ``default-src`` directive, keeping only ``default-src`` and
+            directives that differ from it. This produces a more compact CSP
+            representation without changing its effective policy.
+        :return: The CSP as a semicolon-separated string suitable for use in
+            the Content-Security-Policy HTTP header.
         """
 
         directives = self.directives.copy()
