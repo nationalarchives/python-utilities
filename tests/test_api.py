@@ -99,28 +99,28 @@ class TestSimpleJsonApiClient(TestCase):
 
     @mock.patch("requests.get", side_effect=mocked_requests_get)
     @mock.patch("requests.post", side_effect=mocked_requests_post)
-    def test_resource_forbidden(self, mock_get, mock_post):
+    def test_resource_forbidden(self, mock_post, mock_get):
         client = SimpleJsonApiClient(MOCK_API_BASE_URL)
         with self.assertRaises(ResourceForbidden):
             client.get("/forbidden")
 
     @mock.patch("requests.get", side_effect=mocked_requests_get)
     @mock.patch("requests.post", side_effect=mocked_requests_post)
-    def test_resource_timeout(self, mock_get, mock_post):
+    def test_resource_timeout(self, mock_post, mock_get):
         client = SimpleJsonApiClient(MOCK_API_BASE_URL)
         with self.assertRaises(Timeout):
             client.get("/timeout")
 
     @mock.patch("requests.get", side_effect=mocked_requests_get)
     @mock.patch("requests.post", side_effect=mocked_requests_post)
-    def test_other_exception(self, mock_get, mock_post):
+    def test_other_exception(self, mock_post, mock_get):
         client = SimpleJsonApiClient(MOCK_API_BASE_URL)
         with self.assertRaises(Exception):
             client.get("/servererror")
 
     @mock.patch("requests.get", side_effect=mocked_requests_get)
     @mock.patch("requests.post", side_effect=mocked_requests_post)
-    def test_post(self, mock_get, mock_post):
+    def test_post(self, mock_post, mock_get):
         client = SimpleJsonApiClient(MOCK_API_BASE_URL)
         response = client.post("/post", data={"foo": "bar"})
         self.assertEqual(type(response), dict)
@@ -128,7 +128,7 @@ class TestSimpleJsonApiClient(TestCase):
 
     @mock.patch("requests.get", side_effect=mocked_requests_get)
     @mock.patch("requests.post", side_effect=mocked_requests_post)
-    def test_post_json(self, mock_get, mock_post):
+    def test_post_json(self, mock_post, mock_get):
         client = SimpleJsonApiClient(MOCK_API_BASE_URL)
         response = client.post("/post", json=json.dumps({"foo": "bar"}))
         self.assertEqual(type(response), dict)
