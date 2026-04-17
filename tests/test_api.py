@@ -15,11 +15,14 @@ MOCK_API_BASE_URL = "http://mockapi.com/"
 def mocked_requests_get(*args, **kwargs):
     class MockResponse:
         def __init__(
-            self, json_data: dict | None, status_code: int, headers: dict = {}
+            self,
+            json_data: dict | None,
+            status_code: int,
+            headers: dict | None = None,
         ):
             self.json_data = json_data
             self.status_code = status_code
-            self.headers = headers
+            self.headers = headers if headers is not None else {}
 
         def json(self):
             return self.json_data
@@ -67,7 +70,7 @@ def mocked_requests_post(*args, **kwargs):
 class TestSimpleJsonApiClient(TestCase):
     @mock.patch("requests.get", side_effect=mocked_requests_get)
     @mock.patch("requests.post", side_effect=mocked_requests_post)
-    def test_happy(self, mock_get, mock_post):
+    def test_happy(self, mock_post, mock_get):
         client = SimpleJsonApiClient(MOCK_API_BASE_URL)
         response = client.get("/happy")
         self.assertEqual(type(response), dict)
@@ -75,21 +78,21 @@ class TestSimpleJsonApiClient(TestCase):
 
     @mock.patch("requests.get", side_effect=mocked_requests_get)
     @mock.patch("requests.post", side_effect=mocked_requests_post)
-    def test_bad_request(self, mock_get, mock_post):
+    def test_bad_request(self, mock_post, mock_get):
         client = SimpleJsonApiClient(MOCK_API_BASE_URL)
         with self.assertRaises(Exception):
             client.get("/badrequest")
 
     @mock.patch("requests.get", side_effect=mocked_requests_get)
     @mock.patch("requests.post", side_effect=mocked_requests_post)
-    def test_not_found(self, mock_get, mock_post):
+    def test_not_found(self, mock_post, mock_get):
         client = SimpleJsonApiClient(MOCK_API_BASE_URL)
         with self.assertRaises(ResourceNotFound):
             client.get("/notfound")
 
     @mock.patch("requests.get", side_effect=mocked_requests_get)
     @mock.patch("requests.post", side_effect=mocked_requests_post)
-    def test_resource_unauthorized(self, mock_get, mock_post):
+    def test_resource_unauthorized(self, mock_post, mock_get):
         client = SimpleJsonApiClient(MOCK_API_BASE_URL)
         with self.assertRaises(ResourceUnauthorized):
             client.get("/unauthorized")
