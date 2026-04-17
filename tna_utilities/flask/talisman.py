@@ -88,7 +88,7 @@ class Talisman:
             SESSION_COOKIE_SECURE=force_https and not self.app.debug,
             SESSION_COOKIE_HTTPONLY=True,
             SESSION_COOKIE_SAMESITE="Lax",
-            PERMANENT_SESSION_LIFETIME=86400,  # 1 day
+            PERMANENT_SESSION_LIFETIME=60 * 60 * 24,  # 1 day
         )
 
         self.content_security_policy = content_security_policy
@@ -118,8 +118,16 @@ class Talisman:
         if self.force_https and not any(criteria):
             if flask.request.url.startswith("http://"):
                 parsed = urlparse(flask.request.url)
-                secure_parsed = parsed._replace(scheme="https", fragment="")
-                target = urlunparse(secure_parsed)
+                target = urlunparse(
+                    (
+                        "https",
+                        parsed.netloc,
+                        parsed.path,
+                        parsed.params,
+                        parsed.query,
+                        "",
+                    )
+                )
                 code = 302
                 if self.force_https_permanent:
                     code = 301
