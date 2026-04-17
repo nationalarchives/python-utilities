@@ -46,7 +46,7 @@ class SimpleJsonApiClient:
             default_params = {}
         self.params: dict = default_params.copy()
 
-    def add_default_header(self, key: str, value) -> "SimpleJsonApiClient":
+    def add_default_header(self, key: str, value: str) -> "SimpleJsonApiClient":
         """
         Add a single default header to the requests.
         """
