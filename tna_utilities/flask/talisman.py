@@ -192,7 +192,7 @@ class Talisman(object):
                 csp.add_directive(x, *y)
 
         if allow_typekit_content_security_policy:
-            for x, y in TYPEKIT_CSP_DIRECTIVES.items():
-                csp.add_directive(x, *y)
+            for directive, values in TYPEKIT_CSP_DIRECTIVES.items():
+                csp.add_directive(directive, *values)
 
         return csp.to_string()
