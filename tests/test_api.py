@@ -113,7 +113,7 @@ class TestSimpleJsonApiClient(TestCase):
 
     @mock.patch("requests.get", side_effect=mocked_requests_get)
     @mock.patch("requests.post", side_effect=mocked_requests_post)
-    def test_other_exception(self, mock_get, mock_post):
+    def test_other_exception(self, mock_post, mock_get):
         client = SimpleJsonApiClient(MOCK_API_BASE_URL)
         with self.assertRaises(Exception):
             client.get("/servererror")
