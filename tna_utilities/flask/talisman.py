@@ -43,7 +43,7 @@ TYPEKIT_CSP_DIRECTIVES = {
 }
 
 
-class Talisman(object):
+class Talisman:
     """
     A stripped-down and opinionated reproduction of [wntrblm/flask-talisman](https://github.com/wntrblm/flask-talisman) which is in turn a fork of [GoogleCloudPlatform/flask-talisman](https://github.com/GoogleCloudPlatform/flask-talisman).
 
