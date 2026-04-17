@@ -99,6 +99,10 @@ class SimpleJsonApiClient:
         :param params: Optional dictionary of query parameters to include in the request. These will be merged with any default parameters set for the client.
         :param headers: Optional dictionary of headers to include in the request. These will be merged with any default headers set for the client.
         :param timeout: Timeout in seconds for the request. Defaults to 10.
+        :raises ResourceNotFound: If the requested resource is not found (HTTP 404).
+        :raises ResourceForbidden: If access to the resource is forbidden (HTTP 403).
+        :raises ResourceUnauthorized: If authentication is required or has failed (HTTP 401).
+        :raises Exception: For unexpected response handling or request-processing errors.
         """
 
         url = self._normalise_url(path)
@@ -129,6 +133,10 @@ class SimpleJsonApiClient:
         :param params: Optional dictionary of query parameters to include in the request. These will be merged with any default parameters set for the client.
         :param headers: Optional dictionary of headers to include in the request. These will be merged with any default headers set for the client.
         :param timeout: Request timeout in seconds.
+        :raises ResourceNotFound: If the requested resource is not found (HTTP 404).
+        :raises ResourceForbidden: If access to the resource is forbidden (HTTP 403).
+        :raises ResourceUnauthorized: If authentication is required or has failed (HTTP 401).
+        :raises Exception: For other non-success responses or unexpected response handling errors.
         """
 
         url = self._normalise_url(path)
@@ -151,16 +159,13 @@ class SimpleJsonApiClient:
             try:
                 return response.json()
             except JSONDecodeError:
-                raise Exception(
-                    f"Non-JSON response provided for URL {response.url} "
-                    f"with status {response.status_code}"
-                )
+                raise Exception("Non-JSON response provided")
         if response.status_code == 400:
             try:
                 error_body = response.json()
             except JSONDecodeError:
                 error_body = response.text
-            raise Exception(f"Bad request for URL '{response.url}': {error_body}")
+            raise Exception(f"Bad request: {error_body}")
         if response.status_code == 401:
             raise ResourceUnauthorized("Unauthorized")
         if response.status_code == 403:
