@@ -151,7 +151,10 @@ class SimpleJsonApiClient:
             try:
                 return response.json()
             except JSONDecodeError:
-                raise Exception("Non-JSON response provided")
+                raise Exception(
+                    f"Non-JSON response provided for URL {response.url} "
+                    f"with status {response.status_code}"
+                )
         if response.status_code == 400:
             try:
                 error_body = response.json()
