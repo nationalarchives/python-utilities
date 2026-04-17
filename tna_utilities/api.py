@@ -162,7 +162,7 @@ class SimpleJsonApiClient:
                 error_body = response.text
             raise Exception(f"Bad request for URL '{response.url}': {error_body}")
         if response.status_code == 401:
-            raise ResourceUnauthorized("Unauthorized")
+            raise ResourceUnauthorized(f"Unauthorized for URL {response.url}")
         if response.status_code == 403:
             raise ResourceForbidden(f"Forbidden for URL '{response.url}'")
         if response.status_code == 404:
