@@ -99,6 +99,10 @@ class SimpleJsonApiClient:
         :param params: Optional dictionary of query parameters to include in the request. These will be merged with any default parameters set for the client.
         :param headers: Optional dictionary of headers to include in the request. These will be merged with any default headers set for the client.
         :param timeout: Timeout in seconds for the request. Defaults to 10.
+        :raises ResourceNotFound: If the requested resource is not found (HTTP 404).
+        :raises ResourceForbidden: If access to the resource is forbidden (HTTP 403).
+        :raises ResourceUnauthorized: If authentication is required or has failed (HTTP 401).
+        :raises Exception: For unexpected response handling or request-processing errors.
         """
 
         url = self._normalise_url(path)
