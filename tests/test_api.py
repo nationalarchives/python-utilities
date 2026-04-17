@@ -46,12 +46,12 @@ def mocked_requests_post(*args, **kwargs):
             self,
             json_data: dict | None,
             status_code: int,
-            headers: dict = {},
+            headers: dict | None = None,
             data: dict | None = None,
             json: dict | None = None,
         ):
             self.status_code = status_code
-            self.headers = headers
+            self.headers = headers if headers is not None else {}
             self.data = data
             self.json_data = json_data
 
