@@ -15,11 +15,14 @@ MOCK_API_BASE_URL = "http://mockapi.com/"
 def mocked_requests_get(*args, **kwargs):
     class MockResponse:
         def __init__(
-            self, json_data: dict | None, status_code: int, headers: dict = {}
+            self,
+            json_data: dict | None,
+            status_code: int,
+            headers: dict | None = None,
         ):
             self.json_data = json_data
             self.status_code = status_code
-            self.headers = headers
+            self.headers = headers if headers is not None else {}
 
         def json(self):
             return self.json_data
