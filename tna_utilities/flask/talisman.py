@@ -54,7 +54,6 @@ class Talisman:
 
     def __init__(self, app=None, **kwargs):
         if app is not None:
-            self.app = app
             self.init_app(app, **kwargs)
 
     def init_app(
@@ -179,6 +178,8 @@ class Talisman:
             ("worker-src", csp.worker_src),
         ]
         for directive, method in property_methods:
+            # Intentionally pass an empty string for missing optional directives;
+            # CspGenerator setters treat this as "not set" while keeping call signatures consistent.
             method(content_security_policy.get(directive, ""))
 
         if "sandbox" in content_security_policy:
