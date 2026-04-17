@@ -188,8 +188,8 @@ class Talisman:
             csp.require_trusted_types_for()
 
         if allow_google_content_security_policy:
-            for x, y in GOOGLE_CSP_DIRECTIVES.items():
-                csp.add_directive(x, *y)
+            for directive, values in GOOGLE_CSP_DIRECTIVES.items():
+                csp.add_directive(directive, *values)
 
         if allow_typekit_content_security_policy:
             for directive, values in TYPEKIT_CSP_DIRECTIVES.items():
