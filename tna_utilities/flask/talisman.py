@@ -118,8 +118,16 @@ class Talisman:
         if self.force_https and not any(criteria):
             if flask.request.url.startswith("http://"):
                 parsed = urlparse(flask.request.url)
-                secure_parsed = parsed._replace(scheme="https", fragment="")
-                target = urlunparse(secure_parsed)
+                target = urlunparse(
+                    (
+                        "https",
+                        parsed.netloc,
+                        parsed.path,
+                        parsed.params,
+                        parsed.query,
+                        "",
+                    )
+                )
                 code = 302
                 if self.force_https_permanent:
                     code = 301
