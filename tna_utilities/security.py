@@ -276,7 +276,7 @@ class CspGenerator:
         """
         Add a report-uri directive.
 
-        The report-uri directive is deprecated in favor of report-to however, it is still supported by a few browsers.
+        The report-uri directive is deprecated in favor of report-to, however, it is still supported by a few browsers.
 
         For new implementations, it is recommended to use report-to instead of report-uri.
         """
@@ -313,7 +313,35 @@ class CspGenerator:
 
     def sandbox(self, value: str | None = None) -> "CspGenerator":
         """
-        Add a sandbox directive.
+        Add or configure the CSP ``sandbox`` directive.
+
+        The CSP ``sandbox`` directive enables a set of restrictions for the
+        framed content. When a sandbox directive is present with no allowed
+        flags, all sandbox restrictions are applied.
+
+        :param value:
+            Optional sandbox permission token to allow within the sandboxed
+            context. Must be one of:
+
+            - ``"allow-downloads"``
+            - ``"allow-forms"``
+            - ``"allow-modals"``
+            - ``"allow-orientation-lock"``
+            - ``"allow-pointer-lock"``
+            - ``"allow-popups"``
+            - ``"allow-popups-to-escape-sandbox"``
+            - ``"allow-presentation"``
+            - ``"allow-same-origin"``
+            - ``"allow-scripts"``
+            - ``"allow-top-navigation"``
+            - ``"allow-top-navigation-by-user-activation"``
+            - ``"allow-top-navigation-to-custom-protocols"``
+
+            If ``value`` is ``None`` (the default) or not one of the allowed
+            tokens, no sandbox flags are added and a bare ``sandbox`` directive
+            is generated, applying all sandbox restrictions.
+
+        :returns: This ``CspGenerator`` instance to allow method chaining.
         """
 
         values = [
@@ -434,6 +462,13 @@ class CspGenerator:
     def to_string(self, simplify=False) -> str:
         """
         Get the complete CSP as a string.
+
+        :param simplify: If True, omit directives whose source list is identical
+            to the ``default-src`` directive, keeping only ``default-src`` and
+            directives that differ from it. This produces a more compact CSP
+            representation without changing its effective policy.
+        :return: The CSP as a semicolon-separated string suitable for use in
+            the Content-Security-Policy HTTP header.
         """
 
         directives = self.directives.copy()

@@ -43,7 +43,7 @@ TYPEKIT_CSP_DIRECTIVES = {
 }
 
 
-class Talisman(object):
+class Talisman:
     """
     A stripped-down and opinionated reproduction of [wntrblm/flask-talisman](https://github.com/wntrblm/flask-talisman) which is in turn a fork of [GoogleCloudPlatform/flask-talisman](https://github.com/GoogleCloudPlatform/flask-talisman).
 
@@ -192,7 +192,7 @@ class Talisman(object):
                 csp.add_directive(x, *y)
 
         if allow_typekit_content_security_policy:
-            for x, y in TYPEKIT_CSP_DIRECTIVES.items():
-                csp.add_directive(x, *y)
+            for directive, values in TYPEKIT_CSP_DIRECTIVES.items():
+                csp.add_directive(directive, *values)
 
         return csp.to_string()
