@@ -31,6 +31,9 @@ class TestTalisman(unittest.TestCase):
         self.assertNotIn("Cross-Origin-Opener-Policy", rv.headers)
         self.assertNotIn("Cross-Origin-Resource-Policy", rv.headers)
 
+        self.assertNotIn("Referrer-Policy", rv.headers)
+        self.assertNotIn("Access-Control-Allow-Origin", rv.headers)
+
         self.assertIn("Set-Cookie", rv.headers)
         self.assertIn("session=", rv.headers["Set-Cookie"])
         self.assertNotIn("Secure", rv.headers["Set-Cookie"])
@@ -58,6 +61,11 @@ class TestTalisman(unittest.TestCase):
         self.assertEqual("same-origin", rv.headers["Cross-Origin-Opener-Policy"])
         self.assertIn("Cross-Origin-Resource-Policy", rv.headers)
         self.assertEqual("same-origin", rv.headers["Cross-Origin-Resource-Policy"])
+
+        self.assertIn("Referrer-Policy", rv.headers)
+        self.assertEqual(
+            "strict-origin-when-cross-origin", rv.headers["Referrer-Policy"]
+        )
 
         self.assertIn("Set-Cookie", rv.headers)
         self.assertIn("session=", rv.headers["Set-Cookie"])
@@ -89,7 +97,7 @@ class TestTalisman(unittest.TestCase):
         self.assertIn("Content-Security-Policy", rv.headers)
         self.assertIn("default-src 'self';", rv.headers["Content-Security-Policy"])
         self.assertIn(
-            "connect-src 'self' *.google-analytics.com www.googletagmanager.com;",
+            "connect-src 'self' *.google-analytics.com *.googletagmanager.com *.analytics.google.com;",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
@@ -97,19 +105,19 @@ class TestTalisman(unittest.TestCase):
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
-            "font-src 'self' *.gstatic.com;",
+            "font-src 'self' *.gstatic.com data:;",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
-            "img-src 'self' img.youtube.com i.ytimg.com www.googletagmanager.com;",
+            "img-src 'self' img.youtube.com i.ytimg.com *.googletagmanager.com ssl.gstatic.com www.gstatic.com *.google-analytics.com;",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
-            "script-src 'self' ajax.googleapis.com *.googleanalytics.com *.google-analytics.com www.youtube.com *.gstatic.com www.googletagmanager.com;",
+            "script-src 'self' ajax.googleapis.com *.googleanalytics.com *.google-analytics.com www.youtube.com *.gstatic.com *.googletagmanager.com tagmanager.google.com;",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
-            "style-src 'self' ajax.googleapis.com fonts.googleapis.com *.gstatic.com;",
+            "style-src 'self' ajax.googleapis.com fonts.googleapis.com *.gstatic.com googletagmanager.com tagmanager.google.com;",
             rv.headers["Content-Security-Policy"],
         )
 
@@ -144,15 +152,15 @@ class TestTalisman(unittest.TestCase):
 
         self.assertIn("Content-Security-Policy", rv.headers)
         self.assertIn(
-            "font-src 'self' *.gstatic.com use.typekit.net;",
+            "font-src 'self' *.gstatic.com data: use.typekit.net;",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
-            "style-src 'self' ajax.googleapis.com fonts.googleapis.com *.gstatic.com *.typekit.net;",
+            "style-src 'self' ajax.googleapis.com fonts.googleapis.com *.gstatic.com googletagmanager.com tagmanager.google.com *.typekit.net;",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
-            "img-src 'self' img.youtube.com i.ytimg.com www.googletagmanager.com;",
+            "img-src 'self' img.youtube.com i.ytimg.com *.googletagmanager.com ssl.gstatic.com www.gstatic.com *.google-analytics.com;",
             rv.headers["Content-Security-Policy"],
         )
 
@@ -201,7 +209,7 @@ class TestTalisman(unittest.TestCase):
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
-            "img-src 'self' img.example.com img.youtube.com i.ytimg.com www.googletagmanager.com;",
+            "img-src 'self' img.example.com img.youtube.com i.ytimg.com *.googletagmanager.com ssl.gstatic.com www.gstatic.com *.google-analytics.com;",
             rv.headers["Content-Security-Policy"],
         )
 
@@ -230,4 +238,16 @@ class TestTalisman(unittest.TestCase):
         self.assertEqual(
             "https://localhost/foobar?test=1",
             rv.headers["Location"],
+        )
+
+    def test_talisman_allow_cors_origin(self):
+        Talisman(self.app, force_https=False, allow_cors_origin="https://example.com")
+
+        rv = self.test_client.get("/")
+
+        self.assertEqual(rv.status_code, 200)
+
+        self.assertIn("Access-Control-Allow-Origin", rv.headers)
+        self.assertEqual(
+            "https://example.com", rv.headers["Access-Control-Allow-Origin"]
         )

@@ -5,7 +5,10 @@ import flask
 from ..security import CspGenerator, common_security_headers
 
 GOOGLE_CSP_DIRECTIVES = {
-    "font-src": ["*.gstatic.com"],  # Fonts from fonts.google.com
+    "font-src": [
+        "*.gstatic.com",  # Fonts from fonts.google.com
+        "data:",  # Fonts for GTM preview mode
+    ],
     "frame-src": [
         "www.google.com",  # <iframe> based embeds for Google Maps
         "www.youtube.com",  # <iframe> based embeds for Youtube
@@ -14,7 +17,10 @@ GOOGLE_CSP_DIRECTIVES = {
     "img-src": [
         "img.youtube.com",  # YouTube video thumbnails
         "i.ytimg.com",  # YouTube video thumbnails
-        "www.googletagmanager.com",  # GTM
+        "*.googletagmanager.com",  # GTM
+        "ssl.gstatic.com",  # GTM preview mode
+        "www.gstatic.com",  # GTM preview mode
+        "*.google-analytics.com",  # GA4
     ],
     "script-src": [
         "ajax.googleapis.com",  # Assorted Google-hosted Libraries/APIs
@@ -22,16 +28,20 @@ GOOGLE_CSP_DIRECTIVES = {
         "*.google-analytics.com",  # GA4
         "www.youtube.com",  # YouTube embeds
         "*.gstatic.com",  # Google Translate
-        "www.googletagmanager.com",  # GTM
+        "*.googletagmanager.com",  # GTM preview mode
+        "tagmanager.google.com",  # GTM preview mode
     ],
     "style-src": [
         "ajax.googleapis.com",  # YouTube embedded player styles
         "fonts.googleapis.com",  # Google Fonts stylesheets
         "*.gstatic.com",  # Assorted Google stylesheets
+        "googletagmanager.com",  # GTM preview mode
+        "tagmanager.google.com",  # GTM preview mode
     ],
     "connect-src": [
         "*.google-analytics.com",  # GA4
-        "www.googletagmanager.com",  # GTM
+        "*.googletagmanager.com",  # GTM preview mode
+        "*.analytics.google.com",  # GA4
     ],
 }
 
@@ -66,6 +76,7 @@ class Talisman:
         referrer_policy: str = "strict-origin-when-cross-origin",
         force_https: bool = True,
         force_https_permanent: bool = False,
+        allow_cors_origin: str | None = None,
     ):
         """
         Initialises the Talisman extension for the Flask app.
@@ -77,6 +88,7 @@ class Talisman:
         :param referrer_policy: The Referrer-Policy header value to apply to responses. Defaults to "strict-origin-when-cross-origin".
         :param force_https: If True, forces incoming requests to be redirected to HTTPS if they are not already secure and the application is not in debug mode. Defaults to True.
         :param force_https_permanent: If True, uses a permanent redirect (HTTP 301) when forcing HTTPS, otherwise uses a temporary redirect (HTTP 302). Defaults to False.
+        :param allow_cors_origin: If specified, sets the Access-Control-Allow-Origin header to the given value. Defaults to None.
         """
 
         content_security_policy = content_security_policy or {}
@@ -100,6 +112,7 @@ class Talisman:
         self.referrer_policy = referrer_policy
         self.force_https = force_https
         self.force_https_permanent = force_https_permanent
+        self.allow_cors_origin = allow_cors_origin
 
         self.app.before_request(self._force_https_redirect)
         self.app.after_request(self._apply_extra_headers)
@@ -148,6 +161,8 @@ class Talisman:
         )
         response.headers.update(common_security_headers(**self.security_headers))
         response.headers["Referrer-Policy"] = self.referrer_policy
+        if self.allow_cors_origin:
+            response.headers["Access-Control-Allow-Origin"] = self.allow_cors_origin
         return response
 
     def _csp(
