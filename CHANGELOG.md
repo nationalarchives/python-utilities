@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added option in Flask Talisman to add Adobe Typekit CSP rules with `allow_typekit_content_security_policy=True`
+- Allow `Access-Control-Allow-Origin` header to be set in `Talisman` with `allow_cors_origin`
 
 ### Changed
 
