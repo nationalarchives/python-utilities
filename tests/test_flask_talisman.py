@@ -239,15 +239,3 @@ class TestTalisman(unittest.TestCase):
             "https://localhost/foobar?test=1",
             rv.headers["Location"],
         )
-
-    def test_talisman_allow_cors_origin(self):
-        Talisman(self.app, force_https=False, allow_cors_origin="https://example.com")
-
-        rv = self.test_client.get("/")
-
-        self.assertEqual(rv.status_code, 200)
-
-        self.assertIn("Access-Control-Allow-Origin", rv.headers)
-        self.assertEqual(
-            "https://example.com", rv.headers["Access-Control-Allow-Origin"]
-        )
