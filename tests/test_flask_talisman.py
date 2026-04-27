@@ -41,9 +41,9 @@ class TestTalisman(unittest.TestCase):
         self.assertNotIn("SameSite", rv.headers["Set-Cookie"])
 
     def test_default_talisman_app(self):
-        Talisman(self.app, force_https=False)
+        Talisman(self.app)
 
-        rv = self.test_client.get("/")
+        rv = self.test_client.get("https://localhost/")
 
         self.assertEqual(rv.status_code, 200)
 
@@ -69,15 +69,14 @@ class TestTalisman(unittest.TestCase):
 
         self.assertIn("Set-Cookie", rv.headers)
         self.assertIn("session=", rv.headers["Set-Cookie"])
-        self.assertNotIn(" Secure", rv.headers["Set-Cookie"])  # force_https is False
         self.assertIn(" HttpOnly", rv.headers["Set-Cookie"])
         self.assertIn(" SameSite=Lax", rv.headers["Set-Cookie"])
 
     def test_default_talisman_app_delayed(self):
         talisman = Talisman()
-        talisman.init_app(self.app, force_https=False)
+        talisman.init_app(self.app)
 
-        rv = self.test_client.get("/")
+        rv = self.test_client.get("https://localhost/")
 
         self.assertEqual(rv.status_code, 200)
 
@@ -88,9 +87,9 @@ class TestTalisman(unittest.TestCase):
         )
 
     def test_talisman_google_csp(self):
-        Talisman(self.app, force_https=False, allow_google_content_security_policy=True)
+        Talisman(self.app, allow_google_content_security_policy=True)
 
-        rv = self.test_client.get("/")
+        rv = self.test_client.get("https://localhost/")
 
         self.assertEqual(rv.status_code, 200)
 
@@ -122,11 +121,9 @@ class TestTalisman(unittest.TestCase):
         )
 
     def test_talisman_typekit_csp(self):
-        Talisman(
-            self.app, force_https=False, allow_typekit_content_security_policy=True
-        )
+        Talisman(self.app, allow_typekit_content_security_policy=True)
 
-        rv = self.test_client.get("/")
+        rv = self.test_client.get("https://localhost/")
 
         self.assertEqual(rv.status_code, 200)
 
@@ -141,12 +138,11 @@ class TestTalisman(unittest.TestCase):
     def test_talisman_google_and_typekit_csp(self):
         Talisman(
             self.app,
-            force_https=False,
             allow_google_content_security_policy=True,
             allow_typekit_content_security_policy=True,
         )
 
-        rv = self.test_client.get("/")
+        rv = self.test_client.get("https://localhost/")
 
         self.assertEqual(rv.status_code, 200)
 
@@ -167,14 +163,13 @@ class TestTalisman(unittest.TestCase):
     def test_talisman_custom_csp(self):
         Talisman(
             self.app,
-            force_https=False,
             content_security_policy={
                 "default-src": ["'self'", "example.com"],
                 "img-src": ["'self'", "img.example.com"],
             },
         )
 
-        rv = self.test_client.get("/")
+        rv = self.test_client.get("https://localhost/")
 
         self.assertEqual(rv.status_code, 200)
 
@@ -191,7 +186,6 @@ class TestTalisman(unittest.TestCase):
     def test_talisman_custom_csp_with_google(self):
         Talisman(
             self.app,
-            force_https=False,
             content_security_policy={
                 "default-src": ["'self'", "example.com"],
                 "img-src": ["'self'", "img.example.com"],
@@ -199,7 +193,7 @@ class TestTalisman(unittest.TestCase):
             allow_google_content_security_policy=True,
         )
 
-        rv = self.test_client.get("/")
+        rv = self.test_client.get("https://localhost/")
 
         self.assertEqual(rv.status_code, 200)
 
@@ -239,3 +233,39 @@ class TestTalisman(unittest.TestCase):
             "https://localhost/foobar?test=1",
             rv.headers["Location"],
         )
+
+    def test_talisman_custom_extra_headers(self):
+        Talisman(
+            self.app,
+            extra_headers={
+                "Cross-Origin-Resource-Policy": "cross-origin",
+                "X-Custom-Header": "CustomValue",
+            },
+        )
+
+        rv = self.test_client.get("https://localhost/")
+
+        self.assertEqual(rv.status_code, 200)
+
+        self.assertIn("X-Permitted-Cross-Domain-Policies", rv.headers)
+        self.assertEqual("none", rv.headers["X-Permitted-Cross-Domain-Policies"])
+        self.assertIn("Cross-Origin-Embedder-Policy", rv.headers)
+        self.assertEqual("unsafe-none", rv.headers["Cross-Origin-Embedder-Policy"])
+        self.assertIn("Cross-Origin-Opener-Policy", rv.headers)
+        self.assertEqual("same-origin", rv.headers["Cross-Origin-Opener-Policy"])
+
+        self.assertIn("Cross-Origin-Resource-Policy", rv.headers)
+        self.assertEqual("cross-origin", rv.headers["Cross-Origin-Resource-Policy"])
+
+        self.assertIn("X-Custom-Header", rv.headers)
+        self.assertEqual("CustomValue", rv.headers["X-Custom-Header"])
+
+    def test_talisman_custom_referrer_policy(self):
+        Talisman(self.app, referrer_policy="no-referrer")
+
+        rv = self.test_client.get("https://localhost/")
+
+        self.assertEqual(rv.status_code, 200)
+
+        self.assertIn("Referrer-Policy", rv.headers)
+        self.assertEqual("no-referrer", rv.headers["Referrer-Policy"])

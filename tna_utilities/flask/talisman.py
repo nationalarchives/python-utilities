@@ -72,7 +72,7 @@ class Talisman:
         content_security_policy: dict | None = None,
         allow_google_content_security_policy: bool = False,
         allow_typekit_content_security_policy: bool = False,
-        security_headers: dict | None = None,
+        extra_headers: dict | None = None,
         referrer_policy: str = "strict-origin-when-cross-origin",
         force_https: bool = True,
         force_https_permanent: bool = False,
@@ -83,14 +83,16 @@ class Talisman:
         :param content_security_policy: A dictionary defining the Content Security Policy directives and their values.
         :param allow_google_content_security_policy: If True, includes Google's recommended Content Security Policy directives in addition to the custom directives specified in content_security_policy.
         :param allow_typekit_content_security_policy: If True, includes Adobe Typekit's recommended Content Security Policy directives in addition to the custom directives specified in content_security_policy.
-        :param security_headers: A dictionary of additional security headers to apply to responses, where the keys are header names and the values are header values.
+        :param extra_headers: A dictionary of additional headers to apply to responses, where the keys are header names and the values are header values.
         :param referrer_policy: The Referrer-Policy header value to apply to responses. Defaults to "strict-origin-when-cross-origin".
         :param force_https: If True, forces incoming requests to be redirected to HTTPS if they are not already secure and the application is not in debug mode. Defaults to True.
         :param force_https_permanent: If True, uses a permanent redirect (HTTP 301) when forcing HTTPS, otherwise uses a temporary redirect (HTTP 302). Defaults to False.
         """
 
-        content_security_policy = content_security_policy or {}
-        security_headers = security_headers or {}
+        if content_security_policy is None:
+            content_security_policy = {}
+        if extra_headers is None:
+            extra_headers = {}
 
         self.app = app
 
@@ -106,7 +108,7 @@ class Talisman:
         self.allow_typekit_content_security_policy = (
             allow_typekit_content_security_policy
         )
-        self.security_headers = security_headers
+        self.extra_headers = extra_headers
         self.referrer_policy = referrer_policy
         self.force_https = force_https
         self.force_https_permanent = force_https_permanent
@@ -135,7 +137,7 @@ class Talisman:
                         parsed.path,
                         parsed.params,
                         parsed.query,
-                        "",
+                        parsed.fragment,
                     )
                 )
                 code = 302
@@ -156,8 +158,9 @@ class Talisman:
             self.allow_google_content_security_policy,
             self.allow_typekit_content_security_policy,
         )
-        response.headers.update(common_security_headers(**self.security_headers))
+        response.headers.update(common_security_headers())
         response.headers["Referrer-Policy"] = self.referrer_policy
+        response.headers.update(self.extra_headers)
         return response
 
     def _csp(
@@ -170,7 +173,9 @@ class Talisman:
         Generates a Content-Security-Policy header value based on the provided content security policy configuration and the option to include Google's recommended content security policy directives.
         """
 
-        csp = CspGenerator(default_src=content_security_policy.get("default-src", ""))
+        csp = CspGenerator(
+            default_src=content_security_policy.get("default-src", CspGenerator.SELF)
+        )
 
         property_methods = [
             ("base-uri", csp.base_uri),

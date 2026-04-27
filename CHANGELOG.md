@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added option in Flask Talisman to add Adobe Typekit CSP rules with `allow_typekit_content_security_policy=True`
+- Added `extra_headers` parameter in `Talisman` to update or add any global response headers
 
 ### Changed
 
@@ -18,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 
 ### Removed
+
+- Removed `security_headers` parameter in `Talisman`
 
 ### Fixed
 
