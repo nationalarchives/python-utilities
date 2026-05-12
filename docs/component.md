@@ -1,5 +1,7 @@
 # Component
 
+> Added in `v1.5.0`.
+
 ## `paginate()`
 
 Creates a pagination object in accordance with the [pages to show in a pagination component](https://design-system.nationalarchives.gov.uk/components/pagination/#number-of-page-links) in the National Archives Design System.
@@ -44,13 +46,13 @@ Creates an object that be used directly in a [National Archives pagination compo
 ```python
 from tna_utilities.component import paginate
 
-print(tna_frontend_pagination_items(42, 6, "?page="))
+print(tna_frontend_pagination_items(42, 7, "?page="))
 # [
 #     {"number": 1, "current": False, "href": "?page=1"},
 #     {"ellipsis": True},
-#     {"number": 5, "current": False, "href": "?page=5"},
-#     {"number": 6, "current": True, "href": "?page=6"},
-#     {"number": 7, "current": False, "href": "?page=7"},
+#     {"number": 6, "current": False, "href": "?page=6"},
+#     {"number": 7, "current": True, "href": "?page=7"},
+#     {"number": 8, "current": False, "href": "?page=8"},
 #     {"ellipsis": True},
 #     {"number": 42, "current": False, "href": "?page=42"},
 # ]
