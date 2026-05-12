@@ -160,17 +160,17 @@ class SimpleJsonApiClient:
                 return response.json()
             except JSONDecodeError:
                 raise Exception("Non-JSON response provided")
-        if response.status_code == 400:
+        if response.status_code == codes.bad_request:
             try:
                 error_body = response.json()
             except JSONDecodeError:
                 error_body = response.text
             raise Exception(f"Bad request: {error_body}")
-        if response.status_code == 401:
+        if response.status_code == codes.unauthorized:
             raise ResourceUnauthorized("Unauthorized")
-        if response.status_code == 403:
+        if response.status_code == codes.forbidden:
             raise ResourceForbidden("Forbidden")
-        if response.status_code == 404:
+        if response.status_code == codes.not_found:
             raise ResourceNotFound("Resource not found")
         body_preview = (response.text or "").strip()
         if body_preview:
