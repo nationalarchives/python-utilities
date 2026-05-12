@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated Google CSP domains
+- Switched to checking response codes from `requests` in `SimpleJsonApiClient`
 
 ### Deprecated
 
