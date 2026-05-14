@@ -127,24 +127,26 @@ class Talisman:
             flask.request.headers.get("X-Forwarded-Proto", "http") == "https",
         ]
 
-        if self.force_https and not any(criteria):
-            if flask.request.url.startswith("http://"):
-                parsed = urlparse(flask.request.url)
-                target = urlunparse(
-                    (
-                        "https",
-                        parsed.netloc,
-                        parsed.path,
-                        parsed.params,
-                        parsed.query,
-                        parsed.fragment,
-                    )
+        if (
+            self.force_https
+            and not any(criteria)
+            and flask.request.url.startswith("http://")
+        ):
+            parsed = urlparse(flask.request.url)
+            target = urlunparse(
+                (
+                    "https",
+                    parsed.netloc,
+                    parsed.path,
+                    parsed.params,
+                    parsed.query,
+                    parsed.fragment,
                 )
-                code = 302
-                if self.force_https_permanent:
-                    code = 301
-                r = flask.redirect(target, code=code)
-                return r
+            )
+            code = 302
+            if self.force_https_permanent:
+                code = 301
+            return flask.redirect(target, code=code)
 
         return None
 

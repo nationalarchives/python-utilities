@@ -2,15 +2,19 @@ import requests
 from requests import JSONDecodeError, Response, codes
 
 
-class ResourceNotFound(Exception):
+class ApiError(Exception):
     pass
 
 
-class ResourceForbidden(Exception):
+class ResourceNotFoundError(ApiError):
     pass
 
 
-class ResourceUnauthorized(Exception):
+class ResourceForbiddenError(ApiError):
+    pass
+
+
+class ResourceUnauthorizedError(ApiError):
     pass
 
 
@@ -99,9 +103,9 @@ class SimpleJsonApiClient:
         :param params: Optional dictionary of query parameters to include in the request. These will be merged with any default parameters set for the client.
         :param headers: Optional dictionary of headers to include in the request. These will be merged with any default headers set for the client.
         :param timeout: Timeout in seconds for the request. Defaults to 10.
-        :raises ResourceNotFound: If the requested resource is not found (HTTP 404).
-        :raises ResourceForbidden: If access to the resource is forbidden (HTTP 403).
-        :raises ResourceUnauthorized: If authentication is required or has failed (HTTP 401).
+        :raises ResourceNotFoundError: If the requested resource is not found (HTTP 404).
+        :raises ResourceForbiddenError: If access to the resource is forbidden (HTTP 403).
+        :raises ResourceUnauthorizedError: If authentication is required or has failed (HTTP 401).
         :raises Exception: For unexpected response handling or request-processing errors.
         """
 
@@ -112,7 +116,7 @@ class SimpleJsonApiClient:
             headers=self.headers if headers is None else {**self.headers, **headers},
             timeout=timeout,
         )
-        return self._handle_response(response)
+        return self._handle_response(response, path)
 
     def post(
         self,
@@ -133,9 +137,9 @@ class SimpleJsonApiClient:
         :param params: Optional dictionary of query parameters to include in the request. These will be merged with any default parameters set for the client.
         :param headers: Optional dictionary of headers to include in the request. These will be merged with any default headers set for the client.
         :param timeout: Request timeout in seconds.
-        :raises ResourceNotFound: If the requested resource is not found (HTTP 404).
-        :raises ResourceForbidden: If access to the resource is forbidden (HTTP 403).
-        :raises ResourceUnauthorized: If authentication is required or has failed (HTTP 401).
+        :raises ResourceNotFoundError: If the requested resource is not found (HTTP 404).
+        :raises ResourceForbiddenError: If access to the resource is forbidden (HTTP 403).
+        :raises ResourceUnauthorizedError: If authentication is required or has failed (HTTP 401).
         :raises Exception: For other non-success responses or unexpected response handling errors.
         """
 
@@ -148,9 +152,9 @@ class SimpleJsonApiClient:
             json=json,
             timeout=timeout,
         )
-        return self._handle_response(response)
+        return self._handle_response(response, path)
 
-    def _handle_response(self, response: Response) -> dict:
+    def _handle_response(self, response: Response, path: str) -> dict:
         """
         Handle the API response, checking for common HTTP status codes and returning the JSON content if the request was successful.
         """
@@ -158,27 +162,25 @@ class SimpleJsonApiClient:
         if response.status_code == codes.ok:
             try:
                 return response.json()
-            except JSONDecodeError:
-                raise Exception("Non-JSON response provided")
+            except JSONDecodeError as e:
+                raise ApiError("Non-JSON response provided") from e
         if response.status_code == codes.bad_request:
             try:
                 error_body = response.json()
-            except JSONDecodeError:
+                raise ApiError(f"Bad request: {error_body}")
+            except JSONDecodeError as e:
                 error_body = response.text
-            raise Exception(f"Bad request: {error_body}")
+                raise ApiError(f"Bad request: {error_body}") from e
         if response.status_code == codes.unauthorized:
-            raise ResourceUnauthorized("Unauthorized")
+            raise ResourceUnauthorizedError("Unauthorized")
         if response.status_code == codes.forbidden:
-            raise ResourceForbidden("Forbidden")
+            raise ResourceForbiddenError("Forbidden")
         if response.status_code == codes.not_found:
-            raise ResourceNotFound("Resource not found")
-        body_preview = (response.text or "").strip()
+            raise ResourceNotFoundError("Resource not found")
+        body_preview = (response.text if hasattr(response, "text") else "").strip()
         if body_preview:
             body_preview = body_preview[:500]
-            raise Exception(
-                f"Request failed with status {response.status_code} for URL {response.url}. "
-                f"Response body: {body_preview}"
+            raise ApiError(
+                f"Request failed with status {response.status_code} for {path}. Response body: {body_preview}"
             )
-        raise Exception(
-            f"Request failed with status {response.status_code} for URL {response.url}"
-        )
+        raise ApiError(f"Request failed with status {response.status_code} for {path}")

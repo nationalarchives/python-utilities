@@ -1,6 +1,5 @@
 import datetime
 import math
-from typing import Optional, Union
 
 """
 See https://design-system.nationalarchives.gov.uk/content/dates-and-times/
@@ -9,7 +8,7 @@ from The National Archives.
 """
 
 
-def get_date_from_string(date_string: str) -> datetime.datetime:  # noqa: C901
+def get_date_from_string(date_string: str) -> datetime.datetime:
     """
     Parses a date string into a datetime object.
     """
@@ -70,7 +69,7 @@ def _format_month_index(date: datetime.date) -> int:
 
 
 def pretty_date(
-    date: Union[str, datetime.date],
+    date: str | datetime.date,
     show_day: bool = False,
 ) -> str:
     """
@@ -116,7 +115,7 @@ def pretty_date(
 
 
 def pretty_datetime(
-    date: Union[str, datetime.datetime],
+    date: str | datetime.datetime,
     show_day: bool = False,
     show_seconds: bool = False,
 ) -> str:
@@ -152,14 +151,17 @@ def pretty_datetime(
 
 
 def pretty_date_range(  # noqa: C901
-    date_from: Optional[Union[str, datetime.date]],
-    date_to: Optional[Union[str, datetime.date]],
+    date_from: str | datetime.date | None,
+    date_to: str | datetime.date | None,
     omit_days: bool = False,
     lowercase_first: bool = False,
 ) -> str:
     """
     Formats a date range into the format used by The National Archives.
     """
+
+    max_days_in_month = 31
+    max_months_in_year = 12
 
     if isinstance(date_from, datetime.date):
         pass
@@ -192,8 +194,8 @@ def pretty_date_range(  # noqa: C901
         if (
             date_from.day == 1
             and date_from.month == 1
-            and date_to.day == 31
-            and date_to.month == 12
+            and date_to.day == max_days_in_month
+            and date_to.month == max_months_in_year
         ):
             if date_from.year == date_to.year:
                 return str(date_from.year)
@@ -237,8 +239,8 @@ def pretty_date_range(  # noqa: C901
 
 
 def pretty_datetime_range(  # noqa: C901
-    date_from: Optional[Union[str, datetime.date, datetime.datetime]],
-    date_to: Optional[Union[str, datetime.date, datetime.datetime]],
+    date_from: str | datetime.date | datetime.datetime | None,
+    date_to: str | datetime.date | datetime.datetime | None,
     lowercase_first: bool = False,
     hide_date_if_single_day: bool = False,
     show_seconds: bool = False,
@@ -362,27 +364,31 @@ def pretty_age(
         prefix = ""
         suffix = " ago"
 
-    if days > 365:
-        years = days // 365
+    days_in_year = 365
+    days_in_month = 30
+    seconds_in_hour = 3600
+    seconds_in_minute = 60
+
+    if days > days_in_year:
+        years = days // days_in_year
         return f"{prefix}{years} year{'s' if years != 1 else ''}{suffix}"
-    elif days > 30:
-        months = days // 30
+    if days > days_in_month:
+        months = days // days_in_month
         return f"{prefix}{months} month{'s' if months != 1 else ''}{suffix}"
-    elif days > 0:
+    if days > 0:
         return f"{prefix}{days} day{'s' if days != 1 else ''}{suffix}"
-    elif seconds >= 3600:
-        hours = seconds // 3600
+    if seconds >= seconds_in_hour:
+        hours = seconds // seconds_in_hour
         return f"{prefix}{hours} hour{'s' if hours != 1 else ''}{suffix}"
-    elif seconds >= 60:
-        minutes = seconds // 60
+    if seconds >= seconds_in_minute:
+        minutes = seconds // seconds_in_minute
         return f"{prefix}{minutes} minute{'s' if minutes != 1 else ''}{suffix}"
-    elif seconds > just_now_seconds or future:
+    if seconds > just_now_seconds or future:
         return f"{prefix}{seconds} second{'s' if seconds != 1 else ''}{suffix}"
-    else:
-        return "just now" if lowercase_first else "Just now"
+    return "just now" if lowercase_first else "Just now"
 
 
-def is_today_or_future(date: Union[datetime.date, datetime.datetime]) -> bool:
+def is_today_or_future(date: datetime.date | datetime.datetime) -> bool:
     """
     Determines if the given date string represents today or a future date.
     """
@@ -398,8 +404,8 @@ def is_today_or_future(date: Union[datetime.date, datetime.datetime]) -> bool:
 
 
 def is_today_in_date_range(
-    date_from: Union[datetime.date, datetime.datetime],
-    date_to: Union[datetime.date, datetime.datetime],
+    date_from: datetime.date | datetime.datetime,
+    date_to: datetime.date | datetime.datetime,
 ) -> bool:
     """
     Determines if today's date falls within the given date range.
@@ -420,7 +426,7 @@ def is_today_in_date_range(
 
 def group_by_year_and_month(
     items: list[dict], date_key: str, reverse: bool = False
-) -> list[dict]:  # noqa: C901
+) -> list[dict]:
     """
     Groups a list of items by year and month based on a date key in each item.
     """
@@ -582,7 +588,7 @@ def seconds_to_duration(total_seconds: int, simplify: bool = False) -> str:
     return " ".join(return_values)
 
 
-def rfc_822_date_format(date: Union[datetime.date, datetime.datetime]) -> str:
+def rfc_822_date_format(date: datetime.date | datetime.datetime) -> str:
     """
     Formats a date into RFC 822 format.
     """

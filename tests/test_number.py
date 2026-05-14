@@ -4,7 +4,6 @@ from tna_utilities.number import numberish, pretty_file_size
 
 
 class TestNumberish(unittest.TestCase):
-
     def test_happy(self):
         self.assertEqual(numberish(0), "None")
         self.assertEqual(numberish(1), "1")
@@ -86,18 +85,17 @@ class TestNumberish(unittest.TestCase):
         )
 
     def test_unhappy(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             numberish("one")
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             numberish(None)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             numberish({})
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             numberish([])
 
 
 class TestPrettyFileSize(unittest.TestCase):
-
     def test_pretty_file_size(self):
         self.assertEqual(pretty_file_size(0), "0B")
         self.assertEqual(pretty_file_size(999), "999B")
@@ -139,13 +137,13 @@ class TestPrettyFileSize(unittest.TestCase):
         self.assertEqual(pretty_file_size(1000000000000000, simplify=False), "1PB")
 
     def test_pretty_file_size_unhappy(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             pretty_file_size(1.234)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             pretty_file_size("one")
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             pretty_file_size(None)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             pretty_file_size({})
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             pretty_file_size([])

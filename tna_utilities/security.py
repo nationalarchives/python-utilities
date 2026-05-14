@@ -73,9 +73,7 @@ class CspGenerator:
         processed_values = [src for src in processed_values if src]
 
         # Remove duplicates while preserving order
-        processed_values = list(dict.fromkeys(processed_values))
-
-        return processed_values
+        return list(dict.fromkeys(processed_values))
 
     def add_directive(
         self, directive: str, *values: str | list[str], omit_self=False, replace=False
@@ -359,10 +357,7 @@ class CspGenerator:
             "allow-top-navigation-by-user-activation",
             "allow-top-navigation-to-custom-protocols",
         ]
-        if value is not None and value in values:
-            sources = [value]
-        else:
-            sources = []
+        sources = [value] if value is not None and value in values else []
 
         self.directives["sandbox"] = sources
         return self

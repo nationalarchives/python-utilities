@@ -1,6 +1,7 @@
 import unittest
 
 from flask import Flask, session
+
 from tna_utilities.flask.talisman import Talisman
 
 

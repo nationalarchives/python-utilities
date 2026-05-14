@@ -309,19 +309,19 @@ class TestComponent(unittest.TestCase):
         )
 
     def test_pagination_no_pages(self):
-        with self.assertRaises(Exception):
+        with self.assertRaises(ValueError):
             paginate(0, 1)
 
     def test_pagination_invalid_pages(self):
-        with self.assertRaises(Exception):
+        with self.assertRaises(TypeError):
             paginate(None, 1)
 
     def test_pagination_negative_current_page(self):
-        with self.assertRaises(Exception):
+        with self.assertRaises(ValueError):
             paginate(42, -1)
 
     def test_pagination_negative_around(self):
-        with self.assertRaises(Exception):
+        with self.assertRaises(ValueError):
             paginate(42, 1, around=-1)
 
     def test_tna_pagination_items(self):

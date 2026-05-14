@@ -4,9 +4,8 @@ from tna_utilities.security import CspGenerator, common_security_headers
 
 
 class TestSecurityCSP(unittest.TestCase):
-
     def __init__(self, *args, **kwargs):
-        super(TestSecurityCSP, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.test_domain = "https://example.com"
         self.test_domain_2 = "https://another.net"
 

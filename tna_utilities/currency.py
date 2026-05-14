@@ -1,7 +1,4 @@
-from typing import Optional, Union
-
-
-def currency(value: Union[float, str, int], simplify: bool = True) -> str:
+def currency(value: float | str | int, simplify: bool = True) -> str:
     """
     Formats a number as a currency without the currency symbol.
 
@@ -14,13 +11,13 @@ def currency(value: Union[float, str, int], simplify: bool = True) -> str:
     int_number = int(float_number)
 
     if simplify and int_number == float_number:
-        return str("{:,}".format(int_number))
+        return str(f"{int_number:,}")
 
-    return str("{:,.2f}".format(float_number))
+    return str(f"{float_number:,.2f}")
 
 
 def pretty_price(
-    value: Union[float, str, int],
+    value: float | str | int,
     simplify: bool = True,
     currency_symbol: str = "£",
 ) -> str:
@@ -30,15 +27,15 @@ def pretty_price(
     If the value is 0, returns "Free".
     Otherwise, returns the currency symbol followed by the formatted currency.
     """
-    if value == 0 or value == "0" or round(float(value) * 100) == 0:
+    if value in {0, "0"} or round(float(value) * 100) == 0:
         return "Free"
 
     return f"{currency_symbol}{currency(value, simplify)}"
 
 
 def pretty_price_range(
-    value_from: Optional[Union[float, str, int]] = None,
-    value_to: Optional[Union[float, str, int]] = None,
+    value_from: float | str | int | None = None,
+    value_to: float | str | int | None = None,
     simplify: bool = True,
     currency_symbol: str = "£",
 ) -> str:

@@ -39,10 +39,10 @@ Formats file size to a human-readable string.
 
 ### Arguments
 
-| Argument   | Description                                                | Default |
-| ---------- | ---------------------------------------------------------- | ------- |
-| `bytes`    | The number of bytes                                        | [none]  |
-| `simplify` | If `True`, simplify the string and remove fractional sizes | `True`  |
+| Argument         | Description                                                | Default |
+| ---------------- | ---------------------------------------------------------- | ------- |
+| `filesize_bytes` | The number of bytes                                        | [none]  |
+| `simplify`       | If `True`, simplify the string and remove fractional sizes | `True`  |
 
 ### Example
 

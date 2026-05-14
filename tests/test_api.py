@@ -2,10 +2,12 @@ import json
 from unittest import TestCase, mock
 
 from requests import Timeout
+
 from tna_utilities.api import (
-    ResourceForbidden,
-    ResourceNotFound,
-    ResourceUnauthorized,
+    ApiError,
+    ResourceForbiddenError,
+    ResourceNotFoundError,
+    ResourceUnauthorizedError,
     SimpleJsonApiClient,
 )
 
@@ -29,15 +31,15 @@ def mocked_requests_get(*args, **kwargs):
 
     if args[0] == f"{MOCK_API_BASE_URL}happy":
         return MockResponse({"foo": "bar"}, 200)
-    elif args[0] == f"{MOCK_API_BASE_URL}badrequest":
+    if args[0] == f"{MOCK_API_BASE_URL}badrequest":
         return MockResponse(None, 400)
-    elif args[0] == f"{MOCK_API_BASE_URL}unauthorized":
+    if args[0] == f"{MOCK_API_BASE_URL}unauthorized":
         return MockResponse(None, 401)
-    elif args[0] == f"{MOCK_API_BASE_URL}forbidden":
+    if args[0] == f"{MOCK_API_BASE_URL}forbidden":
         return MockResponse(None, 403)
-    elif args[0] == f"{MOCK_API_BASE_URL}servererror":
+    if args[0] == f"{MOCK_API_BASE_URL}servererror":
         return MockResponse(None, 500)
-    elif args[0] == f"{MOCK_API_BASE_URL}timeout":
+    if args[0] == f"{MOCK_API_BASE_URL}timeout":
         raise Timeout("Request timed out")
 
     return MockResponse(None, 404)
@@ -80,28 +82,28 @@ class TestSimpleJsonApiClient(TestCase):
     @mock.patch("requests.post", side_effect=mocked_requests_post)
     def test_bad_request(self, mock_post, mock_get):
         client = SimpleJsonApiClient(MOCK_API_BASE_URL)
-        with self.assertRaises(Exception):
+        with self.assertRaises(ApiError):
             client.get("/badrequest")
 
     @mock.patch("requests.get", side_effect=mocked_requests_get)
     @mock.patch("requests.post", side_effect=mocked_requests_post)
     def test_not_found(self, mock_post, mock_get):
         client = SimpleJsonApiClient(MOCK_API_BASE_URL)
-        with self.assertRaises(ResourceNotFound):
+        with self.assertRaises(ResourceNotFoundError):
             client.get("/notfound")
 
     @mock.patch("requests.get", side_effect=mocked_requests_get)
     @mock.patch("requests.post", side_effect=mocked_requests_post)
     def test_resource_unauthorized(self, mock_post, mock_get):
         client = SimpleJsonApiClient(MOCK_API_BASE_URL)
-        with self.assertRaises(ResourceUnauthorized):
+        with self.assertRaises(ResourceUnauthorizedError):
             client.get("/unauthorized")
 
     @mock.patch("requests.get", side_effect=mocked_requests_get)
     @mock.patch("requests.post", side_effect=mocked_requests_post)
     def test_resource_forbidden(self, mock_post, mock_get):
         client = SimpleJsonApiClient(MOCK_API_BASE_URL)
-        with self.assertRaises(ResourceForbidden):
+        with self.assertRaises(ResourceForbiddenError):
             client.get("/forbidden")
 
     @mock.patch("requests.get", side_effect=mocked_requests_get)
@@ -115,7 +117,7 @@ class TestSimpleJsonApiClient(TestCase):
     @mock.patch("requests.post", side_effect=mocked_requests_post)
     def test_other_exception(self, mock_post, mock_get):
         client = SimpleJsonApiClient(MOCK_API_BASE_URL)
-        with self.assertRaises(Exception):
+        with self.assertRaises(ApiError):
             client.get("/servererror")
 
     @mock.patch("requests.get", side_effect=mocked_requests_get)
