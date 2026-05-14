@@ -5,7 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nationalarchives/python-utilities/compare/v1.4.0...HEAD)
+## [Unreleased](https://github.com/nationalarchives/python-utilities/compare/v1.5.0...HEAD)
+
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [1.5.0](https://github.com/nationalarchives/python-utilities/compare/v1.4.0...v1.5.0) - 2026-05-14
 
 ### Added
 
@@ -22,8 +36,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `SimpleJsonApiClient` raises `ApiError` exceptions rather than generic `Exception`
 - Renamed the `bytes` parameter of `pretty_file_size()` to `filesize_bytes`
 
-### Deprecated
-
 ### Removed
 
 - Removed `security_headers` parameter in `Talisman`
@@ -32,8 +44,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed logic inversion for `default_headers` in `SimpleJsonApiClient`
 - Incorrect `ValueError` exceptions changed to `TypeError`
-
-### Security
 
 ## [1.4.0](https://github.com/nationalarchives/python-utilities/compare/v1.3.0...v1.4.0) - 2026-04-14
 
