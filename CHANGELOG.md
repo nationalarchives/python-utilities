@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added option in Flask Talisman to add Adobe Typekit CSP rules with `allow_typekit_content_security_policy=True`
 - Added `extra_headers` parameter in `Talisman` to update or add any global response headers
 - New pagination functions for populating pagination components
+- New Flask decorators for specifying `Cache-Control` headers in response
 
 ### Changed
 
