@@ -9,11 +9,11 @@ def strtobool(value: str) -> bool:
     """
     try:
         value = value.lower()
-    except AttributeError:
-        raise TypeError("invalid truth value %r" % (value,))
+    except AttributeError as e:
+        raise TypeError(f"invalid truth value {value!r}") from e
 
     if value in ("y", "yes", "t", "true", "on", "1"):
         return True
     if value in ("n", "no", "f", "false", "off", "0"):
         return False
-    raise ValueError("invalid truth value %r" % (value,))
+    raise ValueError(f"invalid truth value {value!r}")

@@ -17,10 +17,10 @@ class QueryStringTransformer:
         elif args is not None:
             try:
                 args_lists = args.lists()
-            except AttributeError:
+            except AttributeError as e:
                 raise AttributeError(
                     "args must be an ImmutableMultiDict (Django), a QueryDict (Flask) object or an iterable of (key, [values]) tuples"
-                )
+                ) from e
             self.args = list(args_lists)
         else:
             self.args = []
@@ -30,10 +30,7 @@ class QueryStringTransformer:
         Check if a parameter exists in the query parameters.
         """
 
-        for key, _ in self.args:
-            if key == parameter:
-                return True
-        return False
+        return any(key == parameter for key, _ in self.args)
 
     def parameter_values(self, parameter: str) -> list:
         """
@@ -54,7 +51,7 @@ class QueryStringTransformer:
         Raises a ValueError if the parameter already exists.
         """
 
-        for key, vals in self.args:
+        for key, _vals in self.args:
             if key == parameter:
                 raise ValueError(f"Parameter '{parameter}' already exists")
         if not isinstance(values, list):
@@ -83,7 +80,7 @@ class QueryStringTransformer:
         Raises a KeyError if the parameter does not exist.
         """
 
-        for index, (key, vals) in enumerate(self.args):
+        for index, (key, _vals) in enumerate(self.args):
             if key == parameter:
                 del self.args[index]
                 return self
@@ -129,9 +126,8 @@ class QueryStringTransformer:
                 str_value = str(value)
                 if str_value in values:
                     values.remove(str_value)
-                else:
-                    if str_value not in values:
-                        values.append(str_value)
+                elif str_value not in values:
+                    values.append(str_value)
                 return self
         raise KeyError(f"Parameter '{parameter}' does not exist")
 

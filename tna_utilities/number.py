@@ -1,19 +1,18 @@
 import math
 import re
-from typing import Union
 
 
 def numberish(
-    value: Union[float, int],
+    value: float | int,
     simple_units: bool = False,
-    prefix_text: Union[str, tuple[str, str]] = "About ",
+    prefix_text: str | tuple[str, str] = "About ",
 ) -> str:
     """
     Convert a number into a human-readable string with appropriate units.
     """
 
     if not isinstance(value, (int, float)):
-        raise ValueError("Value must be an integer or float")
+        raise TypeError("Value must be an integer or float")
     if value == 0:
         return "None"
     units = [
@@ -29,12 +28,12 @@ def numberish(
                 return f"{int(base_value)}{unit}"
             base_value_rounded = round(
                 base_value,
-                -int(math.floor(math.log10(abs(base_value)))) + 1,
+                -(math.floor(math.log10(abs(base_value)))) + 1,
             )
             if base_value_rounded == base_value:
                 prefix_text = ""
             elif isinstance(prefix_text, tuple):
-                if len(prefix_text) != 2:
+                if not prefix_text[0] or not prefix_text[1]:
                     raise ValueError("prefix_text tuple must have exactly two elements")
                 if not all(isinstance(pt, str) for pt in prefix_text):
                     raise ValueError(
@@ -48,13 +47,13 @@ def numberish(
     return str(int(value))
 
 
-def pretty_file_size(bytes, simplify=True):
-    if not isinstance(bytes, int):
-        raise ValueError("file_size must be an integer")
+def pretty_file_size(filesize_bytes, simplify=True):
+    if not isinstance(filesize_bytes, int):
+        raise TypeError("filesize_bytes must be an integer")
     byte_unit = 1000
     suffixes = ["B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
     i = 0
-    prettified_file_size = bytes
+    prettified_file_size = filesize_bytes
     while prettified_file_size >= byte_unit and i < len(suffixes) - 1:
         prettified_file_size /= byte_unit
         i += 1

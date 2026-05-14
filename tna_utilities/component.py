@@ -15,14 +15,14 @@ def paginate(pages: int, current_page: int, around: int = 1) -> list[int | str]:
         list: A list of dictionaries representing the paginated items, with "current" indicating the current page.
     """
 
-    assert isinstance(pages, int), "pages must be an integer"
-    assert pages >= 1, "pages must be at least 1"
-    assert isinstance(current_page, int), "current_page must be an integer"
-    assert current_page >= 1, "current_page must be at least 1"
-    assert (
-        current_page <= pages
-    ), "current_page cannot be greater than the number of pages"
-    assert around >= 0, "around must be non-negative"
+    if type(pages) is not int or type(current_page) is not int:
+        raise TypeError("pages and current_page must be integers")
+    if pages < 1 or current_page < 1:
+        raise ValueError("pages and current_page must be at least 1")
+    if current_page > pages:
+        raise ValueError("current_page cannot be greater than the number of pages")
+    if around < 0:
+        raise ValueError("around must be non-negative")
 
     items = [item + 1 for item in range(pages)]
     total = len(items)
@@ -40,7 +40,7 @@ def paginate(pages: int, current_page: int, around: int = 1) -> list[int | str]:
 
     if around >= 1:
         for i in range(len(sorted_pages) - 1):
-            if sorted_pages[i + 1] - sorted_pages[i] == 2:
+            if sorted_pages[i + 1] - sorted_pages[i] == 2:  # noqa: PLR2004
                 pagination.add(sorted_pages[i] + 1)
 
         sorted_pages = sorted(pagination)

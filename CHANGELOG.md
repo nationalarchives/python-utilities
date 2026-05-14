@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated Google CSP domains
 - Switched to checking response codes from `requests` in `SimpleJsonApiClient`
+- Renamed `ResourceForbidden`, `ResourceNotFound` and `ResourceUnauthorized` to `ResourceForbiddenError`, `ResourceNotFoundError` and `ResourceUnauthorizedError` in `tna_utilities.api`
+- `SimpleJsonApiClient` raises `ApiError` exceptions rather than generic `Exception`
+- Renamed the `bytes` parameter of `pretty_file_size()` to `filesize_bytes`
 
 ### Deprecated
 
@@ -28,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed logic inversion for `default_headers` in `SimpleJsonApiClient`
+- Incorrect `ValueError` exceptions changed to `TypeError`
 
 ### Security
 

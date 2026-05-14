@@ -33,9 +33,9 @@ except Exception as error:
 
 You can catch and handle some of the more common exceptions:
 
-- `tna_utilities.api.ResourceForbidden`
-- `tna_utilities.api.ResourceNotFound`
-- `tna_utilities.api.ResourceUnauthorized`
+- `tna_utilities.api.ResourceForbiddenError`
+- `tna_utilities.api.ResourceNotFoundError`
+- `tna_utilities.api.ResourceUnauthorizedError`
 
 You can also catch [exceptions raised by `requests`](https://requests.readthedocs.io/en/latest/_modules/requests/exceptions/).
 

@@ -1,0 +1,9 @@
+extend = "/home/app/ruff-strict.toml"
+
+[lint]
+ignore = [
+    "TRY003",
+    "PLR0913",
+    "PLR0911",
+    "PLR0912"
+]

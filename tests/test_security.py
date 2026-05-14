@@ -4,9 +4,8 @@ from tna_utilities.security import CspGenerator, common_security_headers
 
 
 class TestSecurityCSP(unittest.TestCase):
-
     def __init__(self, *args, **kwargs):
-        super(TestSecurityCSP, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.test_domain = "https://example.com"
         self.test_domain_2 = "https://another.net"
 
@@ -270,7 +269,6 @@ class TestSecurityCSP(unittest.TestCase):
             ("base-uri", "base_uri"),
             ("child-src", "child_src"),
             ("connect-src", "connect_src"),
-            # ("fenced-frame-src", "fenced_frame_src"),  # Experimental
             ("font-src", "font_src"),
             ("form-action", "form_action"),
             ("frame-ancestors", "frame_ancestors"),
@@ -286,8 +284,11 @@ class TestSecurityCSP(unittest.TestCase):
             ("style-src", "style_src"),
             ("style-src-attr", "style_src_attr"),
             ("style-src-elem", "style_src_elem"),
-            # ("trusted-types", "trusted_types"),  # Not technically part of the CSP spec
             ("worker-src", "worker_src"),
+            # Experimental
+            # ("fenced-frame-src", "fenced_frame_src"),  # noqa: ERA001
+            # Not technically part of the CSP spec
+            # ("trusted-types", "trusted_types"),  # noqa: ERA001
         ]
         for directive, method in directives:
             generator = CspGenerator()
