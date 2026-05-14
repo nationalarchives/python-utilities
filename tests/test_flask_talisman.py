@@ -1,10 +1,10 @@
 import unittest
 
 from flask import Flask, session
-from tna_utilities.flask.talisman import Talisman
+from tna_utilities.flask import Talisman
 
 
-class TestTalisman(unittest.TestCase):
+class TestFlaskTalisman(unittest.TestCase):
     def setUp(self):
         self.app = Flask(__name__)
         self.app.config["SECRET_KEY"] = "my_secret_key"
