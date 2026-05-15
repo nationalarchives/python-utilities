@@ -2,7 +2,13 @@ import unittest
 
 from flask import Flask
 
-from tna_utilities.flask import cacheable_duration, do_not_cache, set_cache_control
+from tna_utilities.flask import (
+    cacheable_duration,
+    do_not_cache,
+    set_cache_control,
+    vary_by_cookies,
+    vary_by_headers,
+)
 
 
 class TestFlaskCacheControl(unittest.TestCase):
@@ -78,4 +84,34 @@ class TestFlaskCacheControl(unittest.TestCase):
         self.assertEqual(
             rv.headers["Cache-Control"],
             "private, max-age=120",
+        )
+
+    def test_vary_by_cookies_route(self):
+        @self.app.route("/")
+        @vary_by_cookies()
+        def index():
+            return "OK"
+
+        rv = self.test_client.get("/")
+
+        self.assertEqual(rv.status_code, 200)
+        self.assertIn("Vary", rv.headers)
+        self.assertEqual(
+            rv.headers["Vary"],
+            "Cookie",
+        )
+
+    def test_vary_by_headers_route(self):
+        @self.app.route("/")
+        @vary_by_headers("Accept-Encoding, User-Agent")
+        def index():
+            return "OK"
+
+        rv = self.test_client.get("/")
+
+        self.assertEqual(rv.status_code, 200)
+        self.assertIn("Vary", rv.headers)
+        self.assertEqual(
+            rv.headers["Vary"],
+            "Accept-Encoding, User-Agent",
         )
