@@ -28,9 +28,9 @@ def cachable_for_up_to_1h():
 def not_cachable():
     return "Don't cache me!"
 
-@app.route("/not-cacheable/")
+@app.route("/custom-cache/")
 @set_cache_control("private, max-age=120")
-def private_cache():
+def custom_cache():
     return "Cache me in private caches for up to 2 minutes"
 ```
 
