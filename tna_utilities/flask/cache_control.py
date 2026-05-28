@@ -19,6 +19,30 @@ def cacheable_duration(seconds: int = 3600):
     return set_cache_control(f"public, max-age={seconds}")
 
 
+def cacheable_duration_cloudfront(
+    client_seconds: int = 3600,
+    cloudfront_seconds: int = 3600,
+    stale_while_revalidate_seconds: int = 0,
+    stale_if_error_seconds: int = 0,
+):
+    """
+    Decorator to set Cache-Control headers to allow caching of the response for a specified duration with consideration for CloudFront's caching behavior.
+    See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Expiration.html for details on CloudFront's caching behavior.
+    """
+
+    cache_control_value = f"public, max-age={client_seconds}"
+    if cloudfront_seconds > 0 and cloudfront_seconds != client_seconds:
+        cache_control_value += f", s-maxage={cloudfront_seconds}"
+    if stale_while_revalidate_seconds > 0:
+        cache_control_value += (
+            f", stale-while-revalidate={stale_while_revalidate_seconds}"
+        )
+    if stale_if_error_seconds > 0:
+        cache_control_value += f", stale-if-error={stale_if_error_seconds}"
+
+    return set_cache_control(cache_control_value)
+
+
 def set_cache_control(instructions: str):
     """
     Decorator to set Cache-Control headers with custom instructions provided as a string.
