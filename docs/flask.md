@@ -10,7 +10,12 @@ A set of decorators to manage the `Cache-Control` response header of a route.
 
 ```python
 from flask import Flask
-from tna_utilities.flask import cacheable_duration, do_not_cache, set_cache_control
+from tna_utilities.flask import (
+    cacheable_duration,
+    do_not_cache,
+    set_cache_control,
+    cacheable_duration_cloudfront
+)
 
 app = Flask(__name__)
 
@@ -32,6 +37,11 @@ def not_cachable():
 @set_cache_control("private, max-age=120")
 def custom_cache():
     return "Cache me in private caches for up to 2 minutes"
+
+@app.route("/cloudfront-cache/")
+@cacheable_duration_cloudfront(3600, 86400)
+def cloudfront_cache():
+    return "Cache me in client caches for up to an hour and in Cloudfront for up to a day"
 ```
 
 ### Vary

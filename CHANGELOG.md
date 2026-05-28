@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added `vary_by_cookies()` and `vary_by_headers()` decorators for Flask
+- Added `cacheable_duration_cloudfront()` decorator for adding `Cache-Control` headers that are Cloudfront compatible
 
 ### Changed
 
