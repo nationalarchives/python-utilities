@@ -3,7 +3,7 @@ import re
 
 
 def numberish(
-    value: float | int,
+    value: float,
     simple_units: bool = False,
     prefix_text: str | tuple[str, str] = "About ",
 ) -> str:

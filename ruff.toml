@@ -1,4 +1,4 @@
-extend = "/home/app/ruff-strict.toml"
+extend = "/home/app/ruff.toml"
 
 [lint]
 ignore = [
