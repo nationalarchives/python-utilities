@@ -480,7 +480,7 @@ class CspGenerator:
             if sources:
                 directive_str += " " + " ".join(sources)
             parts.append(directive_str)
-        return "; ".join(parts) + ";"
+        return "; ".join(parts)
 
     def __str__(self) -> str:
         return self.to_string()

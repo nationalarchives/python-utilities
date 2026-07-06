@@ -1,9 +1,10 @@
-def currency(value: float | str | int, simplify: bool = True) -> str:
+def currency(value: float | str, simplify: bool = True) -> str:
     """
     Formats a number as a currency without the currency symbol.
 
     If simplify is True, removes unnecessary decimal places for whole numbers.
     """
+
     if not value:
         return "0" if simplify else "0.00"
 
@@ -17,7 +18,7 @@ def currency(value: float | str | int, simplify: bool = True) -> str:
 
 
 def pretty_price(
-    value: float | str | int,
+    value: float | str,
     simplify: bool = True,
     currency_symbol: str = "£",
 ) -> str:
@@ -27,6 +28,7 @@ def pretty_price(
     If the value is 0, returns "Free".
     Otherwise, returns the currency symbol followed by the formatted currency.
     """
+
     if value in {0, "0"} or round(float(value) * 100) == 0:
         return "Free"
 
@@ -34,8 +36,8 @@ def pretty_price(
 
 
 def pretty_price_range(
-    value_from: float | str | int | None = None,
-    value_to: float | str | int | None = None,
+    value_from: float | str | None = None,
+    value_to: float | str | None = None,
     simplify: bool = True,
     currency_symbol: str = "£",
 ) -> str:

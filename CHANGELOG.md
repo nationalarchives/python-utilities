@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Removed the trailing semicolon from CSP strings
+- Added some missing `int` into function parameter types
+
 ### Deprecated
 
 ### Removed

@@ -50,7 +50,7 @@ class TestFlaskTalisman(unittest.TestCase):
 
         self.assertIn("Content-Security-Policy", rv.headers)
         self.assertEqual(
-            "default-src 'self'; object-src 'none'; frame-ancestors 'none'; child-src 'none';",
+            "default-src 'self'; object-src 'none'; frame-ancestors 'none'; child-src 'none'",
             rv.headers["Content-Security-Policy"],
         )
 
@@ -83,7 +83,7 @@ class TestFlaskTalisman(unittest.TestCase):
 
         self.assertIn("Content-Security-Policy", rv.headers)
         self.assertEqual(
-            "default-src 'self'; object-src 'none'; frame-ancestors 'none'; child-src 'none';",
+            "default-src 'self'; object-src 'none'; frame-ancestors 'none'; child-src 'none'",
             rv.headers["Content-Security-Policy"],
         )
 
@@ -95,29 +95,29 @@ class TestFlaskTalisman(unittest.TestCase):
         self.assertEqual(rv.status_code, 200)
 
         self.assertIn("Content-Security-Policy", rv.headers)
-        self.assertIn("default-src 'self';", rv.headers["Content-Security-Policy"])
+        self.assertIn("default-src 'self'", rv.headers["Content-Security-Policy"])
         self.assertIn(
-            "connect-src 'self' *.google-analytics.com *.googletagmanager.com *.analytics.google.com;",
+            "connect-src 'self' *.google-analytics.com *.googletagmanager.com *.analytics.google.com",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
-            "frame-src 'self' www.google.com www.youtube.com www.youtube-nocookie.com;",
+            "frame-src 'self' www.google.com www.youtube.com www.youtube-nocookie.com",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
-            "font-src 'self' *.gstatic.com data:;",
+            "font-src 'self' *.gstatic.com data:",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
-            "img-src 'self' img.youtube.com i.ytimg.com *.googletagmanager.com ssl.gstatic.com www.gstatic.com *.google-analytics.com;",
+            "img-src 'self' img.youtube.com i.ytimg.com *.googletagmanager.com ssl.gstatic.com www.gstatic.com *.google-analytics.com",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
-            "script-src 'self' ajax.googleapis.com *.googleanalytics.com *.google-analytics.com www.youtube.com *.gstatic.com *.googletagmanager.com tagmanager.google.com;",
+            "script-src 'self' ajax.googleapis.com *.googleanalytics.com *.google-analytics.com www.youtube.com *.gstatic.com *.googletagmanager.com tagmanager.google.com",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
-            "style-src 'self' ajax.googleapis.com fonts.googleapis.com *.gstatic.com googletagmanager.com tagmanager.google.com;",
+            "style-src 'self' ajax.googleapis.com fonts.googleapis.com *.gstatic.com googletagmanager.com tagmanager.google.com",
             rv.headers["Content-Security-Policy"],
         )
 
@@ -130,10 +130,10 @@ class TestFlaskTalisman(unittest.TestCase):
 
         self.assertIn("Content-Security-Policy", rv.headers)
         self.assertIn(
-            "font-src 'self' use.typekit.net;", rv.headers["Content-Security-Policy"]
+            "font-src 'self' use.typekit.net", rv.headers["Content-Security-Policy"]
         )
         self.assertIn(
-            "style-src 'self' *.typekit.net;", rv.headers["Content-Security-Policy"]
+            "style-src 'self' *.typekit.net", rv.headers["Content-Security-Policy"]
         )
 
     def test_talisman_google_and_typekit_csp(self):
@@ -149,15 +149,15 @@ class TestFlaskTalisman(unittest.TestCase):
 
         self.assertIn("Content-Security-Policy", rv.headers)
         self.assertIn(
-            "font-src 'self' *.gstatic.com data: use.typekit.net;",
+            "font-src 'self' *.gstatic.com data: use.typekit.net",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
-            "style-src 'self' ajax.googleapis.com fonts.googleapis.com *.gstatic.com googletagmanager.com tagmanager.google.com *.typekit.net;",
+            "style-src 'self' ajax.googleapis.com fonts.googleapis.com *.gstatic.com googletagmanager.com tagmanager.google.com *.typekit.net",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
-            "img-src 'self' img.youtube.com i.ytimg.com *.googletagmanager.com ssl.gstatic.com www.gstatic.com *.google-analytics.com;",
+            "img-src 'self' img.youtube.com i.ytimg.com *.googletagmanager.com ssl.gstatic.com www.gstatic.com *.google-analytics.com",
             rv.headers["Content-Security-Policy"],
         )
 
@@ -176,11 +176,11 @@ class TestFlaskTalisman(unittest.TestCase):
 
         self.assertIn("Content-Security-Policy", rv.headers)
         self.assertIn(
-            "default-src 'self' example.com;",
+            "default-src 'self' example.com",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
-            "img-src 'self' img.example.com;",
+            "img-src 'self' img.example.com",
             rv.headers["Content-Security-Policy"],
         )
 
@@ -200,11 +200,11 @@ class TestFlaskTalisman(unittest.TestCase):
 
         self.assertIn("Content-Security-Policy", rv.headers)
         self.assertIn(
-            "default-src 'self' example.com;",
+            "default-src 'self' example.com",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
-            "img-src 'self' img.example.com img.youtube.com i.ytimg.com *.googletagmanager.com ssl.gstatic.com www.gstatic.com *.google-analytics.com;",
+            "img-src 'self' img.example.com img.youtube.com i.ytimg.com *.googletagmanager.com ssl.gstatic.com www.gstatic.com *.google-analytics.com",
             rv.headers["Content-Security-Policy"],
         )
 
