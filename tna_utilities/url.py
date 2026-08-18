@@ -9,9 +9,10 @@ class QueryStringTransformer:
         args: An object representing the query parameters, typically an
               ImmutableMultiDict (Django) or QueryDict (Flask) which can be
               accessed with request.GET (Django) or request.args (Flask).
+        tolerant: If True, the transformer will not raise exceptions for certain operations.
     """
 
-    def __init__(self, args=None) -> None:
+    def __init__(self, args=None, tolerant=False) -> None:
         if isinstance(args, list):
             self.args = args
         elif args is not None:
@@ -24,6 +25,7 @@ class QueryStringTransformer:
             self.args = list(args_lists)
         else:
             self.args = []
+        self.tolerant = tolerant
 
     def parameter_exists(self, parameter) -> bool:
         """
@@ -41,6 +43,8 @@ class QueryStringTransformer:
         for key, values in self.args:
             if key == parameter:
                 return values
+        if self.tolerant:
+            return []
         raise KeyError(f"Parameter '{parameter}' does not exist")
 
     def add_parameter(
@@ -53,6 +57,8 @@ class QueryStringTransformer:
 
         for key, _vals in self.args:
             if key == parameter:
+                if self.tolerant:
+                    return self
                 raise ValueError(f"Parameter '{parameter}' already exists")
         if not isinstance(values, list):
             values = [str(values)] if values is not None else []
@@ -84,6 +90,8 @@ class QueryStringTransformer:
             if key == parameter:
                 del self.args[index]
                 return self
+        if self.tolerant:
+            return self
         raise KeyError(f"Parameter '{parameter}' does not exist")
 
     def is_value_in_parameter(self, parameter: str, value: str | int) -> bool:
@@ -95,6 +103,8 @@ class QueryStringTransformer:
         for key, values in self.args:
             if key == parameter:
                 return str(value) in values
+        if self.tolerant:
+            return False
         raise KeyError(f"Parameter '{parameter}' does not exist")
 
     def add_parameter_value(
@@ -110,6 +120,9 @@ class QueryStringTransformer:
                 if str(value) not in values:
                     values.append(str(value))
                 return self
+        if self.tolerant:
+            self.args.append((parameter, [str(value)]))
+            return self
         raise KeyError(f"Parameter '{parameter}' does not exist")
 
     def toggle_parameter_value(
@@ -129,6 +142,9 @@ class QueryStringTransformer:
                 elif str_value not in values:
                     values.append(str_value)
                 return self
+        if self.tolerant:
+            self.args.append((parameter, [str(value)]))
+            return self
         raise KeyError(f"Parameter '{parameter}' does not exist")
 
     def remove_parameter_value(
@@ -147,6 +163,8 @@ class QueryStringTransformer:
                 raise KeyError(
                     f"Value '{value}' does not exist for parameter '{parameter}'"
                 )
+        if self.tolerant:
+            return self
         raise KeyError(f"Parameter '{parameter}' does not exist")
 
     def get_query_string(self) -> str:

@@ -117,15 +117,87 @@ class TestQueryStringTransformer(unittest.TestCase):
         self.assertEqual(manipulator.toggle_parameter_value("a", "1"), manipulator)
         self.assertTrue(manipulator.is_value_in_parameter("a", "1"))
         self.assertEqual(manipulator.get_query_string(), "?a=10&a=1&b=3")
+        with self.assertRaises(KeyError):
+            manipulator.toggle_parameter_value("c", "4")
 
     def test_add_remove_parameter_value(self):
         manipulator = QueryStringTransformer(self.test_query)
         self.assertEqual(manipulator.add_parameter_value("a", "10"), manipulator)
         self.assertTrue(manipulator.is_value_in_parameter("a", "10"))
         self.assertEqual(manipulator.parameter_values("a"), ["1", "10"])
+        with self.assertRaises(KeyError):
+            manipulator.add_parameter_value("c", "4")
 
     def test_remove_parameter_value(self):
         manipulator = QueryStringTransformer(self.test_query)
         self.assertEqual(manipulator.remove_parameter_value("b", "2"), manipulator)
         self.assertFalse(manipulator.is_value_in_parameter("b", "2"))
         self.assertEqual(manipulator.parameter_values("b"), ["3"])
+        with self.assertRaises(KeyError):
+            manipulator.remove_parameter_value("c", "4")
+
+
+class TestTolerantQueryStringTransformer(unittest.TestCase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.test_query = [("a", ["1"]), ("b", ["2", "3"])]
+
+    def test_update_parameter(self):
+        manipulator = QueryStringTransformer(self.test_query, tolerant=True)
+        self.assertEqual(manipulator.update_parameter("a", "10"), manipulator)
+        self.assertEqual(manipulator.parameter_values("a"), ["10"])
+        self.assertEqual(manipulator.update_parameter("b", ["20", "30"]), manipulator)
+        self.assertEqual(manipulator.parameter_values("b"), ["20", "30"])
+        self.assertEqual(manipulator.update_parameter("c", ["40"]), manipulator)
+        self.assertEqual(manipulator.parameter_values("c"), ["40"])
+        self.assertEqual(manipulator.get_query_string(), "?a=10&b=20&b=30&c=40")
+
+    def test_remove_parameter(self):
+        manipulator = QueryStringTransformer(self.test_query, tolerant=True)
+        self.assertEqual(manipulator.remove_parameter("a"), manipulator)
+        self.assertFalse(manipulator.parameter_exists("a"))
+        self.assertEqual(manipulator.remove_parameter("b"), manipulator)
+        self.assertFalse(manipulator.parameter_exists("b"))
+        self.assertEqual(manipulator.remove_parameter("c"), manipulator)
+        self.assertEqual(manipulator.get_query_string(), "")
+
+    def test_is_value_in_parameter(self):
+        manipulator = QueryStringTransformer(self.test_query, tolerant=True)
+        self.assertTrue(manipulator.is_value_in_parameter("a", "1"))
+        self.assertTrue(manipulator.is_value_in_parameter("b", "2"))
+        self.assertTrue(manipulator.is_value_in_parameter("b", "3"))
+        self.assertFalse(manipulator.is_value_in_parameter("b", "4"))
+        self.assertFalse(manipulator.is_value_in_parameter("c", "5"))
+
+    def test_toggle_parameter_value(self):
+        manipulator = QueryStringTransformer(self.test_query, tolerant=True)
+        self.assertEqual(manipulator.toggle_parameter_value("a", "1"), manipulator)
+        self.assertFalse(manipulator.is_value_in_parameter("a", "1"))
+        self.assertEqual(manipulator.toggle_parameter_value("a", "10"), manipulator)
+        self.assertTrue(manipulator.is_value_in_parameter("a", "10"))
+        self.assertEqual(manipulator.toggle_parameter_value("b", "2"), manipulator)
+        self.assertFalse(manipulator.is_value_in_parameter("b", "2"))
+        self.assertEqual(manipulator.get_query_string(), "?a=10&b=3")
+        self.assertEqual(manipulator.toggle_parameter_value("a", "1"), manipulator)
+        self.assertTrue(manipulator.is_value_in_parameter("a", "1"))
+        self.assertEqual(manipulator.toggle_parameter_value("c", "4"), manipulator)
+        self.assertEqual(manipulator.get_query_string(), "?a=10&a=1&b=3&c=4")
+        self.assertEqual(manipulator.toggle_parameter_value("c", "4"), manipulator)
+        self.assertEqual(manipulator.get_query_string(), "?a=10&a=1&b=3")
+
+    def test_add_remove_parameter_value(self):
+        manipulator = QueryStringTransformer(self.test_query, tolerant=True)
+        self.assertEqual(manipulator.add_parameter_value("a", "10"), manipulator)
+        self.assertTrue(manipulator.is_value_in_parameter("a", "10"))
+        self.assertEqual(manipulator.parameter_values("a"), ["1", "10"])
+        self.assertEqual(manipulator.add_parameter_value("c", "4"), manipulator)
+        self.assertTrue(manipulator.is_value_in_parameter("c", "4"))
+        self.assertEqual(manipulator.parameter_values("c"), ["4"])
+
+    def test_remove_parameter_value(self):
+        manipulator = QueryStringTransformer(self.test_query, tolerant=True)
+        self.assertEqual(manipulator.remove_parameter_value("b", "2"), manipulator)
+        self.assertFalse(manipulator.is_value_in_parameter("b", "2"))
+        self.assertEqual(manipulator.parameter_values("b"), ["3"])
+        self.assertEqual(manipulator.remove_parameter_value("c", "4"), manipulator)
+        self.assertFalse(manipulator.is_value_in_parameter("c", "4"))
