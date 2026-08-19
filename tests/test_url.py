@@ -72,6 +72,9 @@ class TestQueryStringTransformer(unittest.TestCase):
         self.assertTrue(manipulator.parameter_exists("h"))
         self.assertEqual(manipulator.parameter_values("h"), ["False"])
 
+        with self.assertRaises(ValueError):
+            manipulator.add_parameter("h", [True])
+
         self.assertEqual(
             manipulator.get_query_string(), "?a=1&b=2&b=3&e=&f=4&g=5&g=6&h=False"
         )
@@ -93,7 +96,7 @@ class TestQueryStringTransformer(unittest.TestCase):
         self.assertEqual(manipulator.remove_parameter("b"), manipulator)
         self.assertFalse(manipulator.parameter_exists("b"))
         with self.assertRaises(KeyError):
-            self.assertEqual(manipulator.remove_parameter("c"), manipulator)
+            manipulator.remove_parameter("c")
         self.assertEqual(manipulator.get_query_string(), "")
 
     def test_is_value_in_parameter(self):
@@ -103,7 +106,7 @@ class TestQueryStringTransformer(unittest.TestCase):
         self.assertTrue(manipulator.is_value_in_parameter("b", "3"))
         self.assertFalse(manipulator.is_value_in_parameter("b", "4"))
         with self.assertRaises(KeyError):
-            self.assertFalse(manipulator.is_value_in_parameter("c", "5"))
+            manipulator.is_value_in_parameter("c", "5")
 
     def test_toggle_parameter_value(self):
         manipulator = QueryStringTransformer(self.test_query)
@@ -142,6 +145,19 @@ class TestTolerantQueryStringTransformer(unittest.TestCase):
         super().__init__(*args, **kwargs)
         self.test_query = [("a", ["1"]), ("b", ["2", "3"])]
 
+    def test_add_parameter(self):
+        manipulator = QueryStringTransformer(self.test_query, tolerant=True)
+
+        self.assertEqual(manipulator.add_parameter("h", [False]), manipulator)
+        self.assertTrue(manipulator.parameter_exists("h"))
+        self.assertEqual(manipulator.parameter_values("h"), ["False"])
+
+        self.assertEqual(manipulator.add_parameter("h", [True]), manipulator)
+        self.assertTrue(manipulator.parameter_exists("h"))
+        self.assertEqual(manipulator.parameter_values("h"), ["True"])
+
+        self.assertEqual(manipulator.get_query_string(), "?a=1&b=2&b=3&h=True")
+
     def test_update_parameter(self):
         manipulator = QueryStringTransformer(self.test_query, tolerant=True)
         self.assertEqual(manipulator.update_parameter("a", "10"), manipulator)
@@ -151,6 +167,9 @@ class TestTolerantQueryStringTransformer(unittest.TestCase):
         self.assertEqual(manipulator.update_parameter("c", ["40"]), manipulator)
         self.assertEqual(manipulator.parameter_values("c"), ["40"])
         self.assertEqual(manipulator.get_query_string(), "?a=10&b=20&b=30&c=40")
+        self.assertEqual(manipulator.update_parameter("c", "50"), manipulator)
+        self.assertEqual(manipulator.parameter_values("c"), ["50"])
+        self.assertEqual(manipulator.get_query_string(), "?a=10&b=20&b=30&c=50")
 
     def test_remove_parameter(self):
         manipulator = QueryStringTransformer(self.test_query, tolerant=True)

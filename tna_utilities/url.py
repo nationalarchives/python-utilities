@@ -9,7 +9,8 @@ class QueryStringTransformer:
         args: An object representing the query parameters, typically an
               ImmutableMultiDict (Django) or QueryDict (Flask) which can be
               accessed with request.GET (Django) or request.args (Flask).
-        tolerant: If True, the transformer will not raise exceptions for certain operations.
+        tolerant: If True, the transformer will not raise exceptions when
+                  keys don't exist.
     """
 
     def __init__(self, args=None, tolerant=False) -> None:
@@ -52,19 +53,20 @@ class QueryStringTransformer:
     ) -> "QueryStringTransformer":
         """
         Add a new parameter to the query parameters.
-        Raises a ValueError if the parameter already exists.
+        Raises a ValueError if the parameter already exists and tolerant mode is not enabled.
         """
 
-        for key, _vals in self.args:
-            if key == parameter:
-                if self.tolerant:
-                    return self
-                raise ValueError(f"Parameter '{parameter}' already exists")
+        parameter_exists = self.parameter_exists(parameter)
+        if parameter_exists and not self.tolerant:
+            raise ValueError(f"Parameter '{parameter}' already exists")
         if not isinstance(values, list):
             values = [str(values)] if values is not None else []
         else:
             values = [str(v) for v in values]
-        self.args.append((parameter, values))
+        if parameter_exists:
+            self.update_parameter(parameter, values)
+        else:
+            self.args.append((parameter, values))
         return self
 
     def update_parameter(
@@ -83,7 +85,7 @@ class QueryStringTransformer:
     def remove_parameter(self, parameter: str) -> "QueryStringTransformer":
         """
         Remove a parameter from the query parameters.
-        Raises a KeyError if the parameter does not exist.
+        Raises a KeyError if the parameter does not exist and tolerant mode is not enabled.
         """
 
         for index, (key, _vals) in enumerate(self.args):
@@ -97,7 +99,7 @@ class QueryStringTransformer:
     def is_value_in_parameter(self, parameter: str, value: str | int) -> bool:
         """
         Check if a specific value exists within a parameter's values.
-        Raises a KeyError if the parameter does not exist.
+        Raises a KeyError if the parameter does not exist and tolerant mode is not enabled.
         """
 
         for key, values in self.args:
@@ -112,7 +114,7 @@ class QueryStringTransformer:
     ) -> "QueryStringTransformer":
         """
         Add a specific value to a parameter's values.
-        Raises a KeyError if the parameter does not exist.
+        Raises a KeyError if the parameter does not exist and tolerant mode is not enabled.
         """
 
         for key, values in self.args:
@@ -131,7 +133,7 @@ class QueryStringTransformer:
         """
         Toggle a value within a parameter's values.
         If the value exists, it will be removed; if it does not exist, it will be added.
-        Raises a KeyError if the parameter does not exist.
+        Raises a KeyError if the parameter does not exist and tolerant mode is not enabled.
         """
 
         for key, values in self.args:
@@ -152,7 +154,7 @@ class QueryStringTransformer:
     ) -> "QueryStringTransformer":
         """
         Remove a specific value from a parameter's values.
-        Raises a KeyError if the parameter does not exist or if the value is not present.
+        Raises a KeyError if the parameter does not exist or if the value is not present and tolerant mode is not enabled.
         """
 
         for key, values in self.args:

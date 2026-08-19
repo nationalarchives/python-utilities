@@ -5,17 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nationalarchives/python-utilities/compare/v1.6.0...HEAD)
+## [Unreleased](https://github.com/nationalarchives/python-utilities/compare/v1.7.0...HEAD)
 
 ### Added
 ### Changed
-
-- `QueryStringTransformer` now has a `tolerant` option which doesn't raise exceptions for missing keys
-
 ### Deprecated
 ### Removed
 ### Fixed
 ### Security
+
+## [1.7.0](https://github.com/nationalarchives/python-utilities/compare/v1.6.0...v1.7.0) - 2026-08-19
+
+### Added
+
+- `QueryStringTransformer` now has a `tolerant` option which doesn't raise exceptions for missing keys
 
 ## [1.6.0](https://github.com/nationalarchives/python-utilities/compare/v1.5.0...v1.6.0) - 2026-08-04
 
