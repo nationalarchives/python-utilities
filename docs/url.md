@@ -76,7 +76,9 @@ qs.is_value_in_parameter("b", "4")
 # False
 ```
 
-### Add and remove parameters
+### Add, update and remove parameters
+
+Here, we are creating a new query string using `.new()` which creates a modifyable object which allows us to add, update and remove parameters and their values.
 
 ```python
 from tna_utilities.url import QueryStringTransformer
@@ -84,46 +86,31 @@ from tna_utilities.url import QueryStringTransformer
 # ?a=1&b=2&b=3
 qs = QueryStringTransformer([("a", ["1"]), ("b", ["2", "3"])])
 
-qs.add_parameter("c", "4")
-qs.update_parameter("b", ["5", "6"])
-qs.remove_parameter("a")
+new_qs = qs.new()
 
-print(qs.get_query_string())
-# ?b=5&b=6&c=4
+new_qs.add_parameter("c", "4")
+new_qs.update_parameter("b", ["5", "6"])
+new_qs.add_parameter_value("b", "7")
+new_qs.toggle_parameter_value("b", "1")
+new_qs.remove_parameter_value("b", "5")
+new_qs.remove_parameter("a")
+print(new_qs.get_query_string())
+# ?b=1&b=6&b=7&c=4
 
 # Chainable (as of v1.1.0)
-print(qs.add_parameter(
+print(new_qs.add_parameter(
     "c", "4"
 ).update_parameter(
     "b", ["5", "6"]
+).add_parameter_value(
+    "b", "7"
+).toggle_parameter_value(
+    "b", "1"
+).remove_parameter_value(
+    "b", "5"
 ).remove_parameter(
     "a"
 ).get_query_string())
-```
-
-### Update parameter values
-
-```python
-from tna_utilities.url import QueryStringTransformer
-
-# ?a=1&b=2&b=3
-qs = QueryStringTransformer([("a", ["1"]), ("b", ["2", "3"])])
-
-qs.add_parameter_value("a", "4")
-qs.toggle_parameter_value("b", "3")
-qs.remove_parameter_value("a", "1")
-
-print(qs.get_query_string())
-# ?a=4&b=2
-
-# Chainable (as of v1.1.0)
-new_query_string = qs.add_parameter_value(
-    "a", "4"
-).toggle_parameter_value(
-    "b", "3"
-).remove_parameter_value(
-    "a", "1"
-).get_query_string()
 ```
 
 ### Tolerant mode
@@ -135,12 +122,14 @@ from tna_utilities.url import QueryStringTransformer
 
 # ?a=1
 qs = QueryStringTransformer([("a", ["1"])])
-qs.remove_parameter_value("b", "2")  # Raises KeyError: Parameter 'b' does not exist
-qs.is_value_in_parameter("c", "3")  # Raises KeyError: Parameter 'c' does not exist
+new_qs = qs.new()
+new_qs.remove_parameter_value("b", "2")  # Raises KeyError: Parameter 'b' does not exist
+print(new_qs.is_value_in_parameter("c", "3"))  # Raises KeyError: Parameter 'c' does not exist
 
 # ?a=1
-qs_tolerant = QueryStringTransformer([("a", ["1"])], tolerant=True)
-qs_tolerant.remove_parameter_value("b", "2")  # No exception raised
-print(qs_tolerant.is_value_in_parameter("c", "3"))
+tolerant_qs = QueryStringTransformer([("a", ["1"])], tolerant=True)
+new_tolerant_qs = tolerant_qs.new()
+new_tolerant_qs.remove_parameter_value("b", "2")  # No exception raised
+print(new_tolerant_qs.is_value_in_parameter("c", "3"))
 # False
 ```

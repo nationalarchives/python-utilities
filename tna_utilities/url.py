@@ -1,9 +1,9 @@
 from urllib.parse import urlencode
 
 
-class QueryStringTransformer:
+class BaseQueryString:
     """
-    A utility class to manipulate query strings.
+    A utility class to query URL query strings.
 
     Args:
         args: An object representing the query parameters, typically an
@@ -48,9 +48,39 @@ class QueryStringTransformer:
             return []
         raise KeyError(f"Parameter '{parameter}' does not exist")
 
+    def is_value_in_parameter(self, parameter: str, value: str | int) -> bool:
+        """
+        Check if a specific value exists within a parameter's values.
+        Raises a KeyError if the parameter does not exist and tolerant mode is not enabled.
+        """
+
+        for key, values in self.args:
+            if key == parameter:
+                return str(value) in values
+        if self.tolerant:
+            return False
+        raise KeyError(f"Parameter '{parameter}' does not exist")
+
+    def get_query_string(self) -> str:
+        """
+        Get the full query string.
+        Returns an empty string if there are no query parameters.
+        """
+
+        query = urlencode(self.args, doseq=True)
+        if not query:
+            return ""
+        return f"?{query}"
+
+
+class QueryStringModifier(BaseQueryString):
+    """
+    A utility class to manipulate URL query strings.
+    """
+
     def add_parameter(
         self, parameter: str, values: str | int | list | None = None
-    ) -> "QueryStringTransformer":
+    ) -> "QueryStringModifier":
         """
         Add a new parameter to the query parameters.
         Raises a ValueError if the parameter already exists and tolerant mode is not enabled.
@@ -71,7 +101,7 @@ class QueryStringTransformer:
 
     def update_parameter(
         self, parameter: str, values: str | int | list | None = None
-    ) -> "QueryStringTransformer":
+    ) -> "QueryStringModifier":
         """
         Update an existing parameter in the query parameters.
         If the parameter does not exist, it will be added.
@@ -82,7 +112,7 @@ class QueryStringTransformer:
         self.add_parameter(parameter, values)
         return self
 
-    def remove_parameter(self, parameter: str) -> "QueryStringTransformer":
+    def remove_parameter(self, parameter: str) -> "QueryStringModifier":
         """
         Remove a parameter from the query parameters.
         Raises a KeyError if the parameter does not exist and tolerant mode is not enabled.
@@ -96,22 +126,9 @@ class QueryStringTransformer:
             return self
         raise KeyError(f"Parameter '{parameter}' does not exist")
 
-    def is_value_in_parameter(self, parameter: str, value: str | int) -> bool:
-        """
-        Check if a specific value exists within a parameter's values.
-        Raises a KeyError if the parameter does not exist and tolerant mode is not enabled.
-        """
-
-        for key, values in self.args:
-            if key == parameter:
-                return str(value) in values
-        if self.tolerant:
-            return False
-        raise KeyError(f"Parameter '{parameter}' does not exist")
-
     def add_parameter_value(
         self, parameter: str, value: str | int
-    ) -> "QueryStringTransformer":
+    ) -> "QueryStringModifier":
         """
         Add a specific value to a parameter's values.
         Raises a KeyError if the parameter does not exist and tolerant mode is not enabled.
@@ -129,7 +146,7 @@ class QueryStringTransformer:
 
     def toggle_parameter_value(
         self, parameter: str, value: str | int
-    ) -> "QueryStringTransformer":
+    ) -> "QueryStringModifier":
         """
         Toggle a value within a parameter's values.
         If the value exists, it will be removed; if it does not exist, it will be added.
@@ -151,7 +168,7 @@ class QueryStringTransformer:
 
     def remove_parameter_value(
         self, parameter: str, value: str | int
-    ) -> "QueryStringTransformer":
+    ) -> "QueryStringModifier":
         """
         Remove a specific value from a parameter's values.
         Raises a KeyError if the parameter does not exist or if the value is not present and tolerant mode is not enabled.
@@ -169,13 +186,26 @@ class QueryStringTransformer:
             return self
         raise KeyError(f"Parameter '{parameter}' does not exist")
 
-    def get_query_string(self) -> str:
+
+class QueryStringTransformer(BaseQueryString):
+    """
+    A utility class that extends QueryStringModifier to manipulate query strings while keeping a copy of the initial query string intact for querying later.
+
+    Args:
+        args: An object representing the query parameters, typically an
+              ImmutableMultiDict (Django) or QueryDict (Flask) which can be
+              accessed with request.GET (Django) or request.args (Flask).
+        tolerant: If True, the transformer will not raise exceptions when
+                  keys don't exist.
+    """
+
+    def __init__(self, args=None, tolerant=False) -> None:
+        super().__init__(args, tolerant)
+        self.initial_args = self.args
+
+    def new(self) -> "QueryStringModifier":
         """
-        Get the full query string.
-        Returns an empty string if there are no query parameters.
+        Create a new instance of QueryStringModifier with the same initial query string.
         """
 
-        query = urlencode(self.args, doseq=True)
-        if not query:
-            return ""
-        return f"?{query}"
+        return QueryStringModifier(self.initial_args.copy(), self.tolerant)

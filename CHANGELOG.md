@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added `tna_frontend_pagination()` to `tna_utilities.component` to generate the entire content block required for [TNA Frontend pagination components](https://design-system.nationalarchives.gov.uk/components/pagination/)
 
+### Changed
+
+- `QueryStringTransformer` is now read-only - to modify query strings, create a new editable object with `new()`
+
 ## [1.7.0](https://github.com/nationalarchives/python-utilities/compare/v1.6.0...v1.7.0) - 2026-08-19
 
 ### Added
