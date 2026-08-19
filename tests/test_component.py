@@ -3,6 +3,7 @@ import unittest
 from tna_utilities.component import (
     PAGINATION_GAP,
     paginate,
+    tna_frontend_pagination,
     tna_frontend_pagination_items,
 )
 
@@ -324,7 +325,7 @@ class TestComponent(unittest.TestCase):
         with self.assertRaises(ValueError):
             paginate(42, 1, around=-1)
 
-    def test_tna_pagination_items(self):
+    def test_tna_frontend_pagination_items(self):
         self.assertEqual(
             tna_frontend_pagination_items(42, 6, "/test?page="),
             [
@@ -338,7 +339,7 @@ class TestComponent(unittest.TestCase):
             ],
         )
 
-    def test_tna_pagination_items_custom_transformer(self):
+    def test_tna_frontend_pagination_items_custom_transformer(self):
         def custom_transformer(item, current_page, base_url):
             return {
                 "page": item,
@@ -361,7 +362,7 @@ class TestComponent(unittest.TestCase):
             ],
         )
 
-    def test_tna_pagination_items_custom_transformer_lambda(self):
+    def test_tna_frontend_pagination_items_custom_transformer_lambda(self):
         self.assertEqual(
             tna_frontend_pagination_items(
                 42,
@@ -384,7 +385,7 @@ class TestComponent(unittest.TestCase):
             ],
         )
 
-    def test_tna_pagination_items_custom_ellipsis(self):
+    def test_tna_frontend_pagination_items_custom_ellipsis(self):
         self.assertEqual(
             tna_frontend_pagination_items(
                 42, 6, "/test?page=", ellipsis={"number": None}
@@ -398,4 +399,133 @@ class TestComponent(unittest.TestCase):
                 {"number": None},
                 {"number": 42, "current": False, "href": "/test?page=42"},
             ],
+        )
+
+    def test_tna_frontend_pagination(self):
+        pagination = tna_frontend_pagination(42, 6, "/test?page=")
+
+        self.assertIn("items", pagination)
+        self.assertEqual(
+            pagination["items"],
+            [
+                {"number": 1, "current": False, "href": "/test?page=1"},
+                {"ellipsis": True},
+                {"number": 5, "current": False, "href": "/test?page=5"},
+                {"number": 6, "current": True, "href": "/test?page=6"},
+                {"number": 7, "current": False, "href": "/test?page=7"},
+                {"ellipsis": True},
+                {"number": 42, "current": False, "href": "/test?page=42"},
+            ],
+        )
+
+        self.assertIn("previous", pagination)
+        self.assertEqual(
+            pagination["previous"],
+            {
+                "href": "/test?page=5",
+            },
+        )
+
+        self.assertIn("next", pagination)
+        self.assertEqual(
+            pagination["next"],
+            {
+                "href": "/test?page=7",
+            },
+        )
+
+    def test_tna_frontend_pagination_first(self):
+        pagination = tna_frontend_pagination(42, 1, "/test?page=")
+
+        self.assertIn("items", pagination)
+        self.assertEqual(
+            pagination["items"],
+            [
+                {"number": 1, "current": True, "href": "/test?page=1"},
+                {"number": 2, "current": False, "href": "/test?page=2"},
+                {"ellipsis": True},
+                {"number": 42, "current": False, "href": "/test?page=42"},
+            ],
+        )
+
+        self.assertNotIn("previous", pagination)
+
+        self.assertIn("next", pagination)
+        self.assertEqual(
+            pagination["next"],
+            {
+                "href": "/test?page=2",
+            },
+        )
+
+    def test_tna_frontend_pagination_last(self):
+        pagination = tna_frontend_pagination(42, 42, "/test?page=")
+
+        self.assertIn("items", pagination)
+        self.assertEqual(
+            pagination["items"],
+            [
+                {"number": 1, "current": False, "href": "/test?page=1"},
+                {"ellipsis": True},
+                {"number": 41, "current": False, "href": "/test?page=41"},
+                {"number": 42, "current": True, "href": "/test?page=42"},
+            ],
+        )
+
+        self.assertIn("previous", pagination)
+        self.assertEqual(
+            pagination["previous"],
+            {
+                "href": "/test?page=41",
+            },
+        )
+
+        self.assertNotIn("next", pagination)
+
+    def test_tna_frontend_pagination_custom_properties(self):
+        pagination = tna_frontend_pagination(
+            42,
+            6,
+            "/test?page=",
+            custom_properties={
+                "items": "foobar",
+                "classes": "test-class",
+                "attributes": {"data-test": "value"},
+            },
+        )
+
+        self.assertIn("items", pagination)
+        self.assertNotEqual(pagination["items"], "foobar")
+
+        self.assertIn("classes", pagination)
+        self.assertEqual(pagination["classes"], "test-class")
+
+        self.assertIn("attributes", pagination)
+        self.assertEqual(pagination["attributes"], {"data-test": "value"})
+
+    def test_tna_frontend_pagination_custom_next_previous_properties(self):
+        pagination = tna_frontend_pagination(
+            42,
+            6,
+            "/test?page=",
+            previous_page_properties={"text": "Go back one", "href": "NONONO"},
+            next_page_properties={
+                "title": "Another page please",
+                "description": "foobar",
+            },
+        )
+
+        self.assertIn("previous", pagination)
+        self.assertEqual(
+            pagination["previous"], {"text": "Go back one", "href": "/test?page=5"}
+        )
+
+        self.assertIn("next", pagination)
+        self.assertEqual(
+            pagination["next"],
+            {
+                "href": "/test?page=7",
+                "title": "Another page please",
+                "description": "foobar",
+            },
         )
