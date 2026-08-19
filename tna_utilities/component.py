@@ -90,3 +90,58 @@ def tna_frontend_pagination_items(
         (transformer(item, current_page, base_url) if type(item) is int else ellipsis)
         for item in paginated_items
     ]
+
+
+def tna_frontend_pagination(
+    pages: int,
+    current_page: int,
+    base_url: str,
+    custom_properties: dict = None,
+    around: int = 1,
+    transformer: Callable[
+        [int, int, str], dict
+    ] = lambda item, current_page, base_url: {
+        "number": item,
+        "current": item == current_page,
+        "href": f"{base_url}{item}",
+    },
+    ellipsis: dict | None = None,
+    previous_page_properties: dict = None,
+    next_page_properties: dict = None,
+) -> dict:
+    """
+    Convert paginated items to a format suitable for the TNA frontend.
+
+    Args:
+        pages (int): The total number of pages to paginate.
+        current_page (int): The current page number.
+        base_url (str): The base URL to use for pagination links.
+        custom_properties (dict, optional): A dictionary of additional properties to include in the returned dictionary. Defaults to an empty dictionary.
+        around (int, optional): The number of pages to show around the current page. Defaults to 1.
+        transformer (callable, optional): A function to transform each page item.
+        ellipsis (dict, optional): A dictionary representing the ellipsis item. Defaults to {"ellipsis": True}.
+        previous_page_properties (dict, optional): A dictionary of properties for the previous page link. Defaults to an empty dictionary.
+        next_page_properties (dict, optional): A dictionary of properties for the next page link. Defaults to an empty dictionary.
+    Returns:
+        dict: A dictionary containing the paginated items for the TNA frontend, with "items" as a list of dictionaries representing the paginated items, and a "previous" and "next" for navigation if applicable.
+    """
+
+    content = custom_properties.copy() if custom_properties else {}
+
+    content["items"] = tna_frontend_pagination_items(
+        pages, current_page, base_url, around, transformer, ellipsis
+    )
+
+    if current_page > 1:
+        previous_page = (
+            previous_page_properties.copy() if previous_page_properties else {}
+        )
+        previous_page["href"] = f"{base_url}{current_page - 1}"
+        content["previous"] = previous_page
+
+    if current_page < pages:
+        next_page = next_page_properties.copy() if next_page_properties else {}
+        next_page["href"] = f"{base_url}{current_page + 1}"
+        content["next"] = next_page
+
+    return content
