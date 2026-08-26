@@ -155,28 +155,21 @@ class Talisman:
         Applies the configured security headers to the response.
         """
 
-        response.headers["Content-Security-Policy"] = self._csp(
-            self.content_security_policy,
-            self.allow_google_content_security_policy,
-            self.allow_typekit_content_security_policy,
-        )
+        response.headers["Content-Security-Policy"] = self._csp()
         response.headers.update(common_security_headers())
         response.headers["Referrer-Policy"] = self.referrer_policy
         response.headers.update(self.extra_headers)
         return response
 
-    def _csp(
-        self,
-        content_security_policy: dict,
-        allow_google_content_security_policy: bool = False,
-        allow_typekit_content_security_policy: bool = False,
-    ):
+    def _csp(self):
         """
         Generates a Content-Security-Policy header value based on the provided content security policy configuration and the option to include Google's recommended content security policy directives.
         """
 
         csp = CspGenerator(
-            default_src=content_security_policy.get("default-src", CspGenerator.SELF)
+            default_src=self.content_security_policy.get(
+                "default-src", CspGenerator.SELF
+            )
         )
 
         property_methods = [
@@ -205,19 +198,19 @@ class Talisman:
         for directive, method in property_methods:
             # Intentionally pass an empty string for missing optional directives;
             # CspGenerator setters treat this as "not set" while keeping call signatures consistent.
-            method(content_security_policy.get(directive, ""))
+            method(self.content_security_policy.get(directive, ""))
 
-        if "sandbox" in content_security_policy:
-            csp.sandbox(content_security_policy["sandbox"])
+        if "sandbox" in self.content_security_policy:
+            csp.sandbox(*self.content_security_policy["sandbox"])
 
-        if content_security_policy.get("require-trusted-types-for", False):
+        if self.content_security_policy.get("require-trusted-types-for", False):
             csp.require_trusted_types_for()
 
-        if allow_google_content_security_policy:
+        if self.allow_google_content_security_policy:
             for directive, values in GOOGLE_CSP_DIRECTIVES.items():
                 csp.add_directive(directive, *values)
 
-        if allow_typekit_content_security_policy:
+        if self.allow_typekit_content_security_policy:
             for directive, values in TYPEKIT_CSP_DIRECTIVES.items():
                 csp.add_directive(directive, *values)
 

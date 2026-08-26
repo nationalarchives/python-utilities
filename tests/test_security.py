@@ -342,6 +342,12 @@ class TestSecurityCSP(unittest.TestCase):
         self.assertIn("default-src 'self'", generator.to_string())
         self.assertIn("sandbox allow-scripts", generator.to_string())
 
+    def test_add_sandbox_values(self):
+        generator = CspGenerator()
+        generator.sandbox("allow-scripts", "allow-downloads")
+        self.assertIn("default-src 'self'", generator.to_string())
+        self.assertIn("sandbox allow-scripts allow-downloads", generator.to_string())
+
     def test_add_sandbox_invalid_value(self):
         generator = CspGenerator()
         generator.sandbox("pizza")
