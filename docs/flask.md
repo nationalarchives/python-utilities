@@ -82,5 +82,18 @@ from flask import Flask
 from tna_utilities.flask import Talisman
 
 app = Flask(__name__)
-Talisman(app)
+Talisman(
+    app,
+    content_security_policy={
+        "img-src": ["img.example.com"],
+        "sandbox": [
+            "allow-scripts",
+            "allow-downloads",
+            "allow-forms",
+            "allow-same-origin",
+            "allow-popups",
+        ],
+    },
+    allow_google_content_security_policy=True,
+)
 ```

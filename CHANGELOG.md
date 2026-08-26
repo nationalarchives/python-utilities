@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nationalarchives/python-utilities/compare/v1.8.0...HEAD)
+## [Unreleased](https://github.com/nationalarchives/python-utilities/compare/v1.9.0...HEAD)
 
 ### Added
 ### Changed
@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 ### Fixed
 ### Security
+
+## [1.9.0](https://github.com/nationalarchives/python-utilities/compare/v1.8.0...v1.9.0) - 2026-08-26
+
+### Changed
+
+- `CspGenerator.sandbox()` now accepts multiple parameters
+
+### Fixed
+
+- Fixed issue adding `sandbox` CSP directive through Flask Talisman
 
 ## [1.8.0](https://github.com/nationalarchives/python-utilities/compare/v1.7.0...v1.8.0) - 2026-08-19
 

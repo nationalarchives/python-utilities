@@ -11,22 +11,22 @@ A utility class to generate a CSP.
 ```python
 from tna_utilities.security import CspGenerator
 
-generator = CspGenerator()
+csp = CspGenerator()
 
 # Add a single directive source (plus 'self')
-generator.script_src("example.com")
+csp.script_src("example.com")
 
 # Add multiple sources for a directive (plus 'self')
-generator.style_src("example.com", "another.net")
+csp.style_src("example.com", "another.net")
 
 # Add a directive source without allowing 'self'
-generator.object_src("example.com", omit_self=True)
+csp.object_src("example.com", omit_self=True)
 
 # Disallow a directive
-generator.disallow("worker-src")
+csp.disallow("worker-src")
 
-generator.to_string()
-# default-src 'self'; script-src 'self' example.com; style-src 'self' example.com another.net; object-src example.com; worker-src 'none';
+csp.to_string()
+# default-src 'self'; script-src 'self' example.com; style-src 'self' example.com another.net; object-src example.com; worker-src 'none'
 ```
 
 ## `common_security_headers`

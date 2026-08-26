@@ -309,7 +309,7 @@ class CspGenerator:
         self.directives["require-trusted-types-for"] = ["'script'"]
         return self
 
-    def sandbox(self, value: str | None = None) -> "CspGenerator":
+    def sandbox(self, *values: str | list[str]) -> "CspGenerator":
         """
         Add or configure the CSP ``sandbox`` directive.
 
@@ -317,8 +317,8 @@ class CspGenerator:
         framed content. When a sandbox directive is present with no allowed
         flags, all sandbox restrictions are applied.
 
-        :param value:
-            Optional sandbox permission token to allow within the sandboxed
+        :param values:
+            Optional sandbox permission tokens to allow within the sandboxed
             context. Must be one of:
 
             - ``"allow-downloads"``
@@ -335,14 +335,14 @@ class CspGenerator:
             - ``"allow-top-navigation-by-user-activation"``
             - ``"allow-top-navigation-to-custom-protocols"``
 
-            If ``value`` is ``None`` (the default) or not one of the allowed
+            If ``values`` is ``None`` (the default) or not one of the allowed
             tokens, no sandbox flags are added and a bare ``sandbox`` directive
             is generated, applying all sandbox restrictions.
 
         :returns: This ``CspGenerator`` instance to allow method chaining.
         """
 
-        values = [
+        accepted_values = [
             "allow-downloads",
             "allow-forms",
             "allow-modals",
@@ -357,7 +357,11 @@ class CspGenerator:
             "allow-top-navigation-by-user-activation",
             "allow-top-navigation-to-custom-protocols",
         ]
-        sources = [value] if value is not None and value in values else []
+        sources = (
+            [value for value in values if value in accepted_values]
+            if values is not None
+            else []
+        )
 
         self.directives["sandbox"] = sources
         return self

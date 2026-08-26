@@ -165,8 +165,11 @@ class TestFlaskTalisman(unittest.TestCase):
         Talisman(
             self.app,
             content_security_policy={
-                "default-src": ["'self'", "example.com"],
                 "img-src": ["'self'", "img.example.com"],
+                "sandbox": [
+                    "allow-scripts",
+                    "allow-downloads",
+                ],
             },
         )
 
@@ -176,11 +179,15 @@ class TestFlaskTalisman(unittest.TestCase):
 
         self.assertIn("Content-Security-Policy", rv.headers)
         self.assertIn(
-            "default-src 'self' example.com",
+            "default-src 'self'",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
             "img-src 'self' img.example.com",
+            rv.headers["Content-Security-Policy"],
+        )
+        self.assertIn(
+            "sandbox allow-scripts allow-downloads",
             rv.headers["Content-Security-Policy"],
         )
 
