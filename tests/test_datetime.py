@@ -1,6 +1,5 @@
 import datetime
 import unittest
-from datetime import UTC
 
 from tna_utilities.datetime import (
     get_date_from_string,
@@ -19,38 +18,40 @@ from tna_utilities.datetime import (
 
 
 def now():
-    return datetime.datetime.now(UTC)
+    return datetime.datetime.now(datetime.timezone.utc)
 
 
 class TestGetDateFromString(unittest.TestCase):
     def test_happy_dd_mm_yyyy(self):
         self.assertEqual(
             get_date_from_string("2006-05-04"),
-            datetime.datetime(2006, 5, 4, 0, 0, 0, tzinfo=UTC),
+            datetime.datetime(2006, 5, 4, 0, 0, 0, tzinfo=datetime.timezone.utc),
         )
 
     def test_happy_mm_yyyy(self):
         self.assertEqual(
             get_date_from_string("2006-05"),
-            datetime.datetime(2006, 5, 1, 0, 0, 0, tzinfo=UTC),
+            datetime.datetime(2006, 5, 1, 0, 0, 0, tzinfo=datetime.timezone.utc),
         )
 
     def test_happy_yyyy(self):
         self.assertEqual(
             get_date_from_string("2006"),
-            datetime.datetime(2006, 1, 1, 0, 0, 0, tzinfo=UTC),
+            datetime.datetime(2006, 1, 1, 0, 0, 0, tzinfo=datetime.timezone.utc),
         )
 
     def test_happy_iso_8601(self):
         self.assertEqual(
             get_date_from_string("2006-05-04T01:02:03"),
-            datetime.datetime(2006, 5, 4, 1, 2, 3, tzinfo=UTC),
+            datetime.datetime(2006, 5, 4, 1, 2, 3, tzinfo=datetime.timezone.utc),
         )
 
     def test_happy_iso_8601_microseconds(self):
         self.assertEqual(
             get_date_from_string("2006-05-04T01:02:03.999"),
-            datetime.datetime(2006, 5, 4, 1, 2, 3, 999000, tzinfo=UTC),
+            datetime.datetime(
+                2006, 5, 4, 1, 2, 3, 999000, tzinfo=datetime.timezone.utc
+            ),
         )
 
     def test_happy_iso_8601_timezone(self):
@@ -70,19 +71,21 @@ class TestGetDateFromString(unittest.TestCase):
     def test_happy_iso_8601_zulu(self):
         self.assertEqual(
             get_date_from_string("2006-05-04T01:02:03Z"),
-            datetime.datetime(2006, 5, 4, 1, 2, 3, tzinfo=UTC),
+            datetime.datetime(2006, 5, 4, 1, 2, 3, tzinfo=datetime.timezone.utc),
         )
 
     def test_happy_iso_8601_microseconds_zulu(self):
         self.assertEqual(
             get_date_from_string("2006-05-04T01:02:03.999Z"),
-            datetime.datetime(2006, 5, 4, 1, 2, 3, 999000, tzinfo=UTC),
+            datetime.datetime(
+                2006, 5, 4, 1, 2, 3, 999000, tzinfo=datetime.timezone.utc
+            ),
         )
 
     def test_happy_iso_8601_plain(self):
         self.assertEqual(
             get_date_from_string("1000"),
-            datetime.datetime(1000, 1, 1, 0, 0, 0, tzinfo=UTC),
+            datetime.datetime(1000, 1, 1, 0, 0, 0, tzinfo=datetime.timezone.utc),
         )
 
     def test_unhappy_invalid_day(self):
@@ -148,7 +151,7 @@ class TestPrettyDate(unittest.TestCase):
         self.assertEqual(pretty_date(date, show_day=True), "Saturday 1 January 2000")
 
     def test_happy_datetime(self):
-        date = datetime.datetime(2000, 1, 1, 12, 30, 0, tzinfo=UTC)
+        date = datetime.datetime(2000, 1, 1, 12, 30, 0, tzinfo=datetime.timezone.utc)
         self.assertEqual(pretty_date(date), "1 January 2000")
         self.assertEqual(pretty_date(date, show_day=True), "Saturday 1 January 2000")
 
@@ -183,14 +186,14 @@ class TestPrettyDatetime(unittest.TestCase):
         )
 
     def test_happy_datetime(self):
-        date = datetime.datetime(2000, 1, 1, 12, 30, 0, tzinfo=UTC)
+        date = datetime.datetime(2000, 1, 1, 12, 30, 0, tzinfo=datetime.timezone.utc)
         self.assertEqual(pretty_datetime(date), "1 January 2000, 12:30")
         self.assertEqual(
             pretty_datetime(date, show_day=True), "Saturday 1 January 2000, 12:30"
         )
 
     def test_happy_datetime_with_seconds(self):
-        date = datetime.datetime(2000, 1, 1, 12, 30, 0, tzinfo=UTC)
+        date = datetime.datetime(2000, 1, 1, 12, 30, 0, tzinfo=datetime.timezone.utc)
         self.assertEqual(
             pretty_datetime(date, show_seconds=True), "1 January 2000, 12:30:00"
         )
@@ -319,68 +322,86 @@ class TestPrettyDateRange(unittest.TestCase):
         )
 
     def test_happy_datetime(self):
-        start_date = datetime.datetime(2000, 1, 1, tzinfo=UTC)
+        start_date = datetime.datetime(2000, 1, 1, tzinfo=datetime.timezone.utc)
         self.assertEqual(
             pretty_date_range(
-                start_date, datetime.datetime(2000, 1, 1, 14, 45, 0, tzinfo=UTC)
+                start_date,
+                datetime.datetime(2000, 1, 1, 14, 45, 0, tzinfo=datetime.timezone.utc),
             ),
             "1 January 2000",
         )
         self.assertEqual(
             pretty_date_range(
-                start_date, datetime.datetime(2000, 1, 2, 14, 45, 0, tzinfo=UTC)
+                start_date,
+                datetime.datetime(2000, 1, 2, 14, 45, 0, tzinfo=datetime.timezone.utc),
             ),
             "1 to 2 January 2000",
         )
         self.assertEqual(
             pretty_date_range(
-                start_date, datetime.datetime(2000, 1, 31, 14, 45, 0, tzinfo=UTC)
+                start_date,
+                datetime.datetime(2000, 1, 31, 14, 45, 0, tzinfo=datetime.timezone.utc),
             ),
             "1 to 31 January 2000",
         )
         self.assertEqual(
             pretty_date_range(
-                start_date, datetime.datetime(2000, 2, 1, 14, 45, 0, tzinfo=UTC)
+                start_date,
+                datetime.datetime(2000, 2, 1, 14, 45, 0, tzinfo=datetime.timezone.utc),
             ),
             "1 January to 1 February 2000",
         )
         self.assertEqual(
             pretty_date_range(
-                start_date, datetime.datetime(2000, 12, 31, 14, 45, 0, tzinfo=UTC)
+                start_date,
+                datetime.datetime(
+                    2000, 12, 31, 14, 45, 0, tzinfo=datetime.timezone.utc
+                ),
             ),
             "1 January to 31 December 2000",
         )
         self.assertEqual(
             pretty_date_range(
                 start_date,
-                datetime.datetime(2000, 12, 31, 14, 45, 0, tzinfo=UTC),
+                datetime.datetime(
+                    2000, 12, 31, 14, 45, 0, tzinfo=datetime.timezone.utc
+                ),
                 simplify_whole_years=True,
             ),
             "2000",
         )
         self.assertEqual(
             pretty_date_range(
-                start_date, datetime.datetime(2001, 1, 1, 14, 45, 0, tzinfo=UTC)
+                start_date,
+                datetime.datetime(2001, 1, 1, 14, 45, 0, tzinfo=datetime.timezone.utc),
             ),
             "1 January 2000 to 1 January 2001",
         )
         self.assertEqual(
             pretty_date_range(
-                start_date, datetime.datetime(2001, 12, 31, 14, 45, 0, tzinfo=UTC)
+                start_date,
+                datetime.datetime(
+                    2001, 12, 31, 14, 45, 0, tzinfo=datetime.timezone.utc
+                ),
             ),
             "1 January 2000 to 31 December 2001",
         )
         self.assertEqual(
             pretty_date_range(
                 start_date,
-                datetime.datetime(2001, 12, 31, 14, 45, 0, tzinfo=UTC),
+                datetime.datetime(
+                    2001, 12, 31, 14, 45, 0, tzinfo=datetime.timezone.utc
+                ),
                 simplify_whole_years=True,
             ),
             "2000 to 2001",
         )
         self.assertEqual(
             pretty_date_range(
-                None, datetime.datetime(2001, 12, 31, 14, 45, 0, tzinfo=UTC)
+                None,
+                datetime.datetime(
+                    2001, 12, 31, 14, 45, 0, tzinfo=datetime.timezone.utc
+                ),
             ),
             "Now to 31 December 2001",
         )
@@ -388,7 +409,9 @@ class TestPrettyDateRange(unittest.TestCase):
         self.assertEqual(
             pretty_date_range(
                 None,
-                datetime.datetime(2001, 12, 31, 14, 45, 0, tzinfo=UTC),
+                datetime.datetime(
+                    2001, 12, 31, 14, 45, 0, tzinfo=datetime.timezone.utc
+                ),
                 lowercase_first=True,
             ),
             "now to 31 December 2001",
@@ -553,64 +576,80 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         )
 
     def test_happy_datetime(self):
-        start_date = datetime.datetime(2000, 1, 1, 12, 30, 0, tzinfo=UTC)
+        start_date = datetime.datetime(
+            2000, 1, 1, 12, 30, 0, tzinfo=datetime.timezone.utc
+        )
         self.assertEqual(
             pretty_datetime_range(
-                start_date, datetime.datetime(2000, 1, 1, 12, 30, 0, tzinfo=UTC)
+                start_date,
+                datetime.datetime(2000, 1, 1, 12, 30, 0, tzinfo=datetime.timezone.utc),
             ),
             "1 January 2000, 12:30",
         )
         self.assertEqual(
             pretty_datetime_range(
-                start_date, datetime.datetime(2000, 1, 1, 12, 31, 0, tzinfo=UTC)
+                start_date,
+                datetime.datetime(2000, 1, 1, 12, 31, 0, tzinfo=datetime.timezone.utc),
             ),
             "1 January 2000, 12:30 to 12:31",
         )
         self.assertEqual(
             pretty_datetime_range(
-                start_date, datetime.datetime(2000, 1, 1, 23, 59, 59, tzinfo=UTC)
+                start_date,
+                datetime.datetime(2000, 1, 1, 23, 59, 59, tzinfo=datetime.timezone.utc),
             ),
             "1 January 2000, 12:30 to 23:59",
         )
         self.assertEqual(
             pretty_datetime_range(
-                start_date, datetime.datetime(2000, 1, 2, 0, 0, 0, tzinfo=UTC)
+                start_date,
+                datetime.datetime(2000, 1, 2, 0, 0, 0, tzinfo=datetime.timezone.utc),
             ),
             "1 January 2000, 12:30 to 2 January 2000, 00:00",
         )
         self.assertEqual(
             pretty_datetime_range(
-                start_date, datetime.datetime(2000, 1, 2, 14, 45, 0, tzinfo=UTC)
+                start_date,
+                datetime.datetime(2000, 1, 2, 14, 45, 0, tzinfo=datetime.timezone.utc),
             ),
             "1 January 2000, 12:30 to 2 January 2000, 14:45",
         )
         self.assertEqual(
             pretty_datetime_range(
-                start_date, datetime.datetime(2000, 1, 31, 14, 45, 0, tzinfo=UTC)
+                start_date,
+                datetime.datetime(2000, 1, 31, 14, 45, 0, tzinfo=datetime.timezone.utc),
             ),
             "1 January 2000, 12:30 to 31 January 2000, 14:45",
         )
         self.assertEqual(
             pretty_datetime_range(
-                start_date, datetime.datetime(2000, 2, 1, 14, 45, 0, tzinfo=UTC)
+                start_date,
+                datetime.datetime(2000, 2, 1, 14, 45, 0, tzinfo=datetime.timezone.utc),
             ),
             "1 January 2000, 12:30 to 1 February 2000, 14:45",
         )
         self.assertEqual(
             pretty_datetime_range(
-                start_date, datetime.datetime(2000, 12, 31, 14, 45, 0, tzinfo=UTC)
+                start_date,
+                datetime.datetime(
+                    2000, 12, 31, 14, 45, 0, tzinfo=datetime.timezone.utc
+                ),
             ),
             "1 January 2000, 12:30 to 31 December 2000, 14:45",
         )
         self.assertEqual(
             pretty_datetime_range(
-                start_date, datetime.datetime(2001, 1, 1, 14, 45, 0, tzinfo=UTC)
+                start_date,
+                datetime.datetime(2001, 1, 1, 14, 45, 0, tzinfo=datetime.timezone.utc),
             ),
             "1 January 2000, 12:30 to 1 January 2001, 14:45",
         )
         self.assertEqual(
             pretty_datetime_range(
-                start_date, datetime.datetime(2001, 12, 31, 14, 45, 0, tzinfo=UTC)
+                start_date,
+                datetime.datetime(
+                    2001, 12, 31, 14, 45, 0, tzinfo=datetime.timezone.utc
+                ),
             ),
             "1 January 2000, 12:30 to 31 December 2001, 14:45",
         )
@@ -620,7 +659,10 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         )
         self.assertEqual(
             pretty_datetime_range(
-                None, datetime.datetime(2001, 12, 31, 14, 45, 0, tzinfo=UTC)
+                None,
+                datetime.datetime(
+                    2001, 12, 31, 14, 45, 0, tzinfo=datetime.timezone.utc
+                ),
             ),
             "Now to 31 December 2001, 14:45",
         )
@@ -631,7 +673,9 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         self.assertEqual(
             pretty_datetime_range(
                 None,
-                datetime.datetime(2001, 12, 31, 14, 45, 0, tzinfo=UTC),
+                datetime.datetime(
+                    2001, 12, 31, 14, 45, 0, tzinfo=datetime.timezone.utc
+                ),
                 lowercase_first=True,
             ),
             "now to 31 December 2001, 14:45",
@@ -639,7 +683,7 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         self.assertEqual(
             pretty_datetime_range(
                 start_date,
-                datetime.datetime(2000, 1, 1, 12, 30, 0, tzinfo=UTC),
+                datetime.datetime(2000, 1, 1, 12, 30, 0, tzinfo=datetime.timezone.utc),
                 hide_date_if_single_day=True,
             ),
             "12:30",
@@ -647,7 +691,7 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         self.assertEqual(
             pretty_datetime_range(
                 start_date,
-                datetime.datetime(2000, 1, 1, 12, 45, 0, tzinfo=UTC),
+                datetime.datetime(2000, 1, 1, 12, 45, 0, tzinfo=datetime.timezone.utc),
                 hide_date_if_single_day=True,
             ),
             "12:30 to 12:45",
@@ -655,18 +699,20 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         self.assertEqual(
             pretty_datetime_range(
                 start_date,
-                datetime.datetime(2000, 1, 2, 0, 0, 0, tzinfo=UTC),
+                datetime.datetime(2000, 1, 2, 0, 0, 0, tzinfo=datetime.timezone.utc),
                 hide_date_if_single_day=True,
             ),
             "1 January 2000, 12:30 to 2 January 2000, 00:00",
         )
 
     def test_happy_datetime_with_seconds(self):
-        start_date = datetime.datetime(2000, 1, 1, 12, 30, 0, tzinfo=UTC)
+        start_date = datetime.datetime(
+            2000, 1, 1, 12, 30, 0, tzinfo=datetime.timezone.utc
+        )
         self.assertEqual(
             pretty_datetime_range(
                 start_date,
-                datetime.datetime(2000, 1, 1, 12, 30, 0, tzinfo=UTC),
+                datetime.datetime(2000, 1, 1, 12, 30, 0, tzinfo=datetime.timezone.utc),
                 show_seconds=True,
             ),
             "1 January 2000, 12:30:00",
@@ -674,7 +720,7 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         self.assertEqual(
             pretty_datetime_range(
                 start_date,
-                datetime.datetime(2000, 1, 1, 12, 31, 0, tzinfo=UTC),
+                datetime.datetime(2000, 1, 1, 12, 31, 0, tzinfo=datetime.timezone.utc),
                 show_seconds=True,
             ),
             "1 January 2000, 12:30:00 to 12:31:00",
@@ -682,7 +728,7 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         self.assertEqual(
             pretty_datetime_range(
                 start_date,
-                datetime.datetime(2000, 1, 1, 23, 59, 59, tzinfo=UTC),
+                datetime.datetime(2000, 1, 1, 23, 59, 59, tzinfo=datetime.timezone.utc),
                 show_seconds=True,
             ),
             "1 January 2000, 12:30:00 to 23:59:59",
@@ -690,7 +736,7 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         self.assertEqual(
             pretty_datetime_range(
                 start_date,
-                datetime.datetime(2000, 1, 2, 0, 0, 0, tzinfo=UTC),
+                datetime.datetime(2000, 1, 2, 0, 0, 0, tzinfo=datetime.timezone.utc),
                 show_seconds=True,
             ),
             "1 January 2000, 12:30:00 to 2 January 2000, 00:00:00",
@@ -698,7 +744,7 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         self.assertEqual(
             pretty_datetime_range(
                 start_date,
-                datetime.datetime(2000, 1, 2, 14, 45, 0, tzinfo=UTC),
+                datetime.datetime(2000, 1, 2, 14, 45, 0, tzinfo=datetime.timezone.utc),
                 show_seconds=True,
             ),
             "1 January 2000, 12:30:00 to 2 January 2000, 14:45:00",
@@ -706,7 +752,7 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         self.assertEqual(
             pretty_datetime_range(
                 start_date,
-                datetime.datetime(2000, 1, 31, 14, 45, 0, tzinfo=UTC),
+                datetime.datetime(2000, 1, 31, 14, 45, 0, tzinfo=datetime.timezone.utc),
                 show_seconds=True,
             ),
             "1 January 2000, 12:30:00 to 31 January 2000, 14:45:00",
@@ -714,7 +760,7 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         self.assertEqual(
             pretty_datetime_range(
                 start_date,
-                datetime.datetime(2000, 2, 1, 14, 45, 0, tzinfo=UTC),
+                datetime.datetime(2000, 2, 1, 14, 45, 0, tzinfo=datetime.timezone.utc),
                 show_seconds=True,
             ),
             "1 January 2000, 12:30:00 to 1 February 2000, 14:45:00",
@@ -722,7 +768,9 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         self.assertEqual(
             pretty_datetime_range(
                 start_date,
-                datetime.datetime(2000, 12, 31, 14, 45, 0, tzinfo=UTC),
+                datetime.datetime(
+                    2000, 12, 31, 14, 45, 0, tzinfo=datetime.timezone.utc
+                ),
                 show_seconds=True,
             ),
             "1 January 2000, 12:30:00 to 31 December 2000, 14:45:00",
@@ -730,7 +778,7 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         self.assertEqual(
             pretty_datetime_range(
                 start_date,
-                datetime.datetime(2001, 1, 1, 14, 45, 0, tzinfo=UTC),
+                datetime.datetime(2001, 1, 1, 14, 45, 0, tzinfo=datetime.timezone.utc),
                 show_seconds=True,
             ),
             "1 January 2000, 12:30:00 to 1 January 2001, 14:45:00",
@@ -738,7 +786,9 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         self.assertEqual(
             pretty_datetime_range(
                 start_date,
-                datetime.datetime(2001, 12, 31, 14, 45, 0, tzinfo=UTC),
+                datetime.datetime(
+                    2001, 12, 31, 14, 45, 0, tzinfo=datetime.timezone.utc
+                ),
                 show_seconds=True,
             ),
             "1 January 2000, 12:30:00 to 31 December 2001, 14:45:00",
@@ -750,7 +800,9 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         self.assertEqual(
             pretty_datetime_range(
                 None,
-                datetime.datetime(2001, 12, 31, 14, 45, 0, tzinfo=UTC),
+                datetime.datetime(
+                    2001, 12, 31, 14, 45, 0, tzinfo=datetime.timezone.utc
+                ),
                 show_seconds=True,
             ),
             "Now to 31 December 2001, 14:45:00",
@@ -764,7 +816,9 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         self.assertEqual(
             pretty_datetime_range(
                 None,
-                datetime.datetime(2001, 12, 31, 14, 45, 0, tzinfo=UTC),
+                datetime.datetime(
+                    2001, 12, 31, 14, 45, 0, tzinfo=datetime.timezone.utc
+                ),
                 lowercase_first=True,
                 show_seconds=True,
             ),
@@ -773,7 +827,7 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         self.assertEqual(
             pretty_datetime_range(
                 start_date,
-                datetime.datetime(2000, 1, 1, 12, 30, 0, tzinfo=UTC),
+                datetime.datetime(2000, 1, 1, 12, 30, 0, tzinfo=datetime.timezone.utc),
                 hide_date_if_single_day=True,
                 show_seconds=True,
             ),
@@ -782,7 +836,7 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         self.assertEqual(
             pretty_datetime_range(
                 start_date,
-                datetime.datetime(2000, 1, 1, 12, 45, 0, tzinfo=UTC),
+                datetime.datetime(2000, 1, 1, 12, 45, 0, tzinfo=datetime.timezone.utc),
                 hide_date_if_single_day=True,
                 show_seconds=True,
             ),
@@ -791,7 +845,7 @@ class TestPrettyDatetimeRange(unittest.TestCase):
         self.assertEqual(
             pretty_datetime_range(
                 start_date,
-                datetime.datetime(2000, 1, 2, 0, 0, 0, tzinfo=UTC),
+                datetime.datetime(2000, 1, 2, 0, 0, 0, tzinfo=datetime.timezone.utc),
                 hide_date_if_single_day=True,
                 show_seconds=True,
             ),
@@ -917,8 +971,8 @@ class TestPrettyDatetimeRange(unittest.TestCase):
     def test_unhappy_order(self):
         with self.assertRaises(ValueError):
             pretty_datetime_range(
-                datetime.datetime(2001, 1, 1, 0, 0, 0, tzinfo=UTC),
-                datetime.datetime(2000, 1, 1, 0, 0, 0, tzinfo=UTC),
+                datetime.datetime(2001, 1, 1, 0, 0, 0, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2000, 1, 1, 0, 0, 0, tzinfo=datetime.timezone.utc),
             )
 
     def test_unhappy_type(self):
@@ -1424,7 +1478,9 @@ class TestSecondsToTime(unittest.TestCase):
 class TestRfc822DateFormat(unittest.TestCase):
     def test_happy(self):
         self.assertEqual(
-            rfc_822_date_format(datetime.datetime(2000, 1, 1, 12, 30, 45, tzinfo=UTC)),
+            rfc_822_date_format(
+                datetime.datetime(2000, 1, 1, 12, 30, 45, tzinfo=datetime.timezone.utc)
+            ),
             "Sat, 1 Jan 2000 12:30:45 GMT",
         )
 
@@ -1466,7 +1522,7 @@ class TestTimezoneAwareDates(unittest.TestCase):
         )
 
     def test_date_predicates_accept_timezone_aware_datetimes(self):
-        today = datetime.datetime.now(UTC).date()
+        today = datetime.datetime.now(datetime.timezone.utc).date()
         self.assertTrue(
             is_today_or_future(
                 datetime.datetime.combine(

@@ -1,6 +1,5 @@
 import datetime
 import math
-from datetime import UTC
 
 """
 See https://design-system.nationalarchives.gov.uk/content/dates-and-times/
@@ -20,18 +19,22 @@ def get_date_from_string(date_string: str) -> datetime.datetime:
     try:
         parsed_datetime = datetime.datetime.fromisoformat(date_string)
         if parsed_datetime.tzinfo is None:
-            parsed_datetime = parsed_datetime.replace(tzinfo=UTC)
+            parsed_datetime = parsed_datetime.replace(tzinfo=datetime.timezone.utc)
         return parsed_datetime
     except ValueError:
         pass
 
     try:
-        return datetime.datetime.strptime(date_string, "%Y-%m").replace(tzinfo=UTC)
+        return datetime.datetime.strptime(date_string, "%Y-%m").replace(
+            tzinfo=datetime.timezone.utc
+        )
     except ValueError:
         pass
 
     try:
-        return datetime.datetime.strptime(date_string, "%Y").replace(tzinfo=UTC)
+        return datetime.datetime.strptime(date_string, "%Y").replace(
+            tzinfo=datetime.timezone.utc
+        )
     except ValueError:
         pass
 
@@ -67,7 +70,9 @@ def pretty_date(
         return f"{_format_day(date)} {date.strftime('%B %Y')}"
 
     try:
-        date = datetime.datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=UTC)
+        date = datetime.datetime.strptime(date, "%Y-%m-%d").replace(
+            tzinfo=datetime.timezone.utc
+        )
         if show_day:
             return f"{date.strftime('%A')} {_format_day(date)} {date.strftime('%B %Y')}"
         return f"{_format_day(date)} {date.strftime('%B %Y')}"
@@ -75,13 +80,17 @@ def pretty_date(
         pass
 
     try:
-        date = datetime.datetime.strptime(date, "%Y-%m").replace(tzinfo=UTC)
+        date = datetime.datetime.strptime(date, "%Y-%m").replace(
+            tzinfo=datetime.timezone.utc
+        )
         return date.strftime("%B %Y")
     except ValueError:
         pass
 
     try:
-        date = datetime.datetime.strptime(date, "%Y").replace(tzinfo=UTC)
+        date = datetime.datetime.strptime(date, "%Y").replace(
+            tzinfo=datetime.timezone.utc
+        )
         return date.strftime("%Y")
     except ValueError:
         pass
@@ -146,7 +155,7 @@ def pretty_date_range(  # noqa: C901
         pass
     elif isinstance(date_from, datetime.date):
         date_from = datetime.datetime.combine(date_from, datetime.time.min).replace(
-            tzinfo=UTC
+            tzinfo=datetime.timezone.utc
         )
     elif isinstance(date_from, str):
         try:
@@ -158,7 +167,7 @@ def pretty_date_range(  # noqa: C901
         pass
     elif isinstance(date_to, datetime.date):
         date_to = datetime.datetime.combine(date_to, datetime.time.min).replace(
-            tzinfo=UTC
+            tzinfo=datetime.timezone.utc
         )
     elif isinstance(date_to, str):
         try:
@@ -334,11 +343,11 @@ def pretty_age(
     if isinstance(date, datetime.date) and not isinstance(date, datetime.datetime):
         raise TypeError("Date object provided, datetime object expected")
 
-    now = datetime.datetime.now(UTC).replace(microsecond=0)
+    now = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0)
     date = date.replace(microsecond=0)
 
     if date.tzinfo is None:
-        date = date.astimezone(UTC)
+        date = date.astimezone(datetime.timezone.utc)
     else:
         now = now.astimezone(date.tzinfo)
 
@@ -389,7 +398,7 @@ def is_today_or_future(date: datetime.date | datetime.datetime) -> bool:
     if isinstance(date, datetime.datetime):
         date = date.date()
 
-    today = datetime.datetime.now(UTC).date()
+    today = datetime.datetime.now(datetime.timezone.utc).date()
     return today <= date
 
 
@@ -404,7 +413,7 @@ def is_today_in_date_range(
     if not date_from or not date_to:
         raise ValueError("Both from and to dates must be provided")
 
-    today = datetime.datetime.now(UTC).date()
+    today = datetime.datetime.now(datetime.timezone.utc).date()
 
     if isinstance(date_from, datetime.datetime):
         date_from = date_from.date()
@@ -477,8 +486,8 @@ def group_by_year_and_month(
                             "items"
                         ].append(item)
 
-    datetime_max = datetime.datetime.max.replace(tzinfo=UTC)
-    datetime_min = datetime.datetime.min.replace(tzinfo=UTC)
+    datetime_max = datetime.datetime.max.replace(tzinfo=datetime.timezone.utc)
+    datetime_min = datetime.datetime.min.replace(tzinfo=datetime.timezone.utc)
 
     for year_group in grouped:
         year_group["items"].sort(key=lambda x: x["index"], reverse=reverse)
@@ -578,6 +587,6 @@ def rfc_822_date_format(date: datetime.date | datetime.datetime) -> str:
         raise ValueError("No date provided")
 
     if isinstance(date, datetime.datetime) and date.tzinfo is not None:
-        date = date.astimezone(UTC)
+        date = date.astimezone(datetime.timezone.utc)
 
     return f"{date.strftime('%a')}, {_format_day(date)} {date.strftime('%b %Y %H:%M:%S GMT')}"
