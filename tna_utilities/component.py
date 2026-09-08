@@ -40,7 +40,7 @@ def paginate(pages: int, current_page: int, around: int = 1) -> list[int | str]:
 
     if around >= 1:
         for i in range(len(sorted_pages) - 1):
-            if sorted_pages[i + 1] - sorted_pages[i] == 2:  # noqa: PLR2004
+            if sorted_pages[i + 1] - sorted_pages[i] == 2:
                 pagination.add(sorted_pages[i] + 1)
 
         sorted_pages = sorted(pagination)
@@ -96,7 +96,7 @@ def tna_frontend_pagination(
     pages: int,
     current_page: int,
     base_url: str,
-    custom_properties: dict = None,
+    custom_properties: dict | None = None,
     around: int = 1,
     transformer: Callable[
         [int, int, str], dict
@@ -106,8 +106,8 @@ def tna_frontend_pagination(
         "href": f"{base_url}{item}",
     },
     ellipsis: dict | None = None,
-    previous_page_properties: dict = None,
-    next_page_properties: dict = None,
+    previous_page_properties: dict | None = None,
+    next_page_properties: dict | None = None,
 ) -> dict:
     """
     Convert paginated items to a format suitable for the TNA frontend.

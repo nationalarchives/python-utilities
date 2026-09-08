@@ -51,7 +51,15 @@ Creates an object that be used directly in a [National Archives pagination compo
 ```python
 from tna_utilities.component import tna_frontend_pagination
 
-print(tna_frontend_pagination(42, 7, "?page=", {"landmarkLabel": "Pages of results"}, next_page_properties={"text": "Go on..."}))
+print(
+    tna_frontend_pagination(
+        42,
+        7,
+        "?page=",
+        {"landmarkLabel": "Pages of results"},
+        next_page_properties={"text": "Go on..."},
+    )
+)
 # {
 #     "landmarkLabel": "Pages of results",
 #     "items": [

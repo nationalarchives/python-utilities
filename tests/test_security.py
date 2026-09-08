@@ -286,9 +286,9 @@ class TestSecurityCSP(unittest.TestCase):
             ("style-src-elem", "style_src_elem"),
             ("worker-src", "worker_src"),
             # Experimental
-            # ("fenced-frame-src", "fenced_frame_src"),  # noqa: ERA001
+            # ("fenced-frame-src", "fenced_frame_src"),
             # Not technically part of the CSP spec
-            # ("trusted-types", "trusted_types"),  # noqa: ERA001
+            # ("trusted-types", "trusted_types"),
         ]
         for directive, method in directives:
             generator = CspGenerator()

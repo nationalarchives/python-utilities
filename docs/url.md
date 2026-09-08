@@ -98,19 +98,15 @@ print(new_qs.get_query_string())
 # ?b=1&b=6&b=7&c=4
 
 # Chainable (as of v1.1.0)
-print(new_qs.add_parameter(
-    "c", "4"
-).update_parameter(
-    "b", ["5", "6"]
-).add_parameter_value(
-    "b", "7"
-).toggle_parameter_value(
-    "b", "1"
-).remove_parameter_value(
-    "b", "5"
-).remove_parameter(
-    "a"
-).get_query_string())
+print(
+    new_qs.add_parameter("c", "4")
+    .update_parameter("b", ["5", "6"])
+    .add_parameter_value("b", "7")
+    .toggle_parameter_value("b", "1")
+    .remove_parameter_value("b", "5")
+    .remove_parameter("a")
+    .get_query_string()
+)
 ```
 
 ### Tolerant mode
@@ -124,7 +120,9 @@ from tna_utilities.url import QueryStringTransformer
 qs = QueryStringTransformer([("a", ["1"])])
 new_qs = qs.new()
 new_qs.remove_parameter_value("b", "2")  # Raises KeyError: Parameter 'b' does not exist
-print(new_qs.is_value_in_parameter("c", "3"))  # Raises KeyError: Parameter 'c' does not exist
+print(
+    new_qs.is_value_in_parameter("c", "3")
+)  # Raises KeyError: Parameter 'c' does not exist
 
 # ?a=1
 tolerant_qs = QueryStringTransformer([("a", ["1"])], tolerant=True)

@@ -75,13 +75,13 @@ Formats a date range into the format used by The National Archives.
 
 ### Arguments
 
-| Argument          | Description                                                                                 | Default |
-| ----------------- | ------------------------------------------------------------------------------------------- | ------- |
-| `date_from`       | The start date                                                                              | [none]  |
-| `date_to`         | The end date                                                                                | [none]  |
-| `omit_days`       | If `True`, don't output the day of month, only the month and year range                     | `False` |
-| `lowercase_first` | If `True`, use `from` and `now to` for ranges that normally start `From...` and `Now to...` | `False` |
-| `show_seconds`    | If `True`, show the seconds (added in `v1.4.0`)                                             | `False` |
+| Argument          | Description                                                                                         | Default |
+| ----------------- | --------------------------------------------------------------------------------------------------- | ------- |
+| `date_from`       | The start date                                                                                      | [none]  |
+| `date_to`         | The end date                                                                                        | [none]  |
+| `omit_days`       | If `True`, don't output the day of month, only the month and year range                             | `False` |
+| `lowercase_first` | If `True`, use `from` and `now to` for ranges that normally start `From...` and `Now to...`         | `False` |
+| `simplify_years`  | If `True`, use `2025 to 2026` rather than `1 January 2025 to 31 December 2026` (added in `v1.10.0`) | `False` |
 
 ### Example
 
@@ -113,19 +113,35 @@ Formats a date/time range into the format used by The National Archives.
 | `date_to`                 | The end datetime                                                                            | [none]  |
 | `lowercase_first`         | If `True`, use `from` and `now to` for ranges that normally start `From...` and `Now to...` | `False` |
 | `hide_date_if_single_day` | If `True`, only show a time range if the start and end date are the same                    | `False` |
+| `show_seconds`            | If `True`, show the seconds (added in `v1.4.0`)                                             | `False` |
 
 ### Example
 
 ```python
 from tna_utilities.datetime import pretty_datetime_range
 
-print(pretty_datetime_range(datetime.datetime(2000, 1, 1, 12, 30, 0), "2000-01-01T12:45:00Z"))
+print(
+    pretty_datetime_range(
+        datetime.datetime(2000, 1, 1, 12, 30, 0), "2000-01-01T12:45:00Z"
+    )
+)
 # 1 January 2000, 12:30 to 12:45
 
-print(pretty_datetime_range(datetime.datetime(2000, 1, 1, 12, 30, 0), datetime.datetime(2001, 2, 2, 14, 45, 0)))
+print(
+    pretty_datetime_range(
+        datetime.datetime(2000, 1, 1, 12, 30, 0),
+        datetime.datetime(2001, 2, 2, 14, 45, 0),
+    )
+)
 # 1 January 2000, 12:30 to 2 February 2001, 14:45
 
-print(pretty_datetime_range(datetime.datetime(2000, 1, 1, 12, 30, 0), datetime.datetime(2000, 1, 1, 12, 45, 0), hide_date_if_single_day=True))
+print(
+    pretty_datetime_range(
+        datetime.datetime(2000, 1, 1, 12, 30, 0),
+        datetime.datetime(2000, 1, 1, 12, 45, 0),
+        hide_date_if_single_day=True,
+    )
+)
 # 12:30 to 12:45
 
 print(pretty_datetime_range(datetime.datetime(2000, 1, 1, 12, 30, 0), None))
@@ -157,7 +173,11 @@ print(pretty_age(datetime.datetime.now() - datetime.timedelta(seconds=1337)))
 print(pretty_age(datetime.datetime.now() + datetime.timedelta(days=1)))
 # In 1 day
 
-print(pretty_age(datetime.datetime.now() - datetime.timedelta(seconds=29), just_now_seconds=60))
+print(
+    pretty_age(
+        datetime.datetime.now() - datetime.timedelta(seconds=29), just_now_seconds=60
+    )
+)
 # Just now
 ```
 
