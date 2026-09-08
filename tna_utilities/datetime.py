@@ -17,6 +17,7 @@ def get_date_from_string(date_string: str) -> datetime.datetime:
         raise ValueError("Empty string cannot be parsed as date")
 
     # Fix ISO 8601 format with 'Z' timezone designator for compatibility with older Python versions
+    # TODO: Remove this when support for Python 3.10 is dropped (2026-10)
     if date_string.endswith("Z"):
         date_string = date_string[:-1] + "+00:00"
 
