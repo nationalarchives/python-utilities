@@ -1427,3 +1427,90 @@ class TestRfc822DateFormat(unittest.TestCase):
             rfc_822_date_format(datetime.datetime(2000, 1, 1, 12, 30, 45, tzinfo=UTC)),
             "Sat, 1 Jan 2000 12:30:45 GMT",
         )
+
+
+class TestTimezoneAwareDates(unittest.TestCase):
+    positive_offset = datetime.timezone(datetime.timedelta(hours=1))
+    negative_offset = datetime.timezone(datetime.timedelta(hours=-8))
+
+    def test_parses_negative_offset(self):
+        self.assertEqual(
+            get_date_from_string("2000-01-01T12:30:45-08:00"),
+            datetime.datetime(2000, 1, 1, 12, 30, 45, tzinfo=self.negative_offset),
+        )
+
+    def test_formats_timezone_aware_date_and_datetime(self):
+        date = datetime.datetime(2000, 1, 1, 12, 30, 45, tzinfo=self.positive_offset)
+        self.assertEqual(pretty_date(date, show_day=True), "Saturday 1 January 2000")
+        self.assertEqual(
+            pretty_datetime(date, show_day=True, show_seconds=True),
+            "Saturday 1 January 2000, 12:30:45",
+        )
+
+    def test_formats_timezone_aware_ranges(self):
+        date_from = datetime.datetime(2000, 1, 1, 12, 30, tzinfo=self.positive_offset)
+        date_to = datetime.datetime(2000, 1, 1, 12, 45, tzinfo=self.negative_offset)
+        self.assertEqual(pretty_date_range(date_from, date_to), "1 January 2000")
+        self.assertEqual(
+            pretty_datetime_range(date_from, date_to, show_seconds=True),
+            "1 January 2000, 12:30:00 to 12:45:00",
+        )
+
+    def test_formats_past_age_in_negative_offset(self):
+        self.assertEqual(
+            pretty_age(
+                datetime.datetime.now(self.negative_offset)
+                - datetime.timedelta(seconds=6)
+            ),
+            "6 seconds ago",
+        )
+
+    def test_date_predicates_accept_timezone_aware_datetimes(self):
+        today = datetime.datetime.now(UTC).date()
+        self.assertTrue(
+            is_today_or_future(
+                datetime.datetime.combine(
+                    today, datetime.time.min, self.positive_offset
+                )
+            )
+        )
+        self.assertTrue(
+            is_today_in_date_range(
+                datetime.datetime.combine(
+                    today - datetime.timedelta(days=1),
+                    datetime.time.min,
+                    self.negative_offset,
+                ),
+                datetime.datetime.combine(
+                    today + datetime.timedelta(days=1),
+                    datetime.time.min,
+                    self.positive_offset,
+                ),
+            )
+        )
+
+    def test_groups_timezone_aware_datetimes(self):
+        items = [
+            {
+                "id": 1,
+                "date": datetime.datetime(2022, 5, 20, tzinfo=self.positive_offset),
+            },
+            {
+                "id": 2,
+                "date": datetime.datetime(2022, 5, 15, tzinfo=self.negative_offset),
+            },
+        ]
+        self.assertEqual(
+            group_by_year_and_month(items, "date", reverse=True)[0]["items"][0][
+                "items"
+            ],
+            [items[0], items[1]],
+        )
+
+    def test_converts_timezone_aware_datetime_to_gmt_for_rfc_822(self):
+        self.assertEqual(
+            rfc_822_date_format(
+                datetime.datetime(2000, 1, 1, 12, 30, 45, tzinfo=self.positive_offset)
+            ),
+            "Sat, 1 Jan 2000 11:30:45 GMT",
+        )

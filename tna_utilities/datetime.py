@@ -406,10 +406,10 @@ def is_today_in_date_range(
 
     today = datetime.datetime.now(UTC).date()
 
-    if isinstance(date_from, datetime.datetime) and date_from.tzinfo is None:
-        date_from = date_from.replace(tzinfo=UTC).date()
-    if isinstance(date_to, datetime.datetime) and date_to.tzinfo is None:
-        date_to = date_to.replace(tzinfo=UTC).date()
+    if isinstance(date_from, datetime.datetime):
+        date_from = date_from.date()
+    if isinstance(date_to, datetime.datetime):
+        date_to = date_to.date()
 
     return date_from <= today <= date_to
 
@@ -576,5 +576,8 @@ def rfc_822_date_format(date: datetime.date | datetime.datetime) -> str:
 
     if not date:
         raise ValueError("No date provided")
+
+    if isinstance(date, datetime.datetime) and date.tzinfo is not None:
+        date = date.astimezone(UTC)
 
     return f"{date.strftime('%a')}, {_format_day(date)} {date.strftime('%b %Y %H:%M:%S GMT')}"
