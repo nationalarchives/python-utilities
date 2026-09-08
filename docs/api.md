@@ -60,9 +60,7 @@ from tna_utilities.api import SimpleJsonApiClient
 # Set a default header for any request from the client
 client = SimpleJsonApiClient(
     "https://wagtail.nationalarchives.gov.uk/api/v2",
-    default_headers={
-        "Host": "my.test.client.com"
-    }
+    default_headers={"Host": "my.test.client.com"},
 )
 
 # Append a default header to all requests
@@ -72,12 +70,7 @@ client.add_default_header("Authorization", "Token abc123")
 #   Host: my.test.client.com
 #   Authorization: Token abc123
 #   Pragma: no-cache
-pages = client.get(
-    "pages",
-    headers={
-        "Pragma": "no-cache"
-    }
-)
+pages = client.get("pages", headers={"Pragma": "no-cache"})
 
 #   Host: my.test.client.com
 #   Authorization: Token abc123
@@ -91,20 +84,12 @@ from tna_utilities.api import SimpleJsonApiClient
 
 # Append a default query parameter to all requests
 client = SimpleJsonApiClient(
-    "https://wagtail.nationalarchives.gov.uk/api/v2",
-    default_params={
-        "format": "json"
-    }
+    "https://wagtail.nationalarchives.gov.uk/api/v2", default_params={"format": "json"}
 )
 
 # Append a default query parameter to all requests
 client.add_default_parameter("limit", "100")
 
 # https://wagtail.nationalarchives.gov.uk/api/v2/pages/?format=json&limit=100&offset=400
-pages = client.get(
-    "pages",
-    params={
-        "offset": "400"
-    }
-)
+pages = client.get("pages", params={"offset": "400"})
 ```

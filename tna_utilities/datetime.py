@@ -1,5 +1,6 @@
 import datetime
 import math
+from datetime import UTC
 
 """
 See https://design-system.nationalarchives.gov.uk/content/dates-and-times/
@@ -16,44 +17,21 @@ def get_date_from_string(date_string: str) -> datetime.datetime:
     if not date_string:
         raise ValueError("Empty string cannot be parsed as date")
 
-    normalised_date_string = date_string.replace("Z", "+00:00")
-
     try:
-        return datetime.datetime.fromisoformat(normalised_date_string)
+        parsed_datetime = datetime.datetime.fromisoformat(date_string)
+        if parsed_datetime.tzinfo is None:
+            parsed_datetime = parsed_datetime.replace(tzinfo=UTC)
+        return parsed_datetime
     except ValueError:
         pass
 
     try:
-        return datetime.datetime.strptime(
-            normalised_date_string, "%Y-%m-%dT%H:%M:%S.%f+00:00"
-        )
+        return datetime.datetime.strptime(date_string, "%Y-%m").replace(tzinfo=UTC)
     except ValueError:
         pass
 
     try:
-        return datetime.datetime.strptime(
-            normalised_date_string, "%Y-%m-%dT%H:%M:%S+00:00"
-        )
-    except ValueError:
-        pass
-
-    try:
-        return datetime.datetime.strptime(normalised_date_string, "%Y-%m-%dT%H:%M:%S%z")
-    except ValueError:
-        pass
-
-    try:
-        return datetime.datetime.strptime(normalised_date_string, "%Y-%m-%d")
-    except ValueError:
-        pass
-
-    try:
-        return datetime.datetime.strptime(normalised_date_string, "%Y-%m")
-    except ValueError:
-        pass
-
-    try:
-        return datetime.datetime.strptime(normalised_date_string, "%Y")
+        return datetime.datetime.strptime(date_string, "%Y").replace(tzinfo=UTC)
     except ValueError:
         pass
 
@@ -69,7 +47,7 @@ def _format_month_index(date: datetime.date) -> int:
 
 
 def pretty_date(
-    date: str | datetime.date,
+    date: str | datetime.datetime | datetime.date,
     show_day: bool = False,
 ) -> str:
     """
@@ -89,7 +67,7 @@ def pretty_date(
         return f"{_format_day(date)} {date.strftime('%B %Y')}"
 
     try:
-        date = datetime.datetime.strptime(date, "%Y-%m-%d")
+        date = datetime.datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=UTC)
         if show_day:
             return f"{date.strftime('%A')} {_format_day(date)} {date.strftime('%B %Y')}"
         return f"{_format_day(date)} {date.strftime('%B %Y')}"
@@ -97,13 +75,13 @@ def pretty_date(
         pass
 
     try:
-        date = datetime.datetime.strptime(date, "%Y-%m")
+        date = datetime.datetime.strptime(date, "%Y-%m").replace(tzinfo=UTC)
         return date.strftime("%B %Y")
     except ValueError:
         pass
 
     try:
-        date = datetime.datetime.strptime(date, "%Y")
+        date = datetime.datetime.strptime(date, "%Y").replace(tzinfo=UTC)
         return date.strftime("%Y")
     except ValueError:
         pass
@@ -115,7 +93,7 @@ def pretty_date(
 
 
 def pretty_datetime(
-    date: str | datetime.datetime,
+    date: str | datetime.datetime | datetime.date,
     show_day: bool = False,
     show_seconds: bool = False,
 ) -> str:
@@ -151,10 +129,11 @@ def pretty_datetime(
 
 
 def pretty_date_range(  # noqa: C901
-    date_from: str | datetime.date | None,
-    date_to: str | datetime.date | None,
+    date_from: str | datetime.datetime | datetime.date | None,
+    date_to: str | datetime.datetime | datetime.date | None,
     omit_days: bool = False,
     lowercase_first: bool = False,
+    simplify_whole_years: bool = False,
 ) -> str:
     """
     Formats a date range into the format used by The National Archives.
@@ -163,16 +142,24 @@ def pretty_date_range(  # noqa: C901
     max_days_in_month = 31
     max_months_in_year = 12
 
-    if isinstance(date_from, datetime.date):
+    if isinstance(date_from, datetime.datetime):
         pass
+    elif isinstance(date_from, datetime.date):
+        date_from = datetime.datetime.combine(date_from, datetime.time.min).replace(
+            tzinfo=UTC
+        )
     elif isinstance(date_from, str):
         try:
             date_from = get_date_from_string(date_from)
         except ValueError:
             date_from = None
 
-    if isinstance(date_to, datetime.date):
+    if isinstance(date_to, datetime.datetime):
         pass
+    elif isinstance(date_to, datetime.date):
+        date_to = datetime.datetime.combine(date_to, datetime.time.min).replace(
+            tzinfo=UTC
+        )
     elif isinstance(date_to, str):
         try:
             date_to = get_date_from_string(date_to)
@@ -192,7 +179,8 @@ def pretty_date_range(  # noqa: C901
             else f"{_format_day(date_to)} {date_to.strftime('%B %Y')}"
         )
         if (
-            date_from.day == 1
+            simplify_whole_years
+            and date_from.day == 1
             and date_from.month == 1
             and date_to.day == max_days_in_month
             and date_to.month == max_months_in_year
@@ -343,14 +331,16 @@ def pretty_age(
     if not date:
         raise ValueError("Date must be provided")
 
-    now = datetime.datetime.now().replace(microsecond=0)
+    if isinstance(date, datetime.date) and not isinstance(date, datetime.datetime):
+        raise TypeError("Date object provided, datetime object expected")
 
-    if isinstance(date, datetime.datetime):
-        if date.tzinfo is not None:
-            now = datetime.datetime.now(tz=date.tzinfo).replace(microsecond=0)
-        date = date.replace(microsecond=0)
+    now = datetime.datetime.now(UTC).replace(microsecond=0)
+    date = date.replace(microsecond=0)
+
+    if date.tzinfo is None:
+        date = date.astimezone(UTC)
     else:
-        date = datetime.datetime.combine(date, datetime.time.min)
+        now = now.astimezone(date.tzinfo)
 
     future = now < date
     delta = date - now if future else now - date
@@ -399,7 +389,7 @@ def is_today_or_future(date: datetime.date | datetime.datetime) -> bool:
     if isinstance(date, datetime.datetime):
         date = date.date()
 
-    today = datetime.datetime.now().date()
+    today = datetime.datetime.now(UTC).date()
     return today <= date
 
 
@@ -414,13 +404,13 @@ def is_today_in_date_range(
     if not date_from or not date_to:
         raise ValueError("Both from and to dates must be provided")
 
-    if isinstance(date_from, datetime.datetime):
-        date_from = date_from.date()
+    today = datetime.datetime.now(UTC).date()
 
-    if isinstance(date_to, datetime.datetime):
-        date_to = date_to.date()
+    if isinstance(date_from, datetime.datetime) and date_from.tzinfo is None:
+        date_from = date_from.replace(tzinfo=UTC).date()
+    if isinstance(date_to, datetime.datetime) and date_to.tzinfo is None:
+        date_to = date_to.replace(tzinfo=UTC).date()
 
-    today = datetime.datetime.now().date()
     return date_from <= today <= date_to
 
 
@@ -487,6 +477,9 @@ def group_by_year_and_month(
                             "items"
                         ].append(item)
 
+    datetime_max = datetime.datetime.max.replace(tzinfo=UTC)
+    datetime_min = datetime.datetime.min.replace(tzinfo=UTC)
+
     for year_group in grouped:
         year_group["items"].sort(key=lambda x: x["index"], reverse=reverse)
         for month_group in year_group["items"]:
@@ -497,31 +490,19 @@ def group_by_year_and_month(
                         if isinstance(
                             x.get(date_key), (datetime.date, datetime.datetime)
                         )
-                        else (
-                            get_date_from_string(x.get(date_key))
-                            if x.get(date_key) is not None
-                            else (
-                                datetime.datetime.max
-                                if reverse
-                                else datetime.datetime.min
-                            )
-                        )
+                        else get_date_from_string(x.get(date_key))
+                        if x.get(date_key) is not None
+                        else (datetime_max if reverse else datetime_min)
                     )
                     if isinstance(x.get(date_key), (datetime.date, datetime.datetime))
                     else (
                         (
                             get_date_from_string(x.get(date_key))
                             if x.get(date_key) is not None
-                            else (
-                                datetime.datetime.max
-                                if reverse
-                                else datetime.datetime.min
-                            )
+                            else (datetime_max if reverse else datetime_min)
                         )
                         if isinstance(x.get(date_key), str)
-                        else (
-                            datetime.datetime.max if reverse else datetime.datetime.min
-                        )
+                        else (datetime_max if reverse else datetime_min)
                     )
                 ),
                 reverse=reverse,
