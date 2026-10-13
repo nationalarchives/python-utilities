@@ -518,5 +518,5 @@ flask = ["Flask"]
 
 [metadata]
 lock-version = "2.1"
-python-versions = "^3.11"
-content-hash = "1162904872ca7536a9294b6fdafbdaf0e2a07d339886e5cfe7319d2cedcc1125"
+python-versions = ">=3.11"
+content-hash = "8580aea37aca845f4c7b508badd0c87ac1c4bede1c29ada0e5626b073857096c"
