@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Date/time functions are all timezone-aware
 
 ### Deprecated
+
+- Removed support for Python `3.10`
+
 ### Removed
 ### Fixed
 ### Security
