@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 ### Fixed
+
+- Flask `Talisman` now preserves `SESSION_COOKIE_SECURE=True` when HTTPS redirects are disabled or debug mode is enabled
+
 ### Security
 
 ## [1.9.0](https://github.com/nationalarchives/python-utilities/compare/v1.8.0...v1.9.0) - 2026-08-26
