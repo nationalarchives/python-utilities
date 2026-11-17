@@ -1,4 +1,5 @@
 import unittest
+from itertools import product
 
 from flask import Flask, session
 
@@ -241,6 +242,31 @@ class TestFlaskTalisman(unittest.TestCase):
             "https://localhost/foobar?test=1",
             rv.headers["Location"],
         )
+
+    def test_talisman_session_cookie_secure(self):
+        for secure, force_https, debug in product((False, True), repeat=3):
+            with self.subTest(secure=secure, force_https=force_https, debug=debug):
+                app = Flask(__name__)
+                app.config.update(
+                    SECRET_KEY="my_secret_key",
+                    SESSION_COOKIE_SECURE=secure,
+                    DEBUG=debug,
+                )
+
+                @app.route("/")
+                def index():
+                    session["test"] = "12345"
+                    return "OK"
+
+                Talisman(app, force_https=force_https)
+
+                rv = app.test_client().get("https://localhost/")
+
+                self.assertEqual(rv.status_code, 200)
+                self.assertEqual(
+                    " Secure" in rv.headers["Set-Cookie"],
+                    secure or (force_https and not debug),
+                )
 
     def test_talisman_custom_extra_headers(self):
         Talisman(

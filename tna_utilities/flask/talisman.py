@@ -97,7 +97,8 @@ class Talisman:
         self.app = app
 
         self.app.config.update(
-            SESSION_COOKIE_SECURE=force_https and not self.app.debug,
+            SESSION_COOKIE_SECURE=self.app.config["SESSION_COOKIE_SECURE"]
+            or (force_https and not self.app.debug),
             SESSION_COOKIE_HTTPONLY=True,
             SESSION_COOKIE_SAMESITE="Lax",
             PERMANENT_SESSION_LIFETIME=60 * 60 * 24,  # 1 day

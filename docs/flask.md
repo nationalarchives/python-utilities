@@ -84,6 +84,10 @@ def response_varies_based_on_accept_header():
 
 A stripped-down and opinionated reproduction of [wntrblm/flask-talisman](https://github.com/wntrblm/flask-talisman) which is a fork of [GoogleCloudPlatform/flask-talisman](https://github.com/GoogleCloudPlatform/flask-talisman).
 
+Talisman preserves `SESSION_COOKIE_SECURE=True` when configured before
+initialisation, including in debug mode or when `force_https=False`. Otherwise,
+it enables secure session cookies when `force_https=True` and debug mode is off.
+
 ### Examples
 
 ```python
