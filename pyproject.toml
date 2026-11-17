@@ -1,6 +1,6 @@
 [project]
 name = "tna-utilities"
-version = "1.9.0"
+version = "1.10.0"
 requires-python = ">=3.11"
 authors = [
   {name = "Andrew Hosgood", email = "andrew.hosgood@nationalarchives.gov.uk"},
