@@ -1,4 +1,4 @@
-def currency(value: float | str, simplify: bool = True) -> str:
+def currency(value: float | str, decimals: int = 2, simplify: bool = True) -> str:
     """
     Formats a number as a currency without the currency symbol.
 
@@ -14,11 +14,12 @@ def currency(value: float | str, simplify: bool = True) -> str:
     if simplify and int_number == float_number:
         return str(f"{int_number:,}")
 
-    return str(f"{float_number:,.2f}")
+    return str(f"{float_number:,.{decimals}f}")
 
 
 def pretty_price(
     value: float | str,
+    decimals: int = 2,
     simplify: bool = True,
     currency_symbol: str = "£",
 ) -> str:
@@ -32,12 +33,13 @@ def pretty_price(
     if value in {0, "0"} or round(float(value) * 100) == 0:
         return "Free"
 
-    return f"{currency_symbol}{currency(value, simplify)}"
+    return f"{currency_symbol}{currency(value, decimals, simplify)}"
 
 
 def pretty_price_range(
     value_from: float | str | None = None,
     value_to: float | str | None = None,
+    decimals: int = 2,
     simplify: bool = True,
     currency_symbol: str = "£",
 ) -> str:
@@ -68,13 +70,13 @@ def pretty_price_range(
         return "Free"
 
     if value_from == value_to:
-        return pretty_price(value_from, simplify, currency_symbol)
+        return pretty_price(value_from, decimals, simplify, currency_symbol)
 
     if value_from == 0:
-        return f"Free to {pretty_price(value_to, simplify, currency_symbol)}"
+        return f"Free to {pretty_price(value_to, decimals, simplify, currency_symbol)}"
 
     if value_to == 0:
-        return f"From {pretty_price(value_from, simplify, currency_symbol)}"
+        return f"From {pretty_price(value_from, decimals, simplify, currency_symbol)}"
 
     min_price, max_price = sorted([value_from, value_to])
-    return f"{pretty_price(min_price, simplify, currency_symbol)} to {pretty_price(max_price, simplify, currency_symbol)}"
+    return f"{pretty_price(min_price, decimals, simplify, currency_symbol)} to {pretty_price(max_price, decimals, simplify, currency_symbol)}"

@@ -27,10 +27,19 @@ class TestCurrency(unittest.TestCase):
         self.assertEqual(currency("5.006"), "5.01")
 
     def test_happy_not_simplified(self):
-        self.assertEqual(currency("0", False), "0.00")
-        self.assertEqual(currency("5", False), "5.00")
-        self.assertEqual(currency("5.0", False), "5.00")
-        self.assertEqual(currency("5.00", False), "5.00")
+        self.assertEqual(currency("0", simplify=False), "0.00")
+        self.assertEqual(currency("5", simplify=False), "5.00")
+        self.assertEqual(currency("5.0", simplify=False), "5.00")
+        self.assertEqual(currency("5.00", simplify=False), "5.00")
+
+    def test_decimals(self):
+        self.assertEqual(currency(1234.56, decimals=0), "1,235")
+        self.assertEqual(currency("5.125", decimals=1), "5.1")
+        self.assertEqual(currency(5.125, 3), "5.125")
+        self.assertEqual(currency(5, decimals=3), "5")
+        self.assertEqual(currency(5, decimals=3, simplify=False), "5.000")
+        self.assertEqual(currency(0, decimals=3, simplify=False), "0.00")
+        self.assertEqual(currency("0", decimals=3, simplify=False), "0.000")
 
 
 class TestPrettyPrice(unittest.TestCase):
@@ -40,7 +49,7 @@ class TestPrettyPrice(unittest.TestCase):
         self.assertEqual(pretty_price(0.101), "£0.10")
         self.assertEqual(pretty_price(0.001), "Free")
         self.assertEqual(pretty_price(0.009), "£0.01")
-        self.assertEqual(pretty_price(0.009, False), "£0.01")
+        self.assertEqual(pretty_price(0.009, simplify=False), "£0.01")
         self.assertEqual(pretty_price(1), "£1")
         self.assertEqual(pretty_price(1.1), "£1.10")
         self.assertEqual(pretty_price(1.11), "£1.11")
@@ -55,7 +64,7 @@ class TestPrettyPrice(unittest.TestCase):
         self.assertEqual(pretty_price("0.101"), "£0.10")
         self.assertEqual(pretty_price("0.001"), "Free")
         self.assertEqual(pretty_price("0.009"), "£0.01")
-        self.assertEqual(pretty_price("0.009", False), "£0.01")
+        self.assertEqual(pretty_price("0.009", simplify=False), "£0.01")
         self.assertEqual(pretty_price("1"), "£1")
         self.assertEqual(pretty_price("01"), "£1")
         self.assertEqual(pretty_price("1.1"), "£1.10")
@@ -65,16 +74,22 @@ class TestPrettyPrice(unittest.TestCase):
         self.assertEqual(pretty_price("123456789.01"), "£123,456,789.01")
 
     def test_happy_not_simplified(self):
-        self.assertEqual(pretty_price("0", False), "Free")
+        self.assertEqual(pretty_price("0", simplify=False), "Free")
         self.assertEqual(pretty_price("0.1"), "£0.10")
         self.assertEqual(pretty_price("0.10"), "£0.10")
         self.assertEqual(pretty_price("0.101"), "£0.10")
         self.assertEqual(pretty_price("0.001"), "Free")
         self.assertEqual(pretty_price("0.009"), "£0.01")
-        self.assertEqual(pretty_price("0.009", False), "£0.01")
-        self.assertEqual(pretty_price("5", False), "£5.00")
-        self.assertEqual(pretty_price("5.0", False), "£5.00")
-        self.assertEqual(pretty_price("5.00", False), "£5.00")
+        self.assertEqual(pretty_price("0.009", simplify=False), "£0.01")
+        self.assertEqual(pretty_price("5", simplify=False), "£5.00")
+        self.assertEqual(pretty_price("5.0", simplify=False), "£5.00")
+        self.assertEqual(pretty_price("5.00", simplify=False), "£5.00")
+
+    def test_decimals(self):
+        self.assertEqual(pretty_price(5.125, decimals=3), "£5.125")
+        self.assertEqual(pretty_price(5, 3, False, "€"), "€5.000")
+        self.assertEqual(pretty_price(0.001, decimals=3), "Free")
+        self.assertEqual(pretty_price(0.009, decimals=0), "£0")
 
 
 class TestPrettyPriceRange(unittest.TestCase):
@@ -92,10 +107,19 @@ class TestPrettyPriceRange(unittest.TestCase):
         self.assertEqual(pretty_price_range(5, 10), "£5 to £10")
         self.assertEqual(pretty_price_range(10, 5), "£5 to £10")
         self.assertEqual(pretty_price_range(10, 0), "From £10")
-        self.assertEqual(pretty_price_range(0, 5, False), "Free to £5.00")
-        self.assertEqual(pretty_price_range(5, 10, False), "£5.00 to £10.00")
-        self.assertEqual(pretty_price_range(5, 0, False), "From £5.00")
-        self.assertEqual(pretty_price_range(5, 1, False), "£1.00 to £5.00")
+        self.assertEqual(pretty_price_range(0, 5, simplify=False), "Free to £5.00")
+        self.assertEqual(pretty_price_range(5, 10, simplify=False), "£5.00 to £10.00")
+        self.assertEqual(pretty_price_range(5, 0, simplify=False), "From £5.00")
+        self.assertEqual(pretty_price_range(5, 1, simplify=False), "£1.00 to £5.00")
+
+    def test_decimals(self):
+        self.assertEqual(pretty_price_range(5, 5, 3, False, "€"), "€5.000")
+        self.assertEqual(pretty_price_range(0, 5.125, decimals=3), "Free to £5.125")
+        self.assertEqual(pretty_price_range(5.125, 0, decimals=3), "From £5.125")
+        self.assertEqual(
+            pretty_price_range(10.125, 5.125, decimals=3),
+            "£5.125 to £10.125",
+        )
 
     def test_unhappy(self):
         with self.assertRaises(ValueError):
