@@ -169,7 +169,7 @@ class Talisman:
 
         csp = CspGenerator(
             default_src=self.content_security_policy.get(
-                "default-src", CspGenerator.SELF
+                "default-src", CspGenerator.NONE
             )
         )
 

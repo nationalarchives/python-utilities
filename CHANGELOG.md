@@ -8,10 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased](https://github.com/nationalarchives/python-utilities/compare/v1.10.0...HEAD)
 
 ### Added
+
+- `CspGenerator` constructor options for `base-uri`, `form-action` and `frame-ancestors`
+
 ### Changed
+
+- The default `default-src` for `CspGenerator` is now `'none'` instead of `'self'`
+- The `allow_objects`, `allow_iframe_embedding` and `allow_children` parameters have been removed from `CspGenerator`
+- `base-uri`, `form-action` and `frame-ancestors` default to `'none'` in `CspGenerator` and Flask `Talisman`
+
 ### Deprecated
 ### Removed
 ### Fixed
+
+- CSP simplification preserves directives that do not fall back to `default-src`
+
 ### Security
 
 ## [1.10.0](https://github.com/nationalarchives/python-utilities/compare/v1.9.0...v1.10.0) - 2026-11-17
