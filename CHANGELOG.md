@@ -9,18 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Django cache-control and vary decorators matching the Flask API
+- Flask and Django content negotiation decorators
 - Django 6 helpers for native CSP and security settings
 - Added `decimals` parameter to `currency` and `pretty_price` functions for controlling decimal places
-
-- `CspGenerator` constructor options for `base-uri`, `form-action` and `frame-ancestors`
 
 ### Changed
 
 - The default `default-src` for `CspGenerator` is now `'none'` instead of `'self'`
-- The `allow_objects`, `allow_iframe_embedding` and `allow_children` parameters have been removed from `CspGenerator`
-- `base-uri`, `form-action` and `frame-ancestors` default to `'none'` in `CspGenerator` and Flask `Talisman`
+- The `allow_objects`, `allow_iframe_embedding` and `allow_children` parameters have been removed from `CspGenerator`, replaced with constructor options for `base-uri`, `form-action` and `frame-ancestors`
 
 ### Deprecated
+
+- `vary_by_cookies()` and `vary_by_headers()` decorators have been removed
+
 ### Removed
 ### Fixed
 

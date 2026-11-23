@@ -48,13 +48,22 @@ def setUpModule():
         if not conf.settings.configured:
             conf.settings.configure(
                 SECRET_KEY="test-secret",
-                ROOT_URLCONF=__name__,
-                ALLOWED_HOSTS=["testserver"],
                 INSTALLED_APPS=[],
-                SESSION_ENGINE="django.contrib.sessions.backends.signed_cookies",
-                MIDDLEWARE=[],
             )
         django.setup()
+        global module_settings
+        module_settings = override_settings(
+            ROOT_URLCONF=__name__,
+            ALLOWED_HOSTS=["testserver"],
+            SESSION_ENGINE="django.contrib.sessions.backends.signed_cookies",
+            MIDDLEWARE=[],
+        )
+        module_settings.enable()
+
+
+def tearDownModule():
+    if HAS_DJANGO:
+        module_settings.disable()
 
 
 @unittest.skipUnless(HAS_DJANGO, "Django 6 requires Python 3.12 or later")
