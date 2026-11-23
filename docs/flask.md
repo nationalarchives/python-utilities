@@ -51,32 +51,30 @@ def cloudfront_cache():
     )
 ```
 
-### Vary
+## Content negotiation
 
-> Added in `v1.6.0`.
-
-Decorators to help set the `Vary` response header of a route.
-
-### Examples
+`get_requested_accept(options)` selects an offered media type from the request's `Accept` header and passes it to the view as `preferred_content_type`. The view is responsible for producing the corresponding representation and content type:
 
 ```python
-from flask import Flask
-from tna_utilities.flask import vary_by_cookies, vary_by_headers
+from flask import Flask, Response
+from tna_utilities.flask import get_requested_accept
 
 app = Flask(__name__)
 
 
-@app.route("/vary-cookies/")
-@vary_by_cookies()
-def response_varies_based_on_cookies():
-    return "Send different cookies to get a different response"
-
-
-@app.route("/vary-accept/")
-@vary_by_headers("Accept")
-def response_varies_based_on_accept_header():
-    return "Send a request with a different Accept header to get a different response"
+@app.get("/page/")
+@get_requested_accept(["text/html", "text/markdown"])
+def page(preferred_content_type):
+    if preferred_content_type == "text/markdown":
+        return Response("# Example", content_type="text/markdown")
+    return Response("<h1>Example</h1>", content_type="text/html")
 ```
+
+Quality values, wildcards, and exclusions (`q=0`) are handled by Flask's Werkzeug negotiation. Ties use the order of `options`.
+
+If the header is absent or empty, `preferred_content_type` is `None`; choose a default in the view. If a nonempty header matches no option, the view is not called and an empty 406 response is returned. An empty options list therefore rejects every nonempty `Accept` header.
+
+The decorator adds `Accept` to `Vary`, preserving existing values, and sets `Cache-Control: no-store` on 406 responses. Other decorators or middleware must not overwrite those headers with conflicting cache policies.
 
 ## `Talisman`
 
@@ -84,13 +82,9 @@ def response_varies_based_on_accept_header():
 
 A stripped-down and opinionated reproduction of [wntrblm/flask-talisman](https://github.com/wntrblm/flask-talisman) which is a fork of [GoogleCloudPlatform/flask-talisman](https://github.com/GoogleCloudPlatform/flask-talisman).
 
-Talisman preserves `SESSION_COOKIE_SECURE=True` when configured before
-initialisation, including in debug mode or when `force_https=False`. Otherwise,
-it enables secure session cookies when `force_https=True` and debug mode is off.
+Talisman preserves `SESSION_COOKIE_SECURE=True` when configured before initialisation, including in debug mode or when `force_https=False`. Otherwise, it enables secure session cookies when `force_https=True` and debug mode is off.
 
-By default, the CSP sets `default-src`, `base-uri`, `form-action` and
-`frame-ancestors` to `'none'`. In particular, form submissions are blocked
-unless `form-action` is configured in `content_security_policy`.
+By default, the CSP sets `default-src`, `base-uri`, `form-action` and `frame-ancestors` to `'none'`. In particular, form submissions are blocked unless `form-action` is configured in `content_security_policy`.
 
 ### Examples
 

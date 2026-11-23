@@ -59,28 +59,3 @@ def set_cache_control(instructions: str):
         return decorated_function
 
     return decorator
-
-
-def vary_by_cookies():
-    """
-    Decorator to set Vary headers to indicate that the response varies based on cookies.
-    """
-
-    return vary_by_headers("Cookie")
-
-
-def vary_by_headers(headers: str):
-    """
-    Decorator to set Vary headers to indicate that the response varies based on specified headers.
-    """
-
-    def decorator(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            response = make_response(f(*args, **kwargs))
-            response.headers["Vary"] = headers
-            return response
-
-        return decorated_function
-
-    return decorator
