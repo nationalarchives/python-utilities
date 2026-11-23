@@ -2,55 +2,12 @@ from urllib.parse import urlparse, urlunparse
 
 import flask
 
-from ..security import CspGenerator, common_security_headers
-
-GOOGLE_CSP_DIRECTIVES = {
-    "font-src": [
-        "*.gstatic.com",  # Fonts from fonts.google.com
-        "data:",  # Fonts for GTM preview mode
-    ],
-    "frame-src": [
-        "www.google.com",  # <iframe> based embeds for Google Maps
-        "www.youtube.com",  # <iframe> based embeds for Youtube
-        "www.youtube-nocookie.com",  # <iframe> based embeds for Youtube without cookies
-    ],
-    "img-src": [
-        "img.youtube.com",  # YouTube video thumbnails
-        "i.ytimg.com",  # YouTube video thumbnails
-        "*.googletagmanager.com",  # GTM
-        "ssl.gstatic.com",  # GTM preview mode
-        "www.gstatic.com",  # GTM preview mode
-        "*.google-analytics.com",  # GA4
-    ],
-    "script-src": [
-        "ajax.googleapis.com",  # Assorted Google-hosted Libraries/APIs
-        "*.googleanalytics.com",  # GA4
-        "*.google-analytics.com",  # GA4
-        "www.youtube.com",  # YouTube embeds
-        "*.gstatic.com",  # Google Translate
-        "*.googletagmanager.com",  # GTM preview mode
-        "tagmanager.google.com",  # GTM preview mode
-    ],
-    "style-src": [
-        "ajax.googleapis.com",  # YouTube embedded player styles
-        "fonts.googleapis.com",  # Google Fonts stylesheets
-        "*.gstatic.com",  # Assorted Google stylesheets
-        "googletagmanager.com",  # GTM preview mode
-        "tagmanager.google.com",  # GTM preview mode
-    ],
-    "connect-src": [
-        "*.google-analytics.com",  # GA4
-        "*.googletagmanager.com",  # GTM preview mode
-        "*.analytics.google.com",  # GA4
-    ],
-}
-
-TYPEKIT_CSP_DIRECTIVES = {
-    # Adobe Typekit fonts
-    "font-src": ["use.typekit.net"],
-    # Adobe Typekit stylesheets
-    "style-src": ["*.typekit.net"],
-}
+from ..security import (
+    GOOGLE_CSP_DIRECTIVES,
+    TYPEKIT_CSP_DIRECTIVES,
+    CspGenerator,
+    common_security_headers,
+)
 
 
 class Talisman:
@@ -169,7 +126,7 @@ class Talisman:
 
         csp = CspGenerator(
             default_src=self.content_security_policy.get(
-                "default-src", CspGenerator.SELF
+                "default-src", CspGenerator.NONE
             )
         )
 

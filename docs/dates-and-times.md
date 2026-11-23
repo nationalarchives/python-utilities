@@ -16,10 +16,10 @@ Parses a date string into a datetime object.
 from tna_utilities.datetime import get_date_from_string
 
 print(get_date_from_string("2006-05-04T01:02:03"))
-# datetime.datetime(2006, 5, 4, 1, 2, 3)
+# 2006-05-04 01:02:03+00:00
 
 print(get_date_from_string("2006-05-04T01:02:03+01:00"))
-# datetime.datetime(2006, 5, 4, 1, 2, 3, tzinfo=datetime.timezone(datetime.timedelta(hours=1)))
+# 2006-05-04 01:02:03+01:00
 ```
 
 ## pretty_date()
@@ -36,6 +36,8 @@ Formats a date into the format used by The National Archives.
 ### Example
 
 ```python
+import datetime
+
 from tna_utilities.datetime import pretty_date
 
 print(pretty_date("2000-01-01T12:00:00Z"))
@@ -60,6 +62,8 @@ Formats a date and time into the format used by The National Archives.
 ### Example
 
 ```python
+import datetime
+
 from tna_utilities.datetime import pretty_datetime
 
 print(pretty_datetime("2000-01-01T12:00:00Z"))
@@ -75,17 +79,19 @@ Formats a date range into the format used by The National Archives.
 
 ### Arguments
 
-| Argument          | Description                                                                                         | Default |
-| ----------------- | --------------------------------------------------------------------------------------------------- | ------- |
-| `date_from`       | The start date                                                                                      | [none]  |
-| `date_to`         | The end date                                                                                        | [none]  |
-| `omit_days`       | If `True`, don't output the day of month, only the month and year range                             | `False` |
-| `lowercase_first` | If `True`, use `from` and `now to` for ranges that normally start `From...` and `Now to...`         | `False` |
-| `simplify_years`  | If `True`, use `2025 to 2026` rather than `1 January 2025 to 31 December 2026` (added in `v1.10.0`) | `False` |
+| Argument               | Description                                                                                         | Default |
+| ---------------------- | --------------------------------------------------------------------------------------------------- | ------- |
+| `date_from`            | The start date                                                                                      | [none]  |
+| `date_to`              | The end date                                                                                        | [none]  |
+| `omit_days`            | If `True`, don't output the day of month, only the month and year range                             | `False` |
+| `lowercase_first`      | If `True`, use `from` and `now to` for ranges that normally start `From...` and `Now to...`         | `False` |
+| `simplify_whole_years` | If `True`, use `2025 to 2026` rather than `1 January 2025 to 31 December 2026` (added in `v1.10.0`) | `False` |
 
 ### Example
 
 ```python
+import datetime
+
 from tna_utilities.datetime import pretty_date_range
 
 print(pretty_date_range(datetime.date(2000, 1, 1), "2000-01-02"))
@@ -95,6 +101,15 @@ print(pretty_date_range(datetime.date(2000, 1, 1), datetime.date(2000, 2, 1)))
 # 1 January to 1 February 2000
 
 print(pretty_date_range(datetime.date(2000, 1, 1), datetime.date(2000, 12, 31)))
+# 1 January to 31 December 2000
+
+print(
+    pretty_date_range(
+        datetime.date(2000, 1, 1),
+        datetime.date(2000, 12, 31),
+        simplify_whole_years=True,
+    )
+)
 # 2000
 
 print(pretty_date_range(datetime.date(2000, 1, 1), None))
@@ -118,11 +133,14 @@ Formats a date/time range into the format used by The National Archives.
 ### Example
 
 ```python
+import datetime
+
 from tna_utilities.datetime import pretty_datetime_range
 
 print(
     pretty_datetime_range(
-        datetime.datetime(2000, 1, 1, 12, 30, 0), "2000-01-01T12:45:00Z"
+        datetime.datetime(2000, 1, 1, 12, 30, 0, tzinfo=datetime.timezone.utc),
+        "2000-01-01T12:45:00Z",
     )
 )
 # 1 January 2000, 12:30 to 12:45
@@ -165,6 +183,8 @@ Formats a datetime into a human-readable delta.
 ### Example
 
 ```python
+import datetime
+
 from tna_utilities.datetime import pretty_age
 
 print(pretty_age(datetime.datetime.now() - datetime.timedelta(seconds=1337)))
@@ -194,6 +214,8 @@ Determines if the given date string represents today or a future date.
 ### Example
 
 ```python
+import datetime
+
 from tna_utilities.datetime import is_today_or_future
 
 print(is_today_or_future(datetime.date(2999, 1, 1)))
@@ -217,6 +239,8 @@ Determines if today's date falls within the given date range.
 ### Example
 
 ```python
+import datetime
+
 from tna_utilities.datetime import is_today_in_date_range
 
 print(is_today_in_date_range(datetime.date(2000, 1, 1), datetime.date(2001, 1, 1)))
@@ -241,6 +265,8 @@ Groups a list of items by year and month based on a date key in each item.
 ### Example
 
 ```python
+import datetime
+
 from tna_utilities.datetime import group_by_year_and_month
 
 items = [
@@ -343,6 +369,8 @@ Formats a date into RFC 822 format.
 ### Example
 
 ```python
+import datetime
+
 from tna_utilities.datetime import rfc_822_date_format
 
 print(rfc_822_date_format(datetime.datetime(2000, 1, 1, 12, 30, 45)))

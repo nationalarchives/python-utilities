@@ -24,6 +24,10 @@ pip install tna-utilities
 # Install with extra Flask utilities
 poetry add tna-utilities[flask]
 pip install tna-utilities[flask]
+
+# Install with extra Django utilities
+poetry add tna-utilities[django]
+pip install tna-utilities[django]
 ```
 
 ## Developing

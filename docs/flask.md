@@ -88,6 +88,10 @@ Talisman preserves `SESSION_COOKIE_SECURE=True` when configured before
 initialisation, including in debug mode or when `force_https=False`. Otherwise,
 it enables secure session cookies when `force_https=True` and debug mode is off.
 
+By default, the CSP sets `default-src`, `base-uri`, `form-action` and
+`frame-ancestors` to `'none'`. In particular, form submissions are blocked
+unless `form-action` is configured in `content_security_policy`.
+
 ### Examples
 
 ```python
@@ -98,6 +102,7 @@ app = Flask(__name__)
 Talisman(
     app,
     content_security_policy={
+        "form-action": ["'self'"],
         "img-src": ["img.example.com"],
         "sandbox": [
             "allow-scripts",

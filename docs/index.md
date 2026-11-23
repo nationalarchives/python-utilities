@@ -13,6 +13,7 @@ This is a library of common Python functions, some specific to The National Arch
 
 ## Optional modules
 
+- [Django](./django.md)
 - [Flask](./flask.md)
 
 [Read the changelog](https://github.com/nationalarchives/python-utilities/blob/main/CHANGELOG.md).

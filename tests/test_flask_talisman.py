@@ -51,7 +51,7 @@ class TestFlaskTalisman(unittest.TestCase):
 
         self.assertIn("Content-Security-Policy", rv.headers)
         self.assertEqual(
-            "default-src 'self'; object-src 'none'; frame-ancestors 'none'; child-src 'none'",
+            "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
             rv.headers["Content-Security-Policy"],
         )
 
@@ -84,7 +84,7 @@ class TestFlaskTalisman(unittest.TestCase):
 
         self.assertIn("Content-Security-Policy", rv.headers)
         self.assertEqual(
-            "default-src 'self'; object-src 'none'; frame-ancestors 'none'; child-src 'none'",
+            "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
             rv.headers["Content-Security-Policy"],
         )
 
@@ -96,7 +96,7 @@ class TestFlaskTalisman(unittest.TestCase):
         self.assertEqual(rv.status_code, 200)
 
         self.assertIn("Content-Security-Policy", rv.headers)
-        self.assertIn("default-src 'self'", rv.headers["Content-Security-Policy"])
+        self.assertIn("default-src 'none'", rv.headers["Content-Security-Policy"])
         self.assertIn(
             "connect-src 'self' *.google-analytics.com *.googletagmanager.com *.analytics.google.com",
             rv.headers["Content-Security-Policy"],
@@ -180,7 +180,7 @@ class TestFlaskTalisman(unittest.TestCase):
 
         self.assertIn("Content-Security-Policy", rv.headers)
         self.assertIn(
-            "default-src 'self'",
+            "default-src 'none'",
             rv.headers["Content-Security-Policy"],
         )
         self.assertIn(
@@ -214,6 +214,22 @@ class TestFlaskTalisman(unittest.TestCase):
         self.assertIn(
             "img-src 'self' img.example.com img.youtube.com i.ytimg.com *.googletagmanager.com ssl.gstatic.com www.gstatic.com *.google-analytics.com",
             rv.headers["Content-Security-Policy"],
+        )
+
+    def test_talisman_custom_independent_directives(self):
+        Talisman(
+            self.app,
+            content_security_policy={
+                "base-uri": ["'self'"],
+                "form-action": ["'self'"],
+                "frame-ancestors": ["'self'"],
+            },
+        )
+
+        rv = self.test_client.get("https://localhost/")
+        self.assertEqual(
+            rv.headers["Content-Security-Policy"],
+            "default-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'",
         )
 
     def test_talisman_force_https(self):

@@ -1,5 +1,53 @@
 from collections import OrderedDict
 
+GOOGLE_CSP_DIRECTIVES = {
+    "font-src": [
+        "*.gstatic.com",  # Fonts from fonts.google.com
+        "data:",  # Fonts for GTM preview mode
+    ],
+    "frame-src": [
+        "www.google.com",  # <iframe> based embeds for Google Maps
+        "www.youtube.com",  # <iframe> based embeds for Youtube
+        "www.youtube-nocookie.com",  # <iframe> based embeds for Youtube without cookies
+    ],
+    "img-src": [
+        "img.youtube.com",  # YouTube video thumbnails
+        "i.ytimg.com",  # YouTube video thumbnails
+        "*.googletagmanager.com",  # GTM
+        "ssl.gstatic.com",  # GTM preview mode
+        "www.gstatic.com",  # GTM preview mode
+        "*.google-analytics.com",  # GA4
+    ],
+    "script-src": [
+        "ajax.googleapis.com",  # Assorted Google-hosted Libraries/APIs
+        "*.googleanalytics.com",  # GA4
+        "*.google-analytics.com",  # GA4
+        "www.youtube.com",  # YouTube embeds
+        "*.gstatic.com",  # Google Translate
+        "*.googletagmanager.com",  # GTM preview mode
+        "tagmanager.google.com",  # GTM preview mode
+    ],
+    "style-src": [
+        "ajax.googleapis.com",  # YouTube embedded player styles
+        "fonts.googleapis.com",  # Google Fonts stylesheets
+        "*.gstatic.com",  # Assorted Google stylesheets
+        "googletagmanager.com",  # GTM preview mode
+        "tagmanager.google.com",  # GTM preview mode
+    ],
+    "connect-src": [
+        "*.google-analytics.com",  # GA4
+        "*.googletagmanager.com",  # GTM preview mode
+        "*.analytics.google.com",  # GA4
+    ],
+}
+
+TYPEKIT_CSP_DIRECTIVES = {
+    # Adobe Typekit fonts
+    "font-src": ["use.typekit.net"],
+    # Adobe Typekit stylesheets
+    "style-src": ["*.typekit.net"],
+}
+
 
 class CspGenerator:
     """
@@ -7,16 +55,20 @@ class CspGenerator:
 
     Lets you incrementally add or disallow directive sources (for example for `script-src` or `style-src`) and then produces a correctly formatted CSP string that can be returned from your application or attached to HTTP responses.
 
+    The `base-uri`, `form-action` and `frame-ancestors` directives do not fall back to `default-src` and must be set independently. By default, they are set to `'none'` to block base URLs, form submissions and embedding, respectively.
+
     Typical usage:
-        # Create a generator with a default-src of 'self'
+        # Create a generator with restrictive defaults
         csp = CspGenerator()
         # Add additional directives (methods return self for chaining)
         csp.base_uri("'self'") \
            .connect_src(["'self'", "https://api.example.com"]) \
            .font_src("'self'")
 
-    :param default_src: The sources for the default-src directive, which serves as a fallback for any directives that are not explicitly set. This can be a string or a list of strings. If not provided, it defaults to "'self'".
-    :param allow_objects: If True, allows the use of the object-src directive with a default value of "'self'". If False (the default), disallows the use of the object-src directive by setting it to "'none'".
+    :param default_src: Fallback sources for fetch directives. Defaults to "'none'".
+    :param base_uri: Sources for base-uri, or None to omit it. Defaults to "'none'".
+    :param form_action: Sources for form-action, or None to omit it. Defaults to "'none'".
+    :param frame_ancestors: Sources for frame-ancestors, or None to omit it. Defaults to "'none'".
     """
 
     NONE = "'none'"
@@ -30,9 +82,10 @@ class CspGenerator:
     def __init__(
         self,
         default_src: str | list[str] | None = None,
-        allow_objects: bool = False,
-        allow_iframe_embedding: bool = False,
-        allow_children: bool = False,
+        *,
+        base_uri: str | list[str] | None = NONE,
+        form_action: str | list[str] | None = NONE,
+        frame_ancestors: str | list[str] | None = NONE,
     ) -> None:
         self.default_src_sources: list[str] = []
         if default_src:
@@ -42,18 +95,21 @@ class CspGenerator:
                 self.default_src_sources.append(default_src)
         self.default_src_sources = [src for src in self.default_src_sources if src]
         if not self.default_src_sources:
-            self.default_src_sources = [self.SELF]
+            self.default_src_sources = [self.NONE]
         self.directives: OrderedDict[str, list[str]] = OrderedDict(
             {
                 "default-src": self.default_src_sources,
             }
         )
-        if not allow_objects:
-            self.disallow("object-src")
-        if not allow_iframe_embedding:
-            self.disallow("frame-ancestors")
-        if not allow_children:
-            self.disallow("child-src")
+        for directive, sources in (
+            ("base-uri", base_uri),
+            ("form-action", form_action),
+            ("frame-ancestors", frame_ancestors),
+        ):
+            if sources is not None:
+                if not self._process_sources(sources):
+                    raise ValueError(f"{directive} requires sources or None to omit it")
+                self.add_directive(directive, sources, omit_self=True)
 
     def _process_sources(self, *values: str | list[str]) -> list[str]:
         """
@@ -462,22 +518,45 @@ class CspGenerator:
         """
         Get the complete CSP as a string.
 
-        :param simplify: If True, omit directives whose source list is identical
-            to the ``default-src`` directive, keeping only ``default-src`` and
-            directives that differ from it. This produces a more compact CSP
-            representation without changing its effective policy.
+        :param simplify: If True, omit fetch directives whose source list is
+            identical to their applicable fallback, without changing the policy.
         :return: The CSP as a semicolon-separated string suitable for use in
             the Content-Security-Policy HTTP header.
         """
 
         directives = self.directives.copy()
         if simplify:
-            default_src = self.directives.get("default-src")
-            directives = {
-                k: v
-                for k, v in directives.items()
-                if k == "default-src" or v != default_src
+            fallbacks = {
+                "child-src": ("default-src",),
+                "connect-src": ("default-src",),
+                "font-src": ("default-src",),
+                "frame-src": ("child-src", "default-src"),
+                "img-src": ("default-src",),
+                "manifest-src": ("default-src",),
+                "media-src": ("default-src",),
+                "object-src": ("default-src",),
+                "prefetch-src": ("default-src",),
+                "script-src": ("default-src",),
+                "script-src-attr": ("script-src", "default-src"),
+                "script-src-elem": ("script-src", "default-src"),
+                "style-src": ("default-src",),
+                "style-src-attr": ("style-src", "default-src"),
+                "style-src-elem": ("style-src", "default-src"),
+                "worker-src": ("child-src", "script-src", "default-src"),
             }
+            for directive in list(directives):
+                if (
+                    directive == "child-src"
+                    and "worker-src" not in directives
+                    and "script-src" in directives
+                    and directives["script-src"] != directives.get("default-src")
+                ):
+                    continue
+                for fallback in fallbacks.get(directive, ()):
+                    if fallback in directives:
+                        if directives[directive] == directives[fallback]:
+                            del directives[directive]
+                        break
         parts = []
         for directive, sources in directives.items():
             directive_str = directive

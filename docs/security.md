@@ -6,6 +6,22 @@
 
 A utility class to generate a CSP.
 
+`default-src` is a fallback for fetch directives. The source-list directives
+`base-uri`, `form-action` and `frame-ancestors` do not use that fallback, so
+they each default to `'none'` independently. This blocks base URLs, form
+submissions and embedding, respectively. Set them at construction to a string
+or list of sources, or pass `None` to omit a directive entirely:
+
+```python
+from tna_utilities.security import CspGenerator
+
+csp = CspGenerator(base_uri="'self'", form_action=["'self'"], frame_ancestors=None)
+```
+
+Constructor sources are used as supplied; `'self'` is not added automatically.
+Other non-fetch directives, such as `sandbox`, reporting and Trusted Types,
+also do not fall back to `default-src` and must be configured separately.
+
 ### Examples
 
 ```python
@@ -26,7 +42,7 @@ csp.object_src("example.com", omit_self=True)
 csp.disallow("worker-src")
 
 csp.to_string()
-# default-src 'self'; script-src 'self' example.com; style-src 'self' example.com another.net; object-src example.com; worker-src 'none'
+# default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; script-src 'self' example.com; style-src 'self' example.com another.net; object-src example.com; worker-src 'none'
 ```
 
 ## `common_security_headers`
@@ -42,20 +58,20 @@ Get a dictionary of common security headers.
 | `cross_origin_embedder_policy`      | The option for the `Cross-Origin-Embedder-Policy` header      | `unsafe-none` |
 | `cross_origin_opener_policy`        | The option for the `Cross-Origin-Opener-Policy` header        | `same-origin` |
 | `cross_origin_resource_policy`      | The option for the `Cross-Origin-Resource-Policy` header      | `same-origin` |
-| `x_content_type_options`            | The option for the `X-Content-Type-Options` header            | `no-sniff`    |
+| `x_content_type_options`            | The option for the `X-Content-Type-Options` header            | `nosniff`     |
 | `x_permitted_cross_domain_policies` | The option for the `X-Permitted-Cross-Domain-Policies` header | `none`        |
 
 ### Example
 
 ```python
-from tna_utilities.security import security_headers
+from tna_utilities.security import common_security_headers
 
-print(security_headers())
+print(common_security_headers())
 # {
 #   "Cross-Origin-Embedder-Policy": "unsafe-none",
 #   "Cross-Origin-Opener-Policy": "same-origin",
 #   "Cross-Origin-Resource-Policy": "same-origin",
 #   "X-Permitted-Cross-Domain-Policies": "none",
-#   "X-Content-Type-Options": "no-sniff",
+#   "X-Content-Type-Options": "nosniff",
 # }
 ```
