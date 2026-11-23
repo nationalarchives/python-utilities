@@ -27,6 +27,7 @@ dependencies = [
 
 [project.optional-dependencies]
 flask = ["Flask"]
+django = ["Django>=6,<7; python_version >= '3.12'"]
 
 [project.urls]
 Homepage = "https://pypi.org/project/tna-utilities/"
@@ -41,6 +42,7 @@ optional = true
 [tool.poetry.group.test.dependencies]
 Flask = "^3"
 requests = "^2"
+Django = {version = ">=6,<7", python = ">=3.12"}
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
