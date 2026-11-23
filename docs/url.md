@@ -68,7 +68,7 @@ qs.parameter_values("a")
 qs.parameter_values("b")
 # ["2", "3"]
 qs.parameter_values("c")
-# Raises AttributeError
+# Raises KeyError
 
 qs.is_value_in_parameter("b", "2")
 # True
@@ -95,11 +95,12 @@ new_qs.toggle_parameter_value("b", "1")
 new_qs.remove_parameter_value("b", "5")
 new_qs.remove_parameter("a")
 print(new_qs.get_query_string())
-# ?b=1&b=6&b=7&c=4
+# ?c=4&b=6&b=7&b=1
 
 # Chainable (as of v1.1.0)
 print(
-    new_qs.add_parameter("c", "4")
+    qs.new()
+    .add_parameter("c", "4")
     .update_parameter("b", ["5", "6"])
     .add_parameter_value("b", "7")
     .toggle_parameter_value("b", "1")
@@ -107,6 +108,7 @@ print(
     .remove_parameter("a")
     .get_query_string()
 )
+# ?c=4&b=6&b=7&b=1
 ```
 
 ### Tolerant mode

@@ -50,7 +50,7 @@ print(pretty_price(5, simplify=False))
 # £5.00
 
 print(pretty_price(5, currency_symbol="€"))
-# €5.00
+# €5
 ```
 
 ## `pretty_price_range()`

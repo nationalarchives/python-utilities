@@ -58,20 +58,20 @@ Get a dictionary of common security headers.
 | `cross_origin_embedder_policy`      | The option for the `Cross-Origin-Embedder-Policy` header      | `unsafe-none` |
 | `cross_origin_opener_policy`        | The option for the `Cross-Origin-Opener-Policy` header        | `same-origin` |
 | `cross_origin_resource_policy`      | The option for the `Cross-Origin-Resource-Policy` header      | `same-origin` |
-| `x_content_type_options`            | The option for the `X-Content-Type-Options` header            | `no-sniff`    |
+| `x_content_type_options`            | The option for the `X-Content-Type-Options` header            | `nosniff`     |
 | `x_permitted_cross_domain_policies` | The option for the `X-Permitted-Cross-Domain-Policies` header | `none`        |
 
 ### Example
 
 ```python
-from tna_utilities.security import security_headers
+from tna_utilities.security import common_security_headers
 
-print(security_headers())
+print(common_security_headers())
 # {
 #   "Cross-Origin-Embedder-Policy": "unsafe-none",
 #   "Cross-Origin-Opener-Policy": "same-origin",
 #   "Cross-Origin-Resource-Policy": "same-origin",
 #   "X-Permitted-Cross-Domain-Policies": "none",
-#   "X-Content-Type-Options": "no-sniff",
+#   "X-Content-Type-Options": "nosniff",
 # }
 ```
